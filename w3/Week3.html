@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>班级 Weekly Report</title>
+<style>
+/* ===== 继承 tb.html 的灰蓝变量 ===== */
+:root[data-theme="bright"]{
+  --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;
+}
+:root[data-theme="dark"]{
+  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555555;--gray2:#333333;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;
+}
+* {box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
+.toolbar{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	padding:0px;
+	margin: 0px;
+	height: 30vh;
+	width: 100%;
+}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+
+/* ===== 1. 3D 互斥按钮组（周次选择）===== */
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+
+/* ===== 2. 滚动条列表 ===== */
+.mini-scroll{max-height:140px;overflow:auto;padding-right:8px}
+.mini-scroll::-webkit-scrollbar{width:6px}
+.mini-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:3px}
+.mini-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
+
+/* ===== 3. 统计数字 ===== */
+.stat{display:flex;justify-content:space-around;text-align:center;margin-top:12px}
+.stat div{font-size:24px;font-weight:700;color:var(--bottom-blue)}
+.stat small{display:block;font-size:13px;font-weight:400;color:var(--text);margin-top:4px}
+
+/* ===== 4. 下周备忘输入 ===== */
+.duo-input{width:100%;padding:10px 14px;font-size:15px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
+
+/* ===== 5. 日期选择器 ===== */
+.duo-date{padding:6px 12px;font-size:15px;border:2px solid var(--gray1);border-radius:14px;background:transparent;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999'%3E%3Cpath d='M4 6h8l-4 4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;cursor:pointer}
+.duo-date:focus{border-color:var(--bottom-blue);box-shadow:0 0 0 4px var(--blue-glow)}
+.title-img{
+  height:100%;          /* 根据实际图高调整 */
+  width:100%;
+  display:block;
+  object-fit:contain;   /* 防止拉伸 */
+}
+/* 暗色主题下反白，让深色 LOGO 可见 */
+:root[data-theme="dark"] .title-img{
+  filter:invert(1) hue-rotate(180deg);   /* 简易反色，可换成你自己的白版 LOGO */
+}
+figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+        figcaption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+</style>
+</head>
+<body>
+<div class="card">
+<div class="toolbar">
+  <img class="title-img" src="title.png" alt="班级 Weekly Report">
+</div>
+
+<!-- 周次选择 -->
+<div class="btn-group">
+
+  <button class="switch" onclick="toggleTheme()">切换主题</button>
+  <button class="d-btn active">第 3 周</button>
+  <button class="d-btn">一个按钮</button>
+</div>
+
+<!-- 1. 出勤统计 -->
+<section class="card">
+  <h3>The third publication</h3>
+    <p>Chief editor:王文钰</p>
+    <p>Associate editor:付梓妤</p>
+    <p>Website Builder:王琦朝</p>
+    <p>ALL CONTRIBUTOR ARE WELOCME!!!</p>
+</section>
+
+<!-- 2. 课堂表现 -->
+<section class="card">
+  <h3>Hilarious Character Drawing</h3>
+    <p>Time:December 26th,2025</p>
+    <p>Writer:王文钰</p>
+    <p>Helper:付梓妤
+      </p>
+    <p>Many arists appeared in Class 223 during the art lesonon on the morning of the 26th.<br>
+      Here are some of the pitures they drew.</p>
+ 
+</section>
+<section class="card">
+<figure><img src="1.jpg" alt="插画"></figure>
+<figure><img src="2.jpg" alt="插画"></figure>
+<figure><img src="3.jpg" alt="插画"></figure>
+<figure><img src="4.jpg" alt="插画"></figure>
+<figure><img src="5.jpg" alt="插画"></figure>
+</section>
+<!-- 3. 作业统计 -->
+<section class="card">
+  <h3>注解</h3>
+  <p>1.hilarious adj. 好笑的</p>
+  <p>2.chancter n. 人物角色</p>
+</section>
+
+</div>
+<script>
+/* 互斥按钮 */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.d-btn');
+  const group = e.target.closest('.btn-group');
+  if (btn) {
+    group.querySelectorAll('.d-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+});
+
+/* 主题切换 */
+function toggleTheme(){
+  const root = document.documentElement;
+  root.dataset.theme = root.dataset.theme === 'bright' ? 'dark' : 'bright';
+}
+
+/* 日期默认到下周周一 */
+const d = new Date();
+d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7 || 7);
+document.getElementById('memoDate').valueAsDate = d;
+</script>
+</body>
+</html>
