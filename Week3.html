@@ -88,6 +88,12 @@ figure {
         }
 </style>
 <script src="theme.js"></script>
+<script>
+    (function(){
+      const saved = localStorage.getItem('theme-223');
+      if (saved) document.documentElement.dataset.theme = saved;
+    })();
+  </script>
 </head>
 <body>
 <div class="card">
@@ -152,9 +158,7 @@ function toggleTheme(){
 }
 
 /* 日期默认到下周周一 */
-const d = new Date();
-d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7 || 7);
-document.getElementById('memoDate').valueAsDate = d;
+
 </script>
 </body>
 </html>
