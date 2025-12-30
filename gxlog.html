@@ -126,13 +126,6 @@ document.addEventListener('click', e => {
     btn.classList.add('active');
   }
 });
-
-/* 主题切换 */
-function toggleTheme(){
-  const root = document.documentElement;
-  root.dataset.theme = root.dataset.theme === 'bright' ? 'dark' : 'bright';
-}
-
 /* 日期默认到下周周一 */
 const d = new Date();
 d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7 || 7);

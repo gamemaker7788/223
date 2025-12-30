@@ -88,12 +88,8 @@ figure {
         }
 </style>
 <script src="theme.js"></script>
-<script>
-    (function(){
-      const saved = localStorage.getItem('theme-223');
-      if (saved) document.documentElement.dataset.theme = saved;
-    })();
-  </script>
+<script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
+  
 </head>
 <body>
 <div class="card">
@@ -151,11 +147,6 @@ document.addEventListener('click', e => {
   }
 });
 
-/* 主题切换 */
-function toggleTheme(){
-  const root = document.documentElement;
-  root.dataset.theme = root.dataset.theme === 'bright' ? 'dark' : 'bright';
-}
 
 /* 日期默认到下周周一 */
 

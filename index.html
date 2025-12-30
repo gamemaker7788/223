@@ -103,6 +103,7 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 
 </style>
 <script src="theme.js"></script>
+<script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
 </head>
 <body>
 
@@ -149,12 +150,6 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 </section>
 
 <script>
-/* ===== 主题 ===== */
-function toggleTheme(){
-  document.documentElement.dataset.theme =
-    document.documentElement.dataset.theme === 'bright' ? 'dark' : 'bright';
-}
-
 /* ===== 侧边栏 ===== */
 const bar = document.getElementById('sideBar');
 const mask = document.getElementById('sideMask');
