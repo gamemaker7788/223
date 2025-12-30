@@ -86,6 +86,21 @@ figure {
             font-size: 14px;
             color: #666;
         }
+		/* 去掉原生三角，换自定义图标 */
+summary{
+  list-style: none; /* 隐藏默认三角 */
+  cursor: pointer;
+}
+summary::before{
+  content: '► ';
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform .2s;
+}
+details[open] summary::before{
+  transform: rotate(90deg);
+}
+
 </style>
 <script src="theme.js"></script>
 </head>
@@ -105,6 +120,14 @@ figure {
 <section class="card">
   <h3>更新了</h3>
     <p>日期:20025|12|30</p>
+    <!-- 隐藏/展开文本示例 -->
+  <details>
+    <summary class="d-btn">点我查看隐藏内容</summary>
+    <div class="card" style="margin-top:12px;">
+      <p>我帅吗。</p>
+    </div>
+  </details>
+
 </section>
 
 <!-- 2. 课堂表现 -->
