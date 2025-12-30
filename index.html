@@ -4,54 +4,195 @@
 <meta charset="utf-8">
 <title>223 班 Weekly Report 主页</title>
 <style>
-/* ===== 直接复用 Week2 / Week3 的变量 ===== */
+/* ===== 1. 复用 tb.html 全套变量 ===== */
 :root[data-theme="bright"]{
-  --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
-  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;
+  --bg        : #ffffff;
+  --text      : #333333;
+  --gray1     : #cccccc;
+  --gray2     : #bbbbbb;
+  --bottom-blue: #38bdf8;
+  --blue-glow : #38bdf822;
 }
 :root[data-theme="dark"]{
-  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555555;--gray2:#333333;
-  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;
+  --bg        : #1e1e1e;
+  --text      : #e5e5e5;
+  --gray1     : #555555;
+  --gray2     : #333333;
+  --bottom-blue: #38bdf8;
+  --blue-glow : #38bdf833;
 }
-* {box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
-body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;display:flex;flex-direction:column;align-items:center;padding:60px 24px;}
-h1{margin:0 0 40px;font-size:28px;font-weight:600}
 
-/* 卡片容器 */
-.card{width:100%;max-width:680px;margin-bottom:20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+
+/* ===== 2. tb.html 原版组件 ===== */
+/* 3D 互斥按钮 */
+.btn-group{display:flex;gap:8px;padding:16px 24px}
+.d-btn{position:relative;padding:8px 18px;font-size:15px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 4px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 4px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gray2)}
+
+/* 输入框 */
+.duo-input{
+	width:calc(100% - 48px);
+	font-size:16px;
+	border:2px solid var(--gray1);
+	border-bottom:4px solid var(--bottom-blue);
+	border-radius:14px;
+	background:transparent;
+	outline:none;
+transition:border-color .25s,box-shadow .25s; 				margin-top: 40;
+	margin-right: 24px;
+	margin-bottom: 40;
+	margin-left: 24px;
+	padding-top: 12px;
+	padding-right: 16px;
+	padding-bottom: 12px;
+	padding-left: 16px;
+	color: var(--text);
+}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
+
+/* 滚动条区域 */
+.duo-scroll{width:calc(100% - 48px);margin:12px 24px;max-height:160px;overflow:auto;padding:8px 12px;border:2px solid var(--gray1);border-radius:14px}
+.duo-scroll::-webkit-scrollbar{width:8px}
+.duo-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:4px}
+.duo-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
+
+/* ===== 3. 左侧栏 ===== */
+.side-bar{
+  position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);
+  border-right:2px solid var(--gray1);display:flex;flex-direction:column;
+  padding:16px;z-index:9;
+}
+.side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.side-logo{height:32px;filter:none}
+:root[data-theme="dark"] .side-logo{filter:invert(1) hue-rotate(180deg)}
+.side-close{@extend .d-btn;padding:4px 8px;font-size:14px}
+.side-nav{flex:1;overflow:auto}
+.side-item{display:block;padding:8px 12px;margin:6px 0;border:2px solid transparent;border-radius:6px;text-decoration:none;color:var(--text);transition:border-color .2s}
+.side-item:hover{border-color:var(--bottom-blue)}
+.side-foot{border-top:2px solid var(--gray1);padding-top:12px}
+.switch{@extend .d-btn;font-size:14px;}
+
+/* 移动端汉堡 */
+.side-ham{position:fixed;top:12px;left:12px;z-index:10;@extend .d-btn;padding:6px 10px;font-size:18px}
+.side-mask{position:fixed;inset:0;background:#0004;display:none;z-index:8}
+.side-bar.translate{transform:translateX(-100%);transition:transform .3s ease}
+.side-bar.open{transform:translateX(0)}
+.side-mask.on{display:block}
+@media (max-width:900px){
+  body{padding-left:16px}
+  .side-bar.translate{display:flex}
+}
+
+/* ===== 4. 主内容区 ===== */
+h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
+.card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
 .card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+/* 发表区宽度受 .card 限制，不会占满屏幕 */
+.cmt-post{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
 
-/* 按钮组（与 Week2/3 样式一致） */
-.btn-group{display:flex;flex-wrap:wrap;gap:8px}
-.d-btn{display:inline-block;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease;text-decoration:none}
-.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
-.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+/* 卡片墙：单栏纵向流，宽度自动撑满 */
+.cmt-cards{display:flex;flex-direction:column;gap:12px}
+.cmt-cards .card{
+  width: 100%;          /* 撑满容器 */
+  margin: 0;            /* 去掉默认 margin */
+  box-sizing: border-box;
+}
 
-/* 主题切换按钮 */
-.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px;margin-left:auto}
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 
-<h1>223 班 Weekly Report</h1>
-<button class="switch" onClick="toggleTheme()">切换主题</button>
+<!-- 侧边栏 -->
+<aside id="sideBar" class="side-bar translate">
+  <div class="side-head">
+    <button class="d-btn" onclick="closeSide()">✕</button>
+  </div>
+  <nav class="side-nav">
+    <a class="side-item" href="wud.html">隐私与条款</a>
+    <a class="side-item" href="wud.html">如何点击按钮</a>
+    <a class="side-item" href="gxlog.html">关于更新</a>
+  </nav>
+  <div class="side-foot">
+    <button class="d-btn" onclick="toggleTheme()">切换主题</button>
+  </div>
+</aside>
+<div id="sideMask" class="side-mask" onclick="closeSide()"></div>
+<button id="sideHam" class="d-btn" onclick="openSide()">☰</button>
 
-<!-- 动态周次按钮会插到这里 -->
+<!-- 主内容 -->
+<h1>223 班 Weekly Report</h1>
+
 <section class="card">
   <h3>选择期数</h3>
-<div class="btn-group">
-  <a class="d-btn" href="Week2.html">第 2 周</a>
-  <a class="d-btn" href="Week3.html">第 3 周</a>
-  <!-- 以后加一行就行 -->
-</div></section>
+  <div class="btn-group">
+    <a class="d-btn" href="Week2.html">第 2 周</a>
+    <a class="d-btn" href="Week3.html">第 3 周</a>
+  </div>
+</section>
+
+<!-- 评论区：同款输入 + 3D按钮 + 滚动条 -->
+<section class="card" id="cmtBox">
+  <h3>留言板</h3>
+  <section class="card">
+  <input id="cname" class="duo-input" placeholder="昵称（必填）" maxlength="40">
+  <textarea id="ctext" class="duo-input" placeholder="说点什么…" maxlength="500" rows="4"></textarea>
+  <button class="d-btn" onclick="submitComment()">发表</button>
+</section>
+  <!-- 评论卡片区 -->
+<section class="card" style="padding:12px 16px;">
+  <div id="cmtCards" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"></div>
+</section>
+</section>
 
 <script>
-/* ========== 主题切换 ========== */
+/* ===== 主题 ===== */
 function toggleTheme(){
-  const root = document.documentElement;
-  root.dataset.theme = root.dataset.theme === 'bright' ? 'dark' : 'bright';
+  document.documentElement.dataset.theme =
+    document.documentElement.dataset.theme === 'bright' ? 'dark' : 'bright';
 }
 
+/* ===== 侧边栏 ===== */
+const bar = document.getElementById('sideBar');
+const mask = document.getElementById('sideMask');
+function openSide(){ bar.classList.add('open'); mask.classList.add('on'); }
+function closeSide(){ bar.classList.remove('open'); mask.classList.remove('on'); }
+
+/* ===== Supabase ===== */
+const URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/comments';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+
+async function submitComment(){
+  const name = document.getElementById('cname').value.trim();
+  const txt  = document.getElementById('ctext').value.trim();
+  if(!name||!txt) return alert('请填写完整');
+  const res = await fetch(URL,{
+    method:'POST',
+    headers:{ 'apikey':KEY, 'Authorization':`Bearer ${KEY}`, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
+    body:JSON.stringify({ username:name, content:txt })
+  });
+  if(!res.ok) return alert('提交失败：'+res.status);
+  document.getElementById('ctext').value='';
+  loadComments();
+}
+
+async function loadComments(){
+  const res = await fetch(URL+'?select=id,username,content,post_time&order=post_time.desc&limit=200',{headers:{apikey:KEY}});
+  const arr = await res.json();
+  const html = arr.length
+    ? arr.map(c=>`
+        <section class="card" style="position:relative;padding:12px 16px;display:flex;flex-direction:column;gap:6px;">
+          <div style="position:absolute;top:8px;right:12px;font-size:12px;color:var(--gray2)">${new Date(c.post_time).toLocaleString()}</div>
+          <div style="margin-top:20px;font-size:15px;line-height:1.5;word-break:break-word;">${c.content}</div>
+          <div style="font-size:13px;color:var(--bottom-blue);align-self:flex-end;">— ${c.username}</div>
+        </section>`).join('')
+    : '<section class="card"><div style="text-align:center;color:var(--gray2)">暂无留言</div></section>';
+  document.getElementById('cmtCards').innerHTML = html;
+}
+loadComments();
 </script>
 </body>
 </html>
