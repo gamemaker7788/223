@@ -33,24 +33,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .d-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gray2)}
 
 /* 输入框 */
-.duo-input{
-	width:calc(100% - 48px);
-	font-size:16px;
-	border:2px solid var(--gray1);
-	border-bottom:4px solid var(--bottom-blue);
-	border-radius:14px;
-	background:transparent;
-	outline:none;
-transition:border-color .25s,box-shadow .25s; 				margin-top: 40;
-	margin-right: 24px;
-	margin-bottom: 40;
-	margin-left: 24px;
-	padding-top: 12px;
-	padding-right: 16px;
-	padding-bottom: 12px;
-	padding-left: 16px;
-	color: var(--text);
-}
+.duo-input{width:calc(100% - 48px);margin:0 24px;padding:12px 16px;font-size:16px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s;color:var(--text);}
 .duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
 
 /* 滚动条区域 */
@@ -60,52 +43,82 @@ transition:border-color .25s,box-shadow .25s; 				margin-top: 40;
 .duo-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
 
 /* ===== 3. 左侧栏 ===== */
-.side-bar{
-  position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);
-  border-right:2px solid var(--gray1);display:flex;flex-direction:column;
-  padding:16px;z-index:9;
-}
+.side-bar{position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);border-right:2px solid var(--gray1);display:flex;flex-direction:column;padding:16px;z-index:9;}
 .side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .side-logo{height:32px;filter:none}
 :root[data-theme="dark"] .side-logo{filter:invert(1) hue-rotate(180deg)}
-.side-close{@extend .d-btn;padding:4px 8px;font-size:14px}
 .side-nav{flex:1;overflow:auto}
 .side-item{display:block;padding:8px 12px;margin:6px 0;border:2px solid transparent;border-radius:6px;text-decoration:none;color:var(--text);transition:border-color .2s}
-.side-item:hover{border-color:var(--bottom-blue)}
+.side-item:hover{border-color:var(--bottom-blue);}
 .side-foot{border-top:2px solid var(--gray1);padding-top:12px}
-.switch{@extend .d-btn;font-size:14px;}
 
 /* 移动端汉堡 */
-.side-ham{position:fixed;top:12px;left:12px;z-index:10;@extend .d-btn;padding:6px 10px;font-size:18px}
+.side-ham{position:fixed;top:12px;left:12px;z-index:10;padding:6px 10px;font-size:18px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;cursor:pointer}
 .side-mask{position:fixed;inset:0;background:#0004;display:none;z-index:8}
 .side-bar.translate{transform:translateX(-100%);transition:transform .3s ease}
 .side-bar.open{transform:translateX(0)}
 .side-mask.on{display:block}
-@media (max-width:900px){
-  body{padding-left:16px}
-  .side-bar.translate{display:flex}
-}
+@media (max-width:900px){body{padding-left:16px}.side-bar.translate{display:flex}}
 
 /* ===== 4. 主内容区 ===== */
 h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 .card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
 .card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
-/* 发表区宽度受 .card 限制，不会占满屏幕 */
 .cmt-post{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.cmt-cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.cmt-cards .card{width:260px;margin:0;box-sizing:border-box;}
 
-/* 卡片墙：单栏纵向流，宽度自动撑满 */
-.cmt-cards{display:flex;flex-direction:column;gap:12px}
-.cmt-cards .card{
-  width: 100%;          /* 撑满容器 */
-  margin: 0;            /* 去掉默认 margin */
-  box-sizing: border-box;
+/* ===== 5. 隐私条款浮层 ===== */
+.privacy-mask{
+  position:fixed;
+  inset:0;
+  background:#0006;
+  z-index:19;
+  display:block;
+  opacity:1;
+  transition:opacity .3s ease;
 }
-
+.privacy-mask.hide{opacity:0;pointer-events:none}
+.privacy-panel{
+  position:fixed;
+  inset:0;
+  max-width:480px;
+  margin:auto;
+  height:fit-content;
+  z-index:20;
+  background:var(--bg);
+  transform:translateY(0);
+  transition:transform .3s ease;
+}
+.privacy-panel.hide{transform:translateY(-10086px);pointer-events:none}
 </style>
 <script src="theme.js"></script>
 <script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
 </head>
 <body>
+
+<!-- 遮罩 + 隐私条款浮层 -->
+<div id="privacyMask" class="privacy-mask"></div>
+<section id="privacyPanel" class="card privacy-panel">
+  <h3>隐私条款</h3>
+  <div class="mini-scroll">
+    <p>1. 我们仅收集必要信息用于展示留言。</p>
+    <p>2. 不会将数据分享给第三方。</p>
+    <p>3.同意表明您已阅读《隐私与条款》</p>
+    <details>
+    <summary class="d-btn">点我查看内容</summary>
+    <div class="card" style="margin-top:12px;">
+      <p><a class="side-item" href="ystk.html">隐私与条款</a>点击阅读</p>
+    </div>
+  </details>
+    
+  </div>
+  <div class="btn-group" id="privacyBtns">
+    <button class="d-btn" id="agreeBtn"   onclick="agreePrivacy()">同意</button>
+    <button class="d-btn" id="rejectBtn"  onclick="rejectPrivacy()">不同意</button>
+    <button class="d-btn" id="reselectBtn"style="display:none;" onclick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
+  </div>
+</section>
 
 <!-- 侧边栏 -->
 <aside id="sideBar" class="side-bar translate">
@@ -113,7 +126,7 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
     <button class="d-btn" onclick="closeSide()">✕</button>
   </div>
   <nav class="side-nav">
-    <a class="side-item" href="wud.html">隐私与条款</a>
+    <a class="side-item" href="ystk.html">隐私与条款</a>
     <a class="side-item" href="wud.html">如何点击按钮</a>
     <a class="side-item" href="gxlog.html">关于更新</a>
   </nav>
@@ -130,8 +143,15 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 <section class="card">
   <h3>选择期数</h3>
   <div class="btn-group">
+    <a class="d-btn" href="Week1.html">第 1 周</a>
     <a class="d-btn" href="Week2.html">第 2 周</a>
     <a class="d-btn" href="Week3.html">第 3 周</a>
+  </div>
+</section>
+<section class="card">
+  <h3>选择报外</h3>
+  <div class="btn-group">
+    <a class="d-btn" href="fw1.html">元旦特报</a>
   </div>
 </section>
 
@@ -139,14 +159,13 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 <section class="card" id="cmtBox">
   <h3>留言板</h3>
   <section class="card">
-  <input id="cname" class="duo-input" placeholder="昵称（必填）" maxlength="40">
-  <textarea id="ctext" class="duo-input" placeholder="说点什么…" maxlength="500" rows="4"></textarea>
-  <button class="d-btn" onclick="submitComment()">发表</button>
-</section>
-  <!-- 评论卡片区 -->
-<section class="card" style="padding:12px 16px;">
-  <div id="cmtCards" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"></div>
-</section>
+    <input id="cname" class="duo-input" placeholder="昵称（必填）" maxlength="40">
+    <textarea id="ctext" class="duo-input" placeholder="说点什么…" maxlength="500" rows="4"></textarea>
+    <button class="d-btn" onclick="submitComment()">发表</button>
+  </section>
+  <section class="card" style="padding:12px 16px;">
+    <div id="cmtCards" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"></div>
+  </section>
 </section>
 
 <script>
@@ -173,21 +192,63 @@ async function submitComment(){
   document.getElementById('ctext').value='';
   loadComments();
 }
-
 async function loadComments(){
   const res = await fetch(URL+'?select=id,username,content,post_time&order=post_time.desc&limit=200',{headers:{apikey:KEY}});
   const arr = await res.json();
   const html = arr.length
-    ? arr.map(c=>`
-        <section class="card" style="position:relative;padding:12px 16px;display:flex;flex-direction:column;gap:6px;">
-          <div style="position:absolute;top:8px;right:12px;font-size:12px;color:var(--gray2)">${new Date(c.post_time).toLocaleString()}</div>
-          <div style="margin-top:20px;font-size:15px;line-height:1.5;word-break:break-word;">${c.content}</div>
-          <div style="font-size:13px;color:var(--bottom-blue);align-self:flex-end;">— ${c.username}</div>
-        </section>`).join('')
+    ? arr.map(c=>`<section class="card" style="position:relative;padding:12px 16px;display:flex;flex-direction:column;gap:6px;"><div style="position:absolute;top:8px;right:12px;font-size:12px;color:var(--gray2)">${new Date(c.post_time).toLocaleString()}</div><div style="margin-top:20px;font-size:15px;line-height:1.5;word-break:break-word;">${c.content}</div><div style="font-size:13px;color:var(--bottom-blue);align-self:flex-end;">— ${c.username}</div></section>`).join('')
     : '<section class="card"><div style="text-align:center;color:var(--gray2)">暂无留言</div></section>';
   document.getElementById('cmtCards').innerHTML = html;
 }
 loadComments();
+</script>
+
+<script>
+/* ===== 隐私条款：刷新即渲染已同意 + 重选 ===== */
+(function(){
+  const key = 'privacy-agreed-223';
+  const panel = document.getElementById('privacyPanel');
+  const mask  = document.getElementById('privacyMask');
+  const agreeBtn   = document.getElementById('agreeBtn');
+  const rejectBtn  = document.getElementById('rejectBtn');
+  const reselectBtn= document.getElementById('reselectBtn');
+
+  /* 刷新即渲染：已同意 → 显示"已同意条款"+删除不同意+显示重选 */
+  if (localStorage.getItem(key)) {
+    agreeBtn.textContent   = '已同意条款';
+    agreeBtn.disabled      = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    panel.classList.add('hide');
+    mask.classList.add('hide');
+    return;
+  }
+
+  /* 首次进入：正常双按钮 */
+  window.agreePrivacy = function () {
+    localStorage.setItem(key, '1');
+    agreeBtn.textContent   = '已同意条款';
+    agreeBtn.disabled      = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    setTimeout(() => {
+      panel.classList.add('hide');
+      mask.classList.add('hide');
+    }, 500);
+  };
+
+  /* 不同意：跳转 */
+  window.rejectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.href = 'wud.html';
+  };
+
+  /* 重选：清除记录 → 刷新页面 → 回到双按钮 */
+  window.reselectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.reload();
+  };
+})();
 </script>
 </body>
 </html>

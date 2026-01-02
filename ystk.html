@@ -86,51 +86,65 @@ figure {
             font-size: 14px;
             color: #666;
         }
-		
 </style>
 <script src="theme.js"></script>
 </head>
 <body>
 <div class="card">
-<div class="toolbar">
-  <img class="title-img" src="title.png" alt="班级 Weekly Report">
-</div>
+<h1>隐私与条款</h1>
 
 <!-- 周次选择 -->
 <div class="btn-group">
 
   <button class="switch" onClick="toggleTheme()">切换主题</button>
-  <button class="d-btn active">第 1 周</button>
+  <button class="d-btn active">隐私与条款</button>
   <a class="d-btn" href="index.html">返回</a>
 </div>
 
 <!-- 1. 出勤统计 -->
 <section class="card">
-  <h3>The first publication</h3>
-    <p>Chief editor:王文钰</p>
-    <p>Associate editor:付梓妤</p>
-    <p>Website Builder:王琦朝</p>
-    <p>ALL CONTRIBUTOR ARE WELOCME!!!</p>
+  <h3><strong>宗旨</strong></h3>
+    <p>任何内容均<strong>不得被视为对现实人物、学校或事件的描述、指控或暗示</strong>。</p>
 </section>
 
 <!-- 2. 课堂表现 -->
 <section class="card">
-  <h1>本文因违反《隐私与条款》而下架
-  </h1>
-  <div class="btn-group">
-  <a class="d-btn" href="ystk.html">《隐私与条款》</a>
-  </div>
-  <details>
-    <summary class="d-btn">点我查看原稿</summary>
-    <div class="card" style="margin-top:12px;">
-      <p><figure><img src="9.jpg" alt="插画"><img src="11.jpg" alt="插画"><img src="12.jpg" alt="插画"><img src="10.jpg" alt="插画"></figure>
-</p>
-    </div>
-  </details>
-  </section>
-<section class="card">
-<h1> - The end - </h1>
+  <h3><strong>隐私与匿名保护</strong></h3>
+    <p>1.
+所有报道中使用的姓名（如"杨"、"赵"、"梁"、"王文钰"、"付梓烨"等）均为化名，不代表任何真实个人。</p>
+    <p>2.
+      严禁任何成员尝试将报道中的化名、事件与真实世界的任何人进行关联、猜测或传播。</p>
+    <p> 3.
+      严禁在周报内容（包括正文、注释、手稿）中提及任何同学、老师或学校工作人员的真实全名、身份证号、联系方式等个人信息。</p>
+ 
 </section>
+<section class="card">
+  <h3><strong>使用与传播限制</strong></h3>
+    <ol>
+      <li>
+        <p>本报刊物及其所有稿件（包括手写稿、电子稿、图片）的<strong>唯一合法浏览者</strong>为周报项目组成员（即&ldquo;223成员&rdquo;）及辅导教师。</p>
+      </li>
+      <li>
+        <p>​<strong>严禁</strong>以任何形式（如拍照、复印、转发、口述）将本报内容向非成员、非指定教师传播、展示或泄露内部的个人信息（文章可以）。</p>
+      </li>
+    </ol>
+</section>
+
+<section class="card">
+  <h3><strong>行为准则</strong></h3>
+    <ol>
+      <li>
+        <p>​<strong>内容准则</strong>​：不得创作包含恶意诽谤、人身攻击、暴力色情或任何违反法律法规与公序良俗的内容。</p>
+      </li>
+      <li>
+        <p>​<strong>尊重原则</strong>​：即便使用化名，也应在创作中秉持善意与尊重的原则，不得故意丑化或伤害任何现实或虚构角色的尊严。</p>
+      </li>
+      <li>
+        <p>​<strong>保密义务</strong>​：对内部讨论、未定稿内容及成员个人想法履行保密义务。</p>
+      </li>
+    </ol>
+</section>
+
 </div>
 <script>
 /* 互斥按钮 */
@@ -142,6 +156,7 @@ document.addEventListener('click', e => {
     btn.classList.add('active');
   }
 });
+
 
 /* 日期默认到下周周一 */
 const d = new Date();
