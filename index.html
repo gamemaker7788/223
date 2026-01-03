@@ -116,14 +116,14 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
   <div class="btn-group" id="privacyBtns">
     <button class="d-btn" id="agreeBtn"   onclick="agreePrivacy()">同意</button>
     <button class="d-btn" id="rejectBtn"  onclick="rejectPrivacy()">不同意</button>
-    <button class="d-btn" id="reselectBtn"style="display:none;" onclick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
+    <button class="d-btn" id="reselectBtn"style="display:none;" onClick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
   </div>
 </section>
 
 <!-- 侧边栏 -->
 <aside id="sideBar" class="side-bar translate">
   <div class="side-head">
-    <button class="d-btn" onclick="closeSide()">✕</button>
+    <button class="d-btn" onClick="closeSide()">✕</button>
   </div>
   <nav class="side-nav">
     <a class="side-item" href="ystk.html">隐私与条款</a>
@@ -131,11 +131,11 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
     <a class="side-item" href="gxlog.html">关于更新</a>
   </nav>
   <div class="side-foot">
-    <button class="d-btn" onclick="toggleTheme()">切换主题</button>
+    <button class="d-btn" onClick="toggleTheme()">切换主题</button>
   </div>
 </aside>
-<div id="sideMask" class="side-mask" onclick="closeSide()"></div>
-<button id="sideHam" class="d-btn" onclick="openSide()">☰</button>
+<div id="sideMask" class="side-mask" onClick="closeSide()"></div>
+<button id="sideHam" class="d-btn" onClick="openSide()">☰</button>
 
 <!-- 主内容 -->
 <h1>223 班 Weekly Report</h1>
@@ -152,6 +152,7 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
   <h3>选择报外</h3>
   <div class="btn-group">
     <a class="d-btn" href="fw1.html">元旦特报</a>
+    <a class="d-btn" href="fw2.html">元旦总结</a>
   </div>
 </section>
 
@@ -161,7 +162,7 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
   <section class="card">
     <input id="cname" class="duo-input" placeholder="昵称（必填）" maxlength="40">
     <textarea id="ctext" class="duo-input" placeholder="说点什么…" maxlength="500" rows="4"></textarea>
-    <button class="d-btn" onclick="submitComment()">发表</button>
+    <button class="d-btn" onClick="submitComment()">发表</button>
   </section>
   <section class="card" style="padding:12px 16px;">
     <div id="cmtCards" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"></div>

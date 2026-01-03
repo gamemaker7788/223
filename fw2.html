@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>223班元旦晚会 Weekly Report</title>
+<style>
+:root[data-theme="bright"]{
+  --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;
+}
+:root[data-theme="dark"]{
+  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555555;--gray2:#333333;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;
+}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+.toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0;margin:0;height:30vh;width:100%;
+}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+.mini-scroll{max-height:140px;overflow:auto;padding-right:8px}
+.mini-scroll::-webkit-scrollbar{width:6px}
+.mini-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:3px}
+.stat{display:flex;justify-content:space-around;text-align:center;margin-top:12px}
+.stat div{font-size:24px;font-weight:700;color:var(--bottom-blue)}
+.stat small{display:block;font-size:13px;font-weight:400;color:var(--text);margin-top:4px}
+.title-img{height:100%;width:100%;display:block;object-fit:contain}
+:root[data-theme="dark"] .title-img{filter:invert(1) hue-rotate(180deg)}
+</style>
+<script src="theme.js"></script>
+</head>
+<body>
+<div class="card">
+<div class="toolbar">
+  <img class="title-img" src="title.png" alt="223班 Weekly Report">
+</div>
+<div class="btn-group">
+  <button class="switch" onClick="toggleTheme()">切换主题</button>
+  <button class="d-btn active">元旦总结</button>
+  <a class="d-btn" href="index.html">返回</a>
+</div>
+
+<!-- 刊首 -->
+<section class="card">
+  <p>Chief Editor: 王琦朝</p>
+  <p>Helper: AI</p>
+<p>Website Builder: 王琦朝</p>
+  <p>ALL CONTRIBUTORS ARE WELCOME!!!</p>
+</section>
+
+<!-- 正文 -->
+<section class="card">
+  <h1><strong>New Year's Day Gala 2026</strong></h1>
+  <h3>Time: 31 Dec 2025, 17:30-19:30</h3>
+  <p><strong>Opening:</strong> At 17:30</p>
+
+  <p><strong>Song 1 《给某某》</strong></p>
+
+  <p><strong>Song 2 《特别的人》</strong></p>
+
+  <p><strong>Drama 3 《人民的名义》</strong></p>
+
+  <p><strong>Game 1 接龙画画</strong></p>
+
+  <p><strong>Song 4 《花海》</strong></p>
+
+  <p><strong>Talk-show 5 《天不怕地不怕，就怕老师找我爸》</strong></p>
+
+  <p><strong>Game 2 撕名牌</strong></p>
+
+  <p><strong>Mini-play 6 《总裁看病》</strong></p>
+
+  <p><strong>Finale 7 《Happy New Year》</strong></p>
+</section>
+<div class="btn-group">
+  <a class="d-btn" href="video.html">元旦视频</a>
+</div>
+<!-- 数据卡片 -->
+<section class="card">
+  <h1>- The End -</h1>
+  <p>See you in 2026, 223!</p>
+</section>
+</div>
+
+<script>
+/* 互斥按钮 */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.d-btn');
+  const group = e.target.closest('.btn-group');
+  if (btn) {
+    group.querySelectorAll('.d-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+});
+</script>
+</body>
+</html>
