@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>223班广播系统 - 通知修复版</title>
+    <title>223班广播系统 - 内嵌Service Worker版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -46,15 +46,16 @@
             gap: 10px;
         }
         
-        .debug-panel {
+        .status-panel {
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
             border-radius: 8px;
             margin-top: 10px;
             font-size: 0.8rem;
-            text-align: left;
-            max-height: 100px;
-            overflow-y: auto;
+        }
+        
+        .status-item {
+            margin: 5px 0;
         }
         
         .main-content {
@@ -113,15 +114,11 @@
             width: 100%;
         }
         
-        .test-buttons {
+        .button-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 15px;
-        }
-        
-        .test-buttons button {
-            margin: 0;
         }
         
         .messages-container {
@@ -142,25 +139,40 @@
             border-left: 4px solid #4a00e0;
         }
         
-        .debug-info {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 6px;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 0.9rem;
-        }
-        
-        .debug-log {
+        .debug-panel {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 6px;
             padding: 10px;
             margin: 10px 0;
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
+
             font-family: monospace;
             font-size: 0.8rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-warning {
+            background: #ffc107;
+            color: black;
+        }
+        
+        .badge-danger {
+            background: #dc3545;
+            color: white;
         }
     </style>
 </head>
@@ -168,10 +180,18 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-broadcast-tower"></i> 223班广播系统</h1>
-            <p>通知修复版 - 手机通知栏测试</p>
-            <div class="debug-panel">
-                <div>通知权限: <span id="permStatus">检测中...</span></div>
-                <div>连接状态: <span id="connStatus">检测中...</span></div>
+            <p>手机通知栏支持 - 简化版</p>
+            <div class="status-panel">
+                <div class="status-item">
+                    通知支持: 
+                    <span id="permStatus">检测中...</span>
+                    <span id="permBadge" class="badge badge-warning">检测中</span>
+                </div>
+                <div class="status-item">
+                    连接状态: 
+                    <span id="connStatus">检测中...</span>
+                    <span id="connBadge" class="badge badge-warning">检测中</span>
+                </div>
             </div>
         </header>
         
@@ -189,11 +209,17 @@
                     <input type="text" id="messageInput" placeholder="输入要广播的消息">
                 </div>
                 
-                <button id="sendBtn">发送广播</button>
+                <button id="sendBtn">
+                    <i class="fas fa-paper-plane"></i> 发送广播
+                </button>
                 
-                <div class="test-buttons">
-                    <button id="testNotifyBtn" style="background: #28a745;">测试通知</button>
-                    <button id="testSoundBtn" style="background: #17a2b8;">测试声音</button>
+                <div class="button-group">
+                    <button id="requestPermBtn" style="background: #28a745;">
+                        <i class="fas fa-bell"></i> 请求通知权限
+                    </button>
+                    <button id="testNotifyBtn" style="background: #17a2b8;">
+                        <i class="fas fa-bullhorn"></i> 测试通知
+                    </button>
                 </div>
             </div>
             
@@ -207,14 +233,8 @@
                     </div>
                 </div>
                 
-                <div class="debug-info">
-                    <strong>调试信息:</strong>
-                    <div>页面状态: <span id="pageStatus">活跃</span></div>
-                    <div>最后活动: <span id="lastActive">刚刚</span></div>
-                </div>
-                
-                <div class="debug-log" id="debugLog">
-                    <!-- 调试日志将显示在这里 -->
+                <div class="debug-panel" id="debugLog">
+                    <div>调试日志:</div>
                 </div>
             </div>
         </div>
@@ -232,120 +252,165 @@
             console.log(`[DEBUG] ${message}`);
         }
 
-        // 初始化调试信息
-        debugLog('页面开始加载...');
-
-        // 初始化Supabase
-        const client = supabase.createClient(
-            'https://jbcrkuwnlmdmwwmiimhr.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0'
-        );
+        // 更新状态徽章
+        function updateBadge(elementId, status) {
+            const badge = document.getElementById(elementId);
+            badge.className = 'badge';
+            
+            if (status === 'success') {
+                badge.classList.add('badge-success');
+                badge.textContent = '正常';
+            } else if (status === 'warning') {
+                badge.classList.add('badge-warning');
+                badge.textContent = '警告';
+            } else {
+                badge.classList.add('badge-danger');
+                badge.textContent = '错误';
+            }
+        }
 
         // 全局变量
         let notificationPermission = false;
-        let lastActivity = new Date();
+        let supabaseClient = null;
 
         // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            debugLog('DOM加载完成，开始初始化...');
+        document.addEventListener('DOMContentLoaded', async function() {
+            debugLog('=== 系统初始化开始 ===');
             
-            initializeNotification();
-            setupEventListeners();
-            startConnectionMonitoring();
-            startActivityTracker();
-            
-            debugLog('初始化完成');
+            try {
+                // 1. 初始化通知系统
+                await initializeNotification();
+                
+                // 2. 设置事件监听器
+                setupEventListeners();
+                
+                // 3. 初始化 Supabase
+                await initializeSupabase();
+                
+                debugLog('=== 系统初始化完成 ===');
+                
+            } catch (error) {
+                debugLog(`初始化失败: ${error.message}`);
+                updateBadge('connBadge', 'error');
+            }
         });
 
-
-        // 初始化通知系统
+        // 初始化通知系统（简化版）
         async function initializeNotification() {
-            debugLog('开始初始化通知系统...');
+            debugLog('检查通知支持...');
             
             if (!('Notification' in window)) {
-                debugLog('浏览器不支持通知功能');
-                updatePermissionStatus('不支持');
+                debugLog('❌ 浏览器不支持通知功能');
+                document.getElementById('permStatus').textContent = '不支持';
+                updateBadge('permBadge', 'error');
                 return;
             }
 
+            debugLog('✅ 浏览器支持通知功能');
+            
+            // 检查当前权限状态
+            if (Notification.permission === 'granted') {
+                notificationPermission = true;
+                debugLog('✅ 通知权限已授予');
+                document.getElementById('permStatus').textContent = '已授权';
+                updateBadge('permBadge', 'success');
+            } else if (Notification.permission === 'denied') {
+                debugLog('❌ 通知权限被拒绝');
+                document.getElementById('permStatus').textContent = '被拒绝';
+                updateBadge('permBadge', 'error');
+            } else {
+                debugLog('⚠️ 通知权限待请求');
+                document.getElementById('permStatus').textContent = '待请求';
+                updateBadge('permBadge', 'warning');
+            }
+        }
+
+        // 请求通知权限
+        async function requestNotificationPermission() {
+            debugLog('请求通知权限...');
+            
             try {
-                if (Notification.permission === 'granted') {
-                    notificationPermission = true;
-                    debugLog('通知权限已授予');
-                    updatePermissionStatus('已授权');
-                } else if (Notification.permission === 'denied') {
-                    debugLog('通知权限被拒绝');
-                    updatePermissionStatus('被拒绝');
+                const permission = await Notification.requestPermission();
+                notificationPermission = permission === 'granted';
+                
+                debugLog(`权限请求结果: ${permission}`);
+                document.getElementById('permStatus').textContent = 
+                    notificationPermission ? '已授权' : '被拒绝';
+                
+                updateBadge('permBadge', notificationPermission ? 'success' : 'error');
+                
+                if (notificationPermission) {
+                    debugLog('✅ 通知权限获取成功！');
+                    // 立即测试通知
+                    testNotification();
                 } else {
-                    debugLog('请求通知权限...');
-                    const permission = await Notification.requestPermission();
-                    notificationPermission = permission === 'granted';
-                    debugLog(`权限请求结果: ${permission}`);
-                    updatePermissionStatus(permission === 'granted' ? '已授权' : '被拒绝');
+                    debugLog('❌ 用户拒绝了通知权限');
                 }
+                
             } catch (error) {
-                debugLog(`权限请求错误: ${error.message}`);
-                updatePermissionStatus('错误');
+                debugLog(`❌ 权限请求错误: ${error.message}`);
+                updateBadge('permBadge', 'error');
             }
         }
 
         // 设置事件监听器
         function setupEventListeners() {
+            // 发送消息按钮
             document.getElementById('sendBtn').addEventListener('click', sendMessage);
+            
+            // 请求权限按钮
+            document.getElementById('requestPermBtn').addEventListener('click', requestNotificationPermission);
+            
+            // 测试通知按钮
             document.getElementById('testNotifyBtn').addEventListener('click', testNotification);
-            document.getElementById('testSoundBtn').addEventListener('click', testSound);
+            
+            // 回车发送消息
             document.getElementById('messageInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') sendMessage();
             });
 
-            debugLog('事件监听器设置完成');
-        }
-
-        // 开始连接监控
-        function startConnectionMonitoring() {
-            debugLog('开始连接监控...');
-            
             // 监听页面可见性变化（重要！）
             document.addEventListener('visibilitychange', function() {
-                const status = document.hidden ? '隐藏' : '可见';
-                debugLog(`页面可见性变化: ${status}`);
-                document.getElementById('pageStatus').textContent = status;
+                const isHidden = document.hidden;
+                debugLog(`页面可见性: ${isHidden ? '隐藏' : '可见'}`);
+                
+                if (isHidden) {
+                    debugLog('💡 页面已隐藏，通知将显示在通知栏');
+                }
             });
 
-            // 监听在线/离线状态
-            window.addEventListener('online', function() {
-                debugLog('网络连接恢复');
-                updateConnectionStatus('已连接');
-            });
-
-            window.addEventListener('offline', function() {
-                debugLog('网络连接断开');
-                updateConnectionStatus('断开');
-            });
-
-            // 测试Supabase连接
-            testSupabaseConnection();
+            debugLog('✅ 事件监听器设置完成');
         }
 
-        // 测试Supabase连接
-        async function testSupabaseConnection() {
+        // 初始化 Supabase
+        async function initializeSupabase() {
+            debugLog('初始化 Supabase 连接...');
+            
             try {
-                debugLog('测试Supabase连接...');
-                const { data, error } = await client
+                supabaseClient = supabase.createClient(
+                    'https://jbcrkuwnlmdmwwmiimhr.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0'
+                );
+
+                // 测试连接
+                const { data, error } = await supabaseClient
                     .from('bcast')
                     .select('*')
                     .limit(1);
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
-                debugLog('Supabase连接成功');
-                updateConnectionStatus('已连接');
+                debugLog('✅ Supabase 连接成功');
+                document.getElementById('connStatus').textContent = '已连接';
+                updateBadge('connBadge', 'success');
+                
+                // 设置实时订阅
                 setupRealtimeSubscription();
+                
             } catch (error) {
-                debugLog(`Supabase连接失败: ${error.message}`);
-                updateConnectionStatus('连接失败');
+                debugLog(`❌ Supabase 连接失败: ${error.message}`);
+                document.getElementById('connStatus').textContent = '连接失败';
+                updateBadge('connBadge', 'error');
             }
         }
 
@@ -353,7 +418,7 @@
         function setupRealtimeSubscription() {
             debugLog('设置实时消息订阅...');
             
-            client
+            supabaseClient
                 .channel('broadcast-channel')
                 .on(
                     'postgres_changes',
@@ -363,103 +428,144 @@
                         table: 'bcast',
                     },
                     (payload) => {
-                        debugLog('收到新消息: ' + JSON.stringify(payload.new));
+                        debugLog('📨 收到新消息');
                         handleNewMessage(payload.new);
                     }
                 )
                 .subscribe((status) => {
                     debugLog(`订阅状态: ${status}`);
                     if (status === 'SUBSCRIBED') {
-                        debugLog('成功订阅消息频道');
+                        debugLog('✅ 实时订阅成功');
                     }
                 });
         }
 
         // 处理新消息
         function handleNewMessage(messageData) {
-            const { msg, sender, created_at } = messageData;
+            const { msg, sender } = messageData;
             debugLog(`处理消息: ${sender} - ${msg}`);
             
             // 更新UI
-            displayMessage(msg, sender, created_at);
+            displayMessage(msg, sender);
             
-            // 发送系统通知（关键部分！）
+            // 发送系统通知
             sendSystemNotification(sender, msg);
             
             // 播放声音
             playNotificationSound();
-            
-            // 更新最后活动时间
-            updateLastActivity();
         }
 
-        // 发送系统通知（修复版）
+        // 发送系统通知（直接使用Notification API）
         function sendSystemNotification(sender, message) {
-            debugLog(`尝试发送系统通知: ${sender} - ${message}`);
+            debugLog(`尝试发送系统通知...`);
             
             if (!notificationPermission) {
-                debugLog('通知权限未授予，跳过发送');
+                debugLog('❌ 没有通知权限，跳过发送');
                 return;
             }
 
-            // 检查页面是否可见，如果可见可能不需要通知
-            if (!document.hidden) {
-                debugLog('页面可见，用户可能正在使用应用');
-                // 但仍然发送通知，因为用户可能切换到其他标签页
-            }
-
             try {
+                // 检查页面是否可见
+                const isPageVisible = !document.hidden;
+                debugLog(`页面可见性: ${isPageVisible ? '可见' : '隐藏'}`);
+                
+                // 如果页面可见，用户可能正在使用应用，可以降低通知频率
+                if (isPageVisible) {
+                    debugLog('💡 页面可见，用户可能正在使用应用');
+                }
+
                 // 创建通知
                 const notification = new Notification(`📢 223班广播 - ${sender}`, {
                     body: message,
-                    icon: 'https://img.icons8.com/color/96/000000/classroom.png',
-                    badge: 'https://img.icons8.com/color/48/000000/classroom.png',
+                    icon: 'https://via.placeholder.com/64/4a00e0/ffffff?text=223',
+                    badge: 'https://via.placeholder.com/32/4a00e0/ffffff?text=223',
                     tag: 'class-broadcast', // 相同的tag会替换旧通知
-                    requireInteraction: false, // 不需要用户交互
-                    silent: false, // 播放声音
-                    vibrate: [200, 100, 200], // 震动模式
+                    requireInteraction: false,
+                    silent: false,
                 });
 
-                debugLog('系统通知创建成功');
+                debugLog('✅ 系统通知创建成功');
 
                 // 通知点击事件
                 notification.onclick = function() {
-                    debugLog('通知被点击');
+                    debugLog('👆 通知被点击');
                     window.focus();
-                    notification.close();
+                    this.close();
                 };
 
                 // 通知显示事件
                 notification.onshow = function() {
-                    debugLog('通知显示在屏幕上');
+                    debugLog('👀 通知显示在屏幕上');
+                };
+
+                // 通知关闭事件
+                notification.onclose = function() {
+                    debugLog('❌ 通知已关闭');
                 };
 
                 // 通知错误事件
                 notification.onerror = function(error) {
-                    debugLog(`通知错误: ${error}`);
+                    debugLog(`❌ 通知错误: ${error}`);
                 };
 
-                // 自动关闭通知
+                // 5秒后自动关闭通知
                 setTimeout(() => {
                     notification.close();
                 }, 5000);
 
             } catch (error) {
-                debugLog(`创建通知失败: ${error.message}`);
+                debugLog(`❌ 创建通知失败: ${error.message}`);
                 
-                // 备用方案：使用alert
-                if (document.hidden) {
-                    // 如果页面隐藏，使用alert可能会唤醒应用
-                    alert(`📢 ${sender}: ${message}`);
-                }
+                // 备用方案：使用页面内通知
+                showPageNotification(sender, message);
             }
+        }
+
+        // 页面内通知（备用方案）
+        function showPageNotification(sender, message) {
+            debugLog('使用页面内通知备用方案');
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #4a00e0, #8e2de2);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                z-index: 10000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                animation: slideInRight 0.3s ease;
+                max-width: 300px;
+                border-left: 5px solid #ffeb3b;
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px;">
+                    <i class="fas fa-bullhorn"></i> ${sender}
+                </div>
+                <div>${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 5秒后自动移除
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
         }
 
         // 播放通知声音
         function playNotificationSound() {
             debugLog('播放通知声音');
             try {
-                // 创建简单的通知声音
+                // 创建简单的哔声
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -471,12 +577,10 @@
                 gainNode.gain.value = 0.1;
                 
                 oscillator.start();
-                setTimeout(() => {
-                    oscillator.stop();
-                }, 200);
+                setTimeout(() => oscillator.stop(), 100);
                 
             } catch (error) {
-                debugLog(`播放声音失败: ${error.message}`);
+                debugLog(`❌ 播放声音失败: ${error.message}`);
             }
         }
 
@@ -488,7 +592,6 @@
             const sender = senderInput.value.trim();
 
             if (!message) {
-                debugLog('消息内容为空');
                 alert('请输入消息内容');
                 return;
             }
@@ -496,80 +599,57 @@
             debugLog(`发送消息: ${sender} - ${message}`);
 
             try {
-                const { error } = await client
+                const { error } = await supabaseClient
                     .from('bcast')
                     .insert([{ 
                         msg: message, 
                         sender: sender 
                     }]);
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
-                debugLog('消息发送成功');
                 messageInput.value = '';
                 messageInput.focus();
+                debugLog('✅ 消息发送成功');
 
             } catch (error) {
-                debugLog(`发送消息失败: ${error.message}`);
+                debugLog(`❌ 发送失败: ${error.message}`);
                 alert('发送失败: ' + error.message);
             }
         }
 
-        // 测试通知功能
+        // 测试通知
         function testNotification() {
-            debugLog('手动测试通知功能');
+            if (!notificationPermission) {
+                debugLog('❌ 请先请求通知权限');
+                alert('请先点击"请求通知权限"按钮');
+                return;
+            }
+            
+            debugLog('测试通知功能');
             sendSystemNotification('测试通知', '这是一条测试通知消息！');
         }
 
-        // 测试声音功能
-        function testSound() {
-            debugLog('测试声音功能');
-            playNotificationSound();
-        }
-
         // 显示消息到UI
-        function displayMessage(message, sender, timestamp) {
+        function displayMessage(message, sender) {
             const container = document.getElementById('msgContainer');
+            
+            // 移除空状态提示
+            if (container.children.length === 1 && container.children[0].querySelector('i')) {
+                container.innerHTML = '';
+            }
+            
             const messageElement = document.createElement('div');
             messageElement.className = 'message';
             messageElement.innerHTML = `
                 <strong>${escapeHtml(sender)}</strong>
                 <span style="float: right; font-size: 0.8em; color: #666;">
-                    ${new Date(timestamp).toLocaleTimeString()}
+                    ${new Date().toLocaleTimeString()}
                 </span>
                 <div style="margin-top: 5px;">${escapeHtml(message)}</div>
             `;
             container.appendChild(messageElement);
             container.scrollTop = container.scrollHeight;
-        }
-
-        // 更新权限状态显示
-        function updatePermissionStatus(status) {
-            document.getElementById('permStatus').textContent = status;
-        }
-
-        // 更新连接状态显示
-        function updateConnectionStatus(status) {
-            document.getElementById('connStatus').textContent = status;
-        }
-
-        // 更新最后活动时间
-        function updateLastActivity() {
-            lastActivity = new Date();
-            document.getElementById('lastActive').textContent = '刚刚';
-        }
-
-        // 开始活动跟踪
-        function startActivityTracker() {
-            setInterval(() => {
-                const now = new Date();
-                const diff = Math.floor((now - lastActivity) / 1000);
-                if (diff > 10) {
-                    document.getElementById('lastActive').textContent = `${diff}秒前`;
-                }
-            }, 5000);
         }
 
         // HTML转义
@@ -579,15 +659,22 @@
             return div.innerHTML;
         }
 
-        // 页面可见性变化的特殊处理
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                debugLog('页面变为可见状态');
-                // 页面重新可见时，可以清除一些通知
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
             }
-        });
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
 
-        debugLog('所有功能初始化完成！');
+        debugLog('✅ 所有脚本加载完成');
     </script>
 </body>
 </html>
