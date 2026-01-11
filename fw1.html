@@ -86,6 +86,45 @@ figure {
             font-size: 14px;
             color: #666;
         }
+		
+
+/* ===== 主题变量 ===== */
+:root[data-theme="bright"]{--bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;--bottom-blue:#38bdf8;--blue-glow:#38bdf822;}
+:root[data-theme="dark"]{--bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;--bottom-blue:#38bdf8;--blue-glow:#38bdf833;}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:0;margin:0;height:30vh;width:100%;}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+
+/* 不连续下划线 */
+.word{border-bottom:1px dotted var(--bottom-blue);cursor:pointer;transition:border-color .2s}
+.word:hover{border-bottom-style:dashed}
+
+/* 弹窗卡片 */
+#wordCard{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);border:2px solid var(--bottom-blue);border-radius:12px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;display:none;min-width:220px}
+#wordCard h4{margin:0 0 6px;font-size:20px;color:var(--bottom-blue)}
+#wordCard .phonetic{font-size:15px;color:var(--text)}
+#wordCard .mean{font-size:14px;margin-top:8px;color:var(--text)}
+#wordCard .speaker{width:36px;height:36px;border:2px solid var(--bottom-blue);border-radius:50%;background:transparent;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center}
+#wordCard .speaker:hover{background:var(--blue-glow)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;display:none}
+details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;padding:4px 10px;font-size:13px;cursor:pointer}details.eg-box .card{margin-top:6px;padding:10px;font-size:13px;color:#666;white-space:pre-line}
+
+/* 自定义喇叭图标 */
+.speaker-icon{width:20px;height:20px;display:block}
+:root[data-theme="dark"] .speaker-icon{filter:invert(1)}
 </style>
 <script src="theme.js"></script>
 </head>
@@ -94,10 +133,7 @@ figure {
 <div class="toolbar">
   <img class="title-img" src="title.png" alt="班级 Weekly Report">
 </div>
-
-<!-- 周次选择 -->
 <div class="btn-group">
-
   <button class="switch" onClick="toggleTheme()">切换主题</button>
   <button class="d-btn active">元旦特报</button>
   <a class="d-btn" href="index.html">返回</a>
@@ -105,142 +141,86 @@ figure {
 
 <!-- 1. 出勤统计 -->
 <section class="card">
-  <h3>The second publication</h3>
-    <p>Chief editor:王琦朝</p>
-    <p>Website Builder:王琦朝</p>
-    <p>ALL CONTRIBUTOR ARE WELOCME!!!</p>
+  <h3><span class="word">The</span> <span class="word">second</span> <span class="word">publication</span></h3>
+    <p><span class="word">Chief</span> <span class="word">editor</span>:<span class="word">Wang</span> <span class="word">Qizhao</span></p>
+    <p><span class="word">Website</span> <span class="word">Builder</span>:<span class="word">Wang</span> <span class="word">Qizhao</span></p>
+    <p><span class="word">ALL</span> <span class="word">CONTRIBUTOR</span> <span class="word">ARE</span> <span class="word">WELCOME</span>!!!</p>
 </section>
 
 <!-- 2. 课堂表现 -->
 <section class="card">
-  <h1><strong>New Year's Day: A New Beginning, Everything Looks Fresh and Bright</strong></h1>
-  <h3>Time:December 31th,2025</h3>
-    <p>Writer:王琦朝</p>
-    <p>Helper:AI</p>
-    <p>New Year's Day, the first day of the Gregorian calendar year, marks the beginning of a brand new year. People all over the world celebrate the harvest of the past year on this day and welcome the future with hope.</p>
-    <p>In China, although New Year's Day is a statutory holiday, traditionally the Lunar New Year (Spring Festival) is the more valued "New Year." Nevertheless, modern people still celebrate New Year's Day in various ways: having meals with family and friends, watching New Year's Eve galas, making New Year's resolutions, or sending blessings on social media. Cities often hold light shows or countdown events, filled with a joyful atmosphere.</p>
-<p>For many people, especially students, New Year's Day also means a short holiday, a good opportunity to relax and recharge after busy study or work.</p>
+  <h1><strong><span class="word">New</span> <span class="word">Year's</span> <span class="word">Day</span>: <span class="word">A</span> <span class="word">New</span> <span class="word">Beginning</span>, <span class="word">Everything</span> <span class="word">Looks</span> <span class="word">Fresh</span> <span class="word">and</span> <span class="word">Bright</span></strong></h1>
+  <h3><span class="word">Time</span>:<span class="word">December</span> <span class="word">31th</span>, <span class="word">2025</span></h3>
+    <p><span class="word">Writer</span>:<span class="word">Wang</span> <span class="word">Qizhao</span></p>
+    <p><span class="word">Helper</span>:<span class="word">AI</span></p>
+    <p><span class="word">New</span> <span class="word">Year's</span> <span class="word">Day</span>, <span class="word">the</span> <span class="word">first</span> <span class="word">day</span> <span class="word">of</span> <span class="word">the</span> <span class="word">Gregorian</span> <span class="word">calendar</span> <span class="word">year</span>, <span class="word">marks</span> <span class="word">the</span> <span class="word">beginning</span> <span class="word">of</span> <span class="word">a</span> <span class="word">brand</span> <span class="word">new</span> <span class="word">year</span>. <span class="word">People</span> <span class="word">all</span> <span class="word">over</span> <span class="word">the</span> <span class="word">world</span> <span class="word">celebrate</span> <span class="word">the</span> <span class="word">harvest</span> <span class="word">of</span> <span class="word">the</span> <span class="word">past</span> <span class="word">year</span> <span class="word">on</span> <span class="word">this</span> <span class="word">day</span> <span class="word">and</span> <span class="word">welcome</span> <span class="word">the</span> <span class="word">future</span> <span class="word">with</span> <span class="word">hope</span>.</p>
+    <p><span class="word">In</span> <span class="word">China</span>, <span class="word">although</span> <span class="word">New</span> <span class="word">Year's</span> <span class="word">Day</span> <span class="word">is</span> <span class="word">a</span> <span class="word">statutory</span> <span class="word">holiday</span>, <span class="word">traditionally</span> <span class="word">the</span> <span class="word">Lunar</span> <span class="word">New</span> <span class="word">Year</span> (<span class="word">Spring</span> <span class="word">Festival</span>) <span class="word">is</span> <span class="word">the</span> <span class="word">more</span> <span class="word">valued</span> "<span class="word">New</span> <span class="word">Year</span>." <span class="word">Nevertheless</span>, <span class="word">modern</span> <span class="word">people</span> <span class="word">still</span> <span class="word">celebrate</span> <span class="word">New</span> <span class="word">Year's</span> <span class="word">Day</span> <span class="word">in</span> <span class="word">various</span> <span class="word">ways</span>: <span class="word">having</span> <span class="word">meals</span> <span class="word">with</span> <span class="word">family</span> <span class="word">and</span> <span class="word">friends</span>, <span class="word">watching</span> <span class="word">New</span> <span class="word">Year's</span> <span class="word">Eve</span> <span class="word">galas</span>, <span class="word">making</span> <span class="word">New</span> <span class="word">Year's</span> <span class="word">resolutions</span>, <span class="word">or</span> <span class="word">sending</span> <span class="word">blessings</span> <span class="word">on</span> <span class="word">social</span> <span class="word">media</span>. <span class="word">Cities</span> <span class="word">often</span> <span class="word">hold</span> <span class="word">light</span> <span class="word">shows</span> <span class="word">or</span> <span class="word">countdown</span> <span class="word">events</span>, <span class="word">filled</span> <span class="word">with</span> <span class="word">a</span> <span class="word">joyful</span> <span class="word">atmosphere</span>.</p>
+<p><span class="word">For</span> <span class="word">many</span> <span class="word">people</span>, <span class="word">especially</span> <span class="word">students</span>, <span class="word">New</span> <span class="word">Year's</span> <span class="word">Day</span> <span class="word">also</span> <span class="word">means</span> <span class="word">a</span> <span class="word">short</span> <span class="word">holiday</span>, <span class="word">a</span> <span class="word">good</span> <span class="word">opportunity</span> <span class="word">to</span> <span class="word">relax</span> <span class="word">and</span> <span class="word">recharge</span> <span class="word">after</span> <span class="word">busy</span> <span class="word">study</span> <span class="word">or</span> <span class="word">work</span>.</p>
 </section>
 <section class="card">
-  <h3>注解</h3>
-  <p>① New Year's Day​
-
-•
-    ​音标​：/ˌnjuː jɪəz ˈdeɪ/
-    
-    •
-  ​词性​：n. (名词)
-  
-•
-  ​释义​：元旦。特指公历1月1日。
-  
-</p>
-<p>​② mark​
-  
-  •
-  ​音标​：/mɑːk/
-  
-  •
-  ​词性​：v. (动词)
-  
-  •
-  ​释义​：标志，表示。指作为…的标志或象征。
-  
-  ​</p>
-<p>③ Gregorian calendar​
-  
-  •
-  ​音标​：/ɡrɪˌɡɔːriən ˈkælɪndə(r)/
-  
-  •
-  ​词性​：n. (名词短语)
-  
-  •
-  ​释义​：公历，格里高利历。目前国际上最通用的历法。
-  
-  </p>
-<p>​④ celebrate​
-  
-  •
-  ​音标​：/ˈselɪbreɪt/
-  
-  •
-  ​词性​：v. (动词)
-  
-  •
-  ​释义​：庆祝。指为某事举行活动表示欢乐。
-  
-  ​</p>
-<p>⑤ harvest​
-  
-  •
-  ​音标​：/ˈhɑːvɪst/
-  
-  •
-  ​词性​：n. (名词)
-  
-  •
-  ​释义​：收获，收成。这里比喻一年的成果。
-  
-  </p>
-<p>​⑥ statutory holiday​
-  
-  •
-  ​音标​：/ˈstætʃətri ˈhɒlədeɪ/
-  
-  •
-  ​词性​：n. (名词短语)
-  
-  •
-  ​释义​：法定假日。由国家法律规定放假的节日。
-  
-  </p>
-<p>​⑦ traditionally​
-  
-  •
-  ​音标​：/trəˈdɪʃənəli/
-  
-  •
-  ​词性​：adv. (副词)
-  
-  •
-  ​释义​：传统上，习惯上。</p>
-<p> ​⑧ valued​
-  
-  •
-  ​音标​：/ˈvæljuːd/
-  
-  •
-  ​词性​：adj. (形容词)
-  
-  •
-  ​释义​：受重视的，珍贵的。</p>
-<p> ​⑨ resolution​
-  
-  •
-  ​音标​：/ˌrezəˈluːʃn/
-  
-  •
-  ​词性​：n. (名词)
-  
-  •
-  ​释义​：决心，决定。New Year's resolution 即"新年决心"。</p>
-<p> ​⑩ recharge​
-  
-  •
-  ​音标​：/ˌriːˈtʃɑːdʒ/
-  
-  •
-  ​词性​：v. (动词)
-  
-  •
-  ​释义​：充电；恢复精力。比喻休息后重新获得能量。 </p>
-</section>
-<section class="card">
-<h1> - The end - </h1>
+<h1> - <span class="word">The</span> <span class="word">end</span> - </h1>
 </section>
 </div>
+
+<!-- 弹窗结构 -->
+<div id="overlay"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+  <details class="eg-box">
+    <summary class="d-btn">🔈 例句</summary>
+    <div class="card"><span id="wcEg"></span></div>
+  </details>
+  <button class="speaker" id="wcSpeaker">
+    <img src="speaker.png" alt="朗读" class="speaker-icon">
+  </button>
+</div>
+
+<script src="dict.js"></script>
 <script>
+/* ---------- 点词弹窗 ---------- */
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if (!w) return;
+  const raw = w.textContent.trim().toLowerCase();
+  const entry = DICT[raw] || { ph: '', zh: '（暂无释义）', eg: '' };
+  showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+});
+const overlay = document.getElementById('overlay');
+const wordCard = document.getElementById('wordCard');
+const wcWord = document.getElementById('wcWord');
+const wcPhonetic = document.getElementById('wcPhonetic');
+const wcMean = document.getElementById('wcMean');
+const wcEg = document.getElementById('wcEg');
+const wcSpeaker = document.getElementById('wcSpeaker');
+
+function showCard(word, phonetic, mean, eg = '') {
+  wcWord.textContent = word;
+  wcPhonetic.textContent = phonetic;
+  wcMean.textContent = mean;
+  wcEg.innerHTML = eg;
+  overlay.style.display = 'block';
+  wordCard.style.display = 'block';
+  speak(word);
+}
+function hideCard() {
+  overlay.style.display = 'none';
+  wordCard.style.display = 'none';
+}
+overlay.onclick = hideCard;
+document.onkeydown = e => e.key === 'Escape' && hideCard();
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+wcSpeaker.onclick = () => speak(wcWord.textContent);
+
 /* 互斥按钮 */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.d-btn');
@@ -250,11 +230,6 @@ document.addEventListener('click', e => {
     btn.classList.add('active');
   }
 });
-
-/* 日期默认到下周周一 */
-const d = new Date();
-d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7 || 7);
-document.getElementById('memoDate').valueAsDate = d;
 </script>
 </body>
 </html>

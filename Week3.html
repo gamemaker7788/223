@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-theme="bright">
 <head>
 <meta charset="utf-8">
-<title>班级 Weekly Report</title>
+<title>班级 Weekly Report - Week3</title>
 <style>
 /* ===== 继承 tb.html 的灰蓝变量 ===== */
 :root[data-theme="bright"]{
@@ -86,20 +86,61 @@ figure {
             font-size: 14px;
             color: #666;
         }
+		
+
+/* ===== 主题变量 ===== */
+:root[data-theme="bright"]{--bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;--bottom-blue:#38bdf8;--blue-glow:#38bdf822;}
+:root[data-theme="dark"]{--bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;--bottom-blue:#38bdf8;--blue-glow:#38bdf833;}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:0;margin:0;height:30vh;width:100%;}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+
+/* 不连续下划线 */
+.word{border-bottom:1px dotted var(--bottom-blue);cursor:pointer;transition:border-color .2s}
+.word:hover{border-bottom-style:dashed}
+
+/* 弹窗卡片 */
+#wordCard{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);border:2px solid var(--bottom-blue);border-radius:12px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;display:none;min-width:220px}
+#wordCard h4{margin:0 0 6px;font-size:20px;color:var(--bottom-blue)}
+#wordCard .phonetic{font-size:15px;color:var(--text)}
+#wordCard .mean{font-size:14px;margin-top:8px;color:var(--text)}
+#wordCard .speaker{width:36px;height:36px;border:2px solid var(--bottom-blue);border-radius:50%;background:transparent;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center}
+#wordCard .speaker:hover{background:var(--blue-glow)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;display:none}
+details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;padding:4px 10px;font-size:13px;cursor:pointer}details.eg-box .card{margin-top:6px;padding:10px;font-size:13px;color:#666;white-space:pre-line}
+/* 自定义喇叭图标 */
+.speaker-icon {
+  width: 20px;          /* 按需调整 */
+  height: 20px;
+  display: block;
+}
+/* 暗色主题反白 */
+:root[data-theme="dark"] .speaker-icon {
+  filter: invert(1);    /* 黑图变白图 */
+}
+
 </style>
 <script src="theme.js"></script>
-<script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
-  
 </head>
 <body>
 <div class="card">
 <div class="toolbar">
   <img class="title-img" src="title.png" alt="班级 Weekly Report">
 </div>
-
-<!-- 周次选择 -->
 <div class="btn-group">
-
   <button class="switch" onClick="toggleTheme()">切换主题</button>
   <button class="d-btn active">第 3 周</button>
   <a class="d-btn" href="index.html">返回</a>
@@ -107,36 +148,88 @@ figure {
 
 <!-- 1. 出勤统计 -->
 <section class="card">
-  <h3>The third publication</h3>
-    <p>Chief editor:王文钰</p>
-    <p>Associate editor:付梓妤</p>
-    <p>Website Builder:王琦朝</p>
-    <p>ALL CONTRIBUTOR ARE WELOCME!!!</p>
+  <h3><span class="word">The</span> <span class="word">third</span> <span class="word">publication</span></h3>
+    <p><span class="word">Chief</span> <span class="word">editor</span>:<span class="word">Wang</span> <span class="word">Wenyu</span></p>
+    <p><span class="word">Associate</span> <span class="word">editor</span>:<span class="word">Fu</span> <span class="word">Ziyu</span></p>
+    <p><span class="word">Website</span> <span class="word">Builder</span>:<span class="word">Wang</span> <span class="word">Qizhao</span></p>
+    <p><span class="word">ALL</span> <span class="word">CONTRIBUTOR</span> <span class="word">ARE</span> <span class="word">WELCOME</span>!!!</p>
 </section>
 
 <!-- 2. 课堂表现 -->
 <section class="card">
-  <h1>Hilarious Character Drawing</h1>
-    <h3>Time:December 26th,2025</h3>
-    <p>Writer:王文钰</p>
-    <p>Helper:付梓妤
-      </p>
-    <p>Many arists appeared in Class 223 during the art lesonon on the morning of the 26th.<br>
-    Here are some of the pictures they drew.</p>
- 
+  <h1><span class="word">Hilarious</span> <span class="word">Character</span> <span class="word">Drawing</span></h1>
+    <h3><span class="word">Time</span>:<span class="word">December</span> <span class="word">26th</span>, <span class="word">2025</span></h3>
+    <p><span class="word">Writer</span>:<span class="word">Wang</span> <span class="word">Wenyu</span></p>
+    <p><span class="word">Helper</span>:<span class="word">Fu</span> <span class="word">Ziyu</span></p>
+    <p><span class="word">Many</span> <span class="word">artists</span> <span class="word">appeared</span> <span class="word">in</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">during</span> <span class="word">the</span> <span class="word">art</span> <span class="word">lesson</span> <span class="word">on</span> <span class="word">the</span> <span class="word">morning</span> <span class="word">of</span> <span class="word">the</span> <span class="word">26th</span>.<br>
+    <span class="word">Here</span> <span class="word">are</span> <span class="word">some</span> <span class="word">of</span> <span class="word">the</span> <span class="word">pictures</span> <span class="word">they</span> <span class="word">drew</span>.</p>
 </section>
 <section class="card">
 <figure><img src="1.jpg" alt="插画"><img src="2.jpg" alt="插画"><img src="3.jpg" alt="插画"><img src="4.jpg" alt="插画"><img src="5.jpg" alt="插画"></figure>
 </section>
-<!-- 3. 作业统计 -->
+<!-- 3. 注解 -->
 <section class="card">
-  <h3>注解</h3>
-  <p>1.hilarious adj. 好笑的</p>
-  <p>2.character n. 人物角色</p>
+  <h1>- The end -</h1>
 </section>
-
 </div>
+
+<!-- 弹窗结构 -->
+<div id="overlay"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+  <details class="eg-box">
+    <summary class="d-btn">🔈 例句</summary>
+    <div class="card"><span id="wcEg"></span></div>
+  </details>
+  <button class="speaker" id="wcSpeaker"><img src="speaker.png" alt="朗读" class="speaker-icon"></button>
+</div>
+
+<script src="dict.js"></script>
 <script>
+/* ---------- 点词弹窗 ---------- */
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if (!w) return;
+  const raw = w.textContent.trim().toLowerCase();
+  const entry = DICT[raw] || { ph: '', zh: '（暂无释义）', eg: '' };
+  showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+});
+const overlay = document.getElementById('overlay');
+const wordCard = document.getElementById('wordCard');
+const wcWord = document.getElementById('wcWord');
+const wcPhonetic = document.getElementById('wcPhonetic');
+const wcMean = document.getElementById('wcMean');
+const wcEg = document.getElementById('wcEg');
+const wcSpeaker = document.getElementById('wcSpeaker');
+
+function showCard(word, phonetic, mean, eg = '') {
+  wcWord.textContent = word;
+  wcPhonetic.textContent = phonetic;
+  wcMean.textContent = mean;
+  wcEg.innerHTML = eg;
+  overlay.style.display = 'block';
+  wordCard.style.display = 'block';
+  speak(word);
+}
+function hideCard() {
+  overlay.style.display = 'none';
+  wordCard.style.display = 'none';
+}
+overlay.onclick = hideCard;
+document.onkeydown = e => e.key === 'Escape' && hideCard();
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+wcSpeaker.onclick = () => speak(wcWord.textContent);
+
 /* 互斥按钮 */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.d-btn');
@@ -146,10 +239,6 @@ document.addEventListener('click', e => {
     btn.classList.add('active');
   }
 });
-
-
-/* 日期默认到下周周一 */
-
 </script>
 </body>
 </html>

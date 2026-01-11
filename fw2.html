@@ -2,8 +2,9 @@
 <html lang="zh-CN" data-theme="bright">
 <head>
 <meta charset="utf-8">
-<title>223班元旦晚会 Weekly Report</title>
+<title>223班元旦晚会 Weekly Report - 点词版</title>
 <style>
+/* ===== 继承 tb.html 的灰蓝变量 ===== */
 :root[data-theme="bright"]{
   --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
   --bottom-blue:#38bdf8;--blue-glow:#38bdf822;
@@ -12,14 +13,93 @@
   --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555555;--gray2:#333333;
   --bottom-blue:#38bdf8;--blue-glow:#38bdf833;
 }
-*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+* {box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
 body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
 .toolbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0;margin:0;height:30vh;width:100%;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	padding:0px;
+	margin: 0px;
+	height: 30vh;
+	width: 100%;
 }
 .toolbar h1{margin:0;font-size:20px;font-weight:600}
 .switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+
+/* ===== 1. 3D 互斥按钮组（周次选择）===== */
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+
+/* ===== 2. 滚动条列表 ===== */
+.mini-scroll{max-height:140px;overflow:auto;padding-right:8px}
+.mini-scroll::-webkit-scrollbar{width:6px}
+.mini-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:3px}
+.mini-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
+
+/* ===== 3. 统计数字 ===== */
+.stat{display:flex;justify-content:space-around;text-align:center;margin-top:12px}
+.stat div{font-size:24px;font-weight:700;color:var(--bottom-blue)}
+.stat small{display:block;font-size:13px;font-weight:400;color:var(--text);margin-top:4px}
+
+/* ===== 4. 下周备忘输入 ===== */
+.duo-input{width:100%;padding:10px 14px;font-size:15px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
+
+/* ===== 5. 日期选择器 ===== */
+.duo-date{padding:6px 12px;font-size:15px;border:2px solid var(--gray1);border-radius:14px;background:transparent;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999'%3E%3Cpath d='M4 6h8l-4 4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;cursor:pointer}
+.duo-date:focus{border-color:var(--bottom-blue);box-shadow:0 0 0 4px var(--blue-glow)}
+.title-img{
+  height:100%;          /* 根据实际图高调整 */
+  width:100%;
+  display:block;
+  object-fit:contain;   /* 防止拉伸 */
+}
+/* 暗色主题下反白，让深色 LOGO 可见 */
+:root[data-theme="dark"] .title-img{
+  filter:invert(1) hue-rotate(180deg);   /* 简易反色，可换成你自己的白版 LOGO */
+}
+figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figure img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0,0,0,.08);
+	width: 30vw;
+	margin: 5px;
+	border: 2px solid #FFF;
+        }
+        figcaption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+		
+
+/* ===== 主题变量 ===== */
+:root[data-theme="bright"]{--bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;--bottom-blue:#38bdf8;--blue-glow:#38bdf822;}
+:root[data-theme="dark"]{--bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;--bottom-blue:#38bdf8;--blue-glow:#38bdf833;}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:0;margin:0;height:30vh;width:100%;}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
 .card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
 .card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
 .btn-group{display:flex;gap:8px;margin-bottom:12px}
@@ -27,14 +107,25 @@ body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
 .d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
 .d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
 .d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
-.mini-scroll{max-height:140px;overflow:auto;padding-right:8px}
-.mini-scroll::-webkit-scrollbar{width:6px}
-.mini-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:3px}
-.stat{display:flex;justify-content:space-around;text-align:center;margin-top:12px}
-.stat div{font-size:24px;font-weight:700;color:var(--bottom-blue)}
-.stat small{display:block;font-size:13px;font-weight:400;color:var(--text);margin-top:4px}
-.title-img{height:100%;width:100%;display:block;object-fit:contain}
-:root[data-theme="dark"] .title-img{filter:invert(1) hue-rotate(180deg)}
+
+/* 不连续下划线 */
+.word{border-bottom:1px dotted var(--bottom-blue);cursor:pointer;transition:border-color .2s}
+.word:hover{border-bottom-style:dashed}
+
+/* 弹窗卡片 */
+#wordCard{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);border:2px solid var(--bottom-blue);border-radius:12px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;display:none;min-width:220px}
+#wordCard h4{margin:0 0 6px;font-size:20px;color:var(--bottom-blue)}
+#wordCard .phonetic{font-size:15px;color:var(--text)}
+#wordCard .mean{font-size:14px;margin-top:8px;color:var(--text)}
+#wordCard .speaker{width:36px;height:36px;border:2px solid var(--bottom-blue);border-radius:50%;background:transparent;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center}
+#wordCard .speaker:hover{background:var(--blue-glow)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;display:none}
+details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;padding:4px 10px;font-size:13px;cursor:pointer}details.eg-box .card{margin-top:6px;padding:10px;font-size:13px;color:#666;white-space:pre-line}
+
+/* 自定义喇叭图标 */
+.speaker-icon{width:20px;height:20px;display:block}
+:root[data-theme="dark"] .speaker-icon{filter:invert(1)}
+.speaker:hover .speaker-icon{transform:scale(1.15);transition:transform .2s}
 </style>
 <script src="theme.js"></script>
 </head>
@@ -51,47 +142,107 @@ body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
 
 <!-- 刊首 -->
 <section class="card">
-  <p>Chief Editor: 王琦朝</p>
-  <p>Helper: AI</p>
-<p>Website Builder: 王琦朝</p>
-  <p>ALL CONTRIBUTORS ARE WELCOME!!!</p>
+  <p><span class="word">Chief</span> <span class="word">Editor</span>: <span class="word">Wang</span> <span class="word">Qizhao</span></p>
+  <p><span class="word">Helper</span>: <span class="word">AI</span></p>
+  <p><span class="word">Website</span> <span class="word">Builder</span>: <span class="word">Wang</span> <span class="word">Qizhao</span></p>
+  <p><span class="word">ALL</span> <span class="word">CONTRIBUTORS</span> <span class="word">ARE</span> <span class="word">WELCOME</span>!!!</p>
 </section>
 
 <!-- 正文 -->
 <section class="card">
-  <h1><strong>New Year's Day Gala 2026</strong></h1>
-  <h3>Time: 31 Dec 2025, 17:30-19:30</h3>
-  <p><strong>Opening:</strong> At 17:30</p>
+  <h1><strong><span class="word">New</span> <span class="word">Year's</span> <span class="word">Day</span> <span class="word">Gala</span> <span class="word">2026</span></strong></h1>
+  <h3><span class="word">Time</span>: <span class="word">31</span> <span class="word">Dec</span> <span class="word">2025</span>, <span class="word">17</span>:<span class="word">30</span>-<span class="word">19</span>:<span class="word">30</span></h3>
 
-  <p><strong>Song 1 《给某某》</strong></p>
+  <p><strong><span class="word">Opening</span>:</strong> <span class="word">At</span> <span class="word">17</span>:<span class="word">30</span></p>
 
-  <p><strong>Song 2 《特别的人》</strong></p>
+  <p><strong><span class="word">Song</span> 1 《<span class="word">给</span> <span class="word">某某</span>》</strong></p>
 
-  <p><strong>Drama 3 《人民的名义》</strong></p>
+  <p><strong><span class="word">Song</span> 2 《<span class="word">特别</span> <span class="word">的</span> <span class="word">人</span>》</strong></p>
 
-  <p><strong>Game 1 接龙画画</strong></p>
+  <p><strong><span class="word">Drama</span> 3 《<span class="word">人民</span> <span class="word">的</span> <span class="word">名义</span>》</strong></p>
 
-  <p><strong>Song 4 《花海》</strong></p>
+  <p><strong><span class="word">Game</span> 1 <span class="word">接龙</span> <span class="word">画画</span></strong></p>
 
-  <p><strong>Talk-show 5 《天不怕地不怕，就怕老师找我爸》</strong></p>
+  <p><strong><span class="word">Song</span> 4 《<span class="word">花海</span>》</strong></p>
 
-  <p><strong>Game 2 撕名牌</strong></p>
+  <p><strong><span class="word">Talk</span>-<span class="word">show</span> 5 《<span class="word">天</span> <span class="word">不</span> <span class="word">怕</span> <span class="word">地</span> <span class="word">不</span> <span class="word">怕</span>，<span class="word">就</span> <span class="word">怕</span> <span class="word">老师</span> <span class="word">找</span> <span class="word">我</span> <span class="word">爸</span>》</strong></p>
 
-  <p><strong>Mini-play 6 《总裁看病》</strong></p>
+  <p><strong><span class="word">Game</span> 2 <span class="word">撕名牌</span></strong></p>
 
-  <p><strong>Finale 7 《Happy New Year》</strong></p>
+  <p><strong><span class="word">Mini</span>-<span class="word">play</span> 6 《<span class="word">总裁</span> <span class="word">看病</span>》</strong></p>
+
+  <p><strong><span class="word">Finale</span> 7 《<span class="word">Happy</span> <span class="word">New</span> <span class="word">Year</span>》</strong></p>
 </section>
+
 <div class="btn-group">
   <a class="d-btn" href="video.html">元旦视频</a>
 </div>
-<!-- 数据卡片 -->
+
+<!-- 结尾 -->
 <section class="card">
-  <h1>- The End -</h1>
-  <p>See you in 2026, 223!</p>
+<h1> - <span class="word">The</span> <span class="word">End</span> - </h1>
 </section>
 </div>
 
+<!-- 弹窗结构 -->
+<div id="overlay"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+  <details class="eg-box">
+    <summary class="d-btn">🔈 例句</summary>
+    <div class="card"><span id="wcEg"></span></div>
+  </details>
+  <button class="speaker" id="wcSpeaker">
+    <img src="speaker.png" alt="朗读" class="speaker-icon">
+  </button>
+</div>
+
+<script src="dict.js"></script>
 <script>
+/* ---------- 点词弹窗 ---------- */
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if (!w) return;
+  const raw = w.textContent.trim().toLowerCase();
+  const entry = DICT[raw] || { ph: '', zh: '（暂无释义）', eg: '' };
+  showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+});
+const overlay = document.getElementById('overlay');
+const wordCard = document.getElementById('wordCard');
+const wcWord = document.getElementById('wcWord');
+const wcPhonetic = document.getElementById('wcPhonetic');
+const wcMean = document.getElementById('wcMean');
+const wcEg = document.getElementById('wcEg');
+const wcSpeaker = document.getElementById('wcSpeaker');
+
+function showCard(word, phonetic, mean, eg = '') {
+  wcWord.textContent = word;
+  wcPhonetic.textContent = phonetic;
+  wcMean.textContent = mean;
+  wcEg.innerHTML = eg;
+  overlay.style.display = 'block';
+  wordCard.style.display = 'block';
+  speak(word);
+}
+function hideCard() {
+  overlay.style.display = 'none';
+  wordCard.style.display = 'none';
+}
+overlay.onclick = hideCard;
+document.onkeydown = e => e.key === 'Escape' && hideCard();
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+wcSpeaker.onclick = () => speak(wcWord.textContent);
+
 /* 互斥按钮 */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.d-btn');

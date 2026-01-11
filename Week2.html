@@ -2,9 +2,9 @@
 <html lang="zh-CN" data-theme="bright">
 <head>
 <meta charset="utf-8">
-<title>班级 Weekly Report</title>
+<title>班级 Weekly Report — 全词点译版</title>
 <style>
-/* ===== 继承 tb.html 的灰蓝变量 ===== */
+/* ===== 继承你原来的灰蓝变量 ===== */
 :root[data-theme="bright"]{
   --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
   --bottom-blue:#38bdf8;--blue-glow:#38bdf822;
@@ -33,59 +33,96 @@ body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
 .card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
 .card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
 
-/* ===== 1. 3D 互斥按钮组（周次选择）===== */
+/* 3D 互斥按钮组 */
 .btn-group{display:flex;gap:8px;margin-bottom:12px}
 .d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
 .d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
 .d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
 .d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
 
-/* ===== 2. 滚动条列表 ===== */
+/* 滚动条列表 */
 .mini-scroll{max-height:140px;overflow:auto;padding-right:8px}
 .mini-scroll::-webkit-scrollbar{width:6px}
 .mini-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:3px}
 .mini-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
 
-/* ===== 3. 统计数字 ===== */
+/* 统计数字 */
 .stat{display:flex;justify-content:space-around;text-align:center;margin-top:12px}
 .stat div{font-size:24px;font-weight:700;color:var(--bottom-blue)}
 .stat small{display:block;font-size:13px;font-weight:400;color:var(--text);margin-top:4px}
 
-/* ===== 4. 下周备忘输入 ===== */
+/* 下周备忘输入 */
 .duo-input{width:100%;padding:10px 14px;font-size:15px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s}
 .duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
 
-/* ===== 5. 日期选择器 ===== */
+/* 日期选择器 */
 .duo-date{padding:6px 12px;font-size:15px;border:2px solid var(--gray1);border-radius:14px;background:transparent;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999'%3E%3Cpath d='M4 6h8l-4 4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;cursor:pointer}
 .duo-date:focus{border-color:var(--bottom-blue);box-shadow:0 0 0 4px var(--blue-glow)}
 .title-img{
-  height:100%;          /* 根据实际图高调整 */
-  width:100%;
-  display:block;
-  object-fit:contain;   /* 防止拉伸 */
+	height:100%;
+	width:100%;
+	display:block;
+	object-fit:contain
 }
-/* 暗色主题下反白，让深色 LOGO 可见 */
-:root[data-theme="dark"] .title-img{
-  filter:invert(1) hue-rotate(180deg);   /* 简易反色，可换成你自己的白版 LOGO */
+:root[data-theme="dark"] .title-img{filter:invert(1) hue-rotate(180deg)}
+figure{margin:32px 0;text-align:center}
+figure img{max-width:100%;height:auto;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08);width:30vw;margin:5px;border:2px solid #FFF}
+figcaption{margin-top:10px;font-size:14px;color:#666}
+
+/* ===== 弹窗卡片 ===== */
+#wordCard{
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  background:var(--bg);
+  border:2px solid var(--bottom-blue);
+  border-radius:12px;
+  padding:16px 20px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  z-index:9999;
+  display:none;
+  min-width:220px;
 }
-figure {
-            margin: 32px 0;
-            text-align: center;
-        }
-        figure img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
-	box-shadow: 0 4px 12px rgba(0,0,0,.08);
-	width: 30vw;
-	margin: 5px;
-	border: 2px solid #FFF;
-        }
-        figcaption {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
-        }
+#wordCard h4{margin:0 0 6px;font-size:20px;color:var(--bottom-blue);}
+#wordCard .phonetic{font-size:15px;color:var(--text);}
+#wordCard .mean{font-size:14px;margin-top:8px;color:var(--text);}
+#wordCard .speaker{
+  width:36px;height:36px;
+  border:2px solid var(--bottom-blue);
+  border-radius:50%;
+  background:transparent;
+  cursor:pointer;
+  margin-top:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+#wordCard .speaker:hover{background:var(--blue-glow);}
+/* 遮罩 */
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:9998;
+  display:none;
+}
+/* ===== 不连续下划线 ===== */
+.word {
+  border-bottom: 1px dotted var(--bottom-blue);   /* 颜色随主题 */
+  cursor: pointer;                                /* 手型提示可点 */
+  transition: border-color .2s;
+}
+.word:hover {
+  border-bottom-style: dashed;                    /* 悬停时变虚线 */
+}
+/* 自定义喇叭图标 */
+.speaker-icon {
+  width: 20px;          /* 按需调整 */
+  height: 20px;
+  display: block;
+}
+/* 暗色主题反白 */
+:root[data-theme="dark"] .speaker-icon {
+  filter: invert(1);    /* 黑图变白图 */
+}
+
 </style>
 <script src="theme.js"></script>
 </head>
@@ -97,7 +134,6 @@ figure {
 
 <!-- 周次选择 -->
 <div class="btn-group">
-
   <button class="switch" onClick="toggleTheme()">切换主题</button>
   <button class="d-btn active">第 2 周</button>
   <a class="d-btn" href="index.html">返回</a>
@@ -105,82 +141,116 @@ figure {
 
 <!-- 1. 出勤统计 -->
 <section class="card">
-  <h3>The second publication</h3>
-    <p>Chief editor:王文钰</p>
-    <p>Associate editor:付梓妤</p>
-    <p>Website Builder:王琦朝</p>
-    <p>ALL CONTRIBUTOR ARE WELOCME!!!</p>
+  <h3><span class="word">The</span> <span class="word">second</span> <span class="word">publication</span></h3>
+    <p><span class="word">Chief</span> <span class="word">editor</span>: <span class="word">Wang</span> <span class="word">Wenyu</span></p>
+    <p><span class="word">Associate</span> <span class="word">editor</span>: <span class="word">Fu</span> <span class="word">Ziyu</span></p>
+    <p><span class="word">Website</span> <span class="word">Builder</span>: <span class="word">Wang</span> <span class="word">Qizhao</span></p>
+    <p><span class="word">ALL</span> <span class="word">CONTRIBUTOR</span> <span class="word">ARE</span> <span class="word">WELCOME</span>!!!</p>
 </section>
 
 <!-- 2. 课堂表现 -->
 <section class="card">
-  <h1>Huge Reversal!</h1>
-  <h2>Class 223 Got two Championships Again!</h2>
-    <h3>Time:December 18th,2025</h3>
-    <p>Writer:王文钰</p>
-    <p>Helper:付梓妤
-      </p>
-    <p>The football matches in Gu Tao No.1 Middle School began on December 15th, 2025.</p>
-    <p>On Tuesday, we saw the football matches, and footballers in Class 223 won easily.</p>
-<p> On Wednesday aftermoon physics teacher don't wanted us to seethe footiball matches.</p><details>
-    <summary class="d-btn">来自编者吐槽</summary>
+  <h1><span class="word">Huge</span> <span class="word">Reversal</span>!</h1>
+  <h2><span class="word">Class</span> <span class="word">223</span> <span class="word">Got</span> <span class="word">two</span> <span class="word">Championships</span> <span class="word">Again</span>!</h2>
+    <h3><span class="word">Time</span>: <span class="word">December</span> <span class="word">18th</span>, <span class="word">2025</span></h3>
+    <p><span class="word">Writer</span>: <span class="word">Wang</span> <span class="word">Wenyu</span></p>
+    <p><span class="word">Helper</span>: <span class="word">Fu</span> <span class="word">Ziyu</span></p>
+    <p><span class="word">The</span> <span class="word">football</span> <span class="word">matches</span> <span class="word">in</span> <span class="word">Gu</span> <span class="word">Tao</span> <span class="word">No</span>.<span class="word">1</span> <span class="word">Middle</span> <span class="word">School</span> <span class="word">began</span> <span class="word">on</span> <span class="word">December</span> <span class="word">15th</span>, <span class="word">2025</span>.</p>
+    <p><span class="word">On</span> <span class="word">Tuesday</span>, <span class="word">we</span> <span class="word">saw</span> <span class="word">the</span> <span class="word">football</span> <span class="word">matches</span>, <span class="word">and</span> <span class="word">footballers</span> <span class="word">in</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">won</span> <span class="word">easily</span>.</p>
+<p> <span class="word">On</span> <span class="word">Wednesday</span> <span class="word">afternoon</span> <span class="word">physics</span> <span class="word">teacher</span> <span class="word">don't</span> <span class="word">wanted</span> <span class="word">us</span> <span class="word">to</span> <span class="word">see</span> <span class="word">the</span> <span class="word">football</span> <span class="word">matches</span>.</p>
+<details>
+    <summary class="d-btn"><span class="word">来自编者吐槽</span></summary>
     <div class="card" style="margin-top:12px;">
-      <p>私人恩怨吧</p>
+      <p><span class="word">私人恩怨吧</span></p>
     </div>
   </details>
-<p>However, the second lesson that day afternoon is PE, but we heard bad information when we got to the playground. This information shocked our women's football team results had been cancelledy! The news shocked us deeply, and even some students planned to launch "The December 8th Uprising".
-      Lately, the reporter interviewed the male and female athletes of Class 223.
-      Hou Qinren, who led us to win in the difficult situation, and this victory had a lot to do with him.
-    Ren Keyu, the football star of Class 223, said: "At the end of the penalty shootout, Mr. Hou thought Class 223 had won. Then, Liu Qingxi said, 'How was the judgment made?' However, Mr. Hou misheard it as 'What are you looking at?' She said angrily, 'How can your quality be so poor?' and then cancelled the results."</p>
+<p><span class="word">However</span>, <span class="word">the</span> <span class="word">second</span> <span class="word">lesson</span> <span class="word">that</span> <span class="word">day</span> <span class="word">afternoon</span> <span class="word">is</span> <span class="word">PE</span>, <span class="word">but</span> <span class="word">we</span> <span class="word">heard</span> <span class="word">bad</span> <span class="word">information</span> <span class="word">when</span> <span class="word">we</span> <span class="word">got</span> <span class="word">to</span> <span class="word">the</span> <span class="word">playground</span>. <span class="word">This</span> <span class="word">information</span> <span class="word">shocked</span> <span class="word">our</span> <span class="word">women's</span> <span class="word">football</span> <span class="word">team</span> <span class="word">results</span> <span class="word">had</span> <span class="word">been</span> <span class="word">cancelled</span>! <span class="word">The</span> <span class="word">news</span> <span class="word">shocked</span> <span class="word">us</span> <span class="word">deeply</span>, <span class="word">and</span> <span class="word">even</span> <span class="word">some</span> <span class="word">students</span> <span class="word">planned</span> <span class="word">to</span> <span class="word">launch</span> "<span class="word">The</span> <span class="word">December</span> <span class="word">8th</span> <span class="word">Uprising</span>".
+      <span class="word">Lately</span>, <span class="word">the</span> <span class="word">reporter</span> <span class="word">interviewed</span> <span class="word">the</span> <span class="word">male</span> <span class="word">and</span> <span class="word">female</span> <span class="word">athletes</span> <span class="word">of</span> <span class="word">Class</span> <span class="word">223</span>.
+      <span class="word">Hou</span> <span class="word">Qinren</span>, <span class="word">who</span> <span class="word">led</span> <span class="word">us</span> <span class="word">to</span> <span class="word">win</span> <span class="word">in</span> <span class="word">the</span> <span class="word">difficult</span> <span class="word">situation</span>, <span class="word">and</span> <span class="word">this</span> <span class="word">victory</span> <span class="word">had</span> <span class="word">a</span> <span class="word">lot</span> <span class="word">to</span> <span class="word">do</span> <span class="word">with</span> <span class="word">him</span>.
+    <span class="word">Ren</span> <span class="word">Keyu</span>, <span class="word">the</span> <span class="word">football</span> <span class="word">star</span> <span class="word">of</span> <span class="word">Class</span> <span class="word">223</span>, <span class="word">said</span>: "<span class="word">At</span> <span class="word">the</span> <span class="word">end</span> <span class="word">of</span> <span class="word">the</span> <span class="word">penalty</span> <span class="word">shootout</span>, <span class="word">Mr</span>. <span class="word">Hou</span> <span class="word">thought</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">had</span> <span class="word">won</span>. <span class="word">Then</span>, <span class="word">Liu</span> <span class="word">Qingxi</span> <span class="word">said</span>, '<span class="word">How</span> <span class="word">was</span> <span class="word">the</span> <span class="word">judgment</span> <span class="word">made</span>?' <span class="word">However</span>, <span class="word">Mr</span>. <span class="word">Hou</span> <span class="word">misheard</span> <span class="word">it</span> <span class="word">as</span> '<span class="word">What</span> <span class="word">are</span> <span class="word">you</span> <span class="word">looking</span> <span class="word">at</span>?' <span class="word">She</span> <span class="word">said</span> <span class="word">angrily</span>, '<span class="word">How</span> <span class="word">can</span> <span class="word">your</span> <span class="word">quality</span> <span class="word">be</span> <span class="word">so</span> <span class="word">poor</span>?' <span class="word">and</span> <span class="word">then</span> <span class="word">cancelled</span> <span class="word">the</span> <span class="word">results</span>."</p>
 <p>
-  When we all thought there was no hope, the huge grey ex-soldier came, and it was our class teacher Mr. Li. He tried every means to please Mrs. Hou, and said all kinds of nice things. Finally, Mrs. Hou decided that we would have a rematch. What a great class teacher! He also made a great contribution to our winning the double championship.</p>
-    <p>On Thursday, Liu Shuhan, one of the female football team members of Class 223, said: "We don't need to have a rematch because Liu Qingzi took the initiative to apologize to Mrs. Hou. Duan Yankai has been directly adjusted to the first place!"</p>
-    <p>All the students in Class 22 were very happy because this meant that Class 22 got two championships again! I hope that Class 22 is sure to become better in the future!!</p>
- 
+  <span class="word">When</span> <span class="word">we</span> <span class="word">all</span> <span class="word">thought</span> <span class="word">there</span> <span class="word">was</span> <span class="word">no</span> <span class="word">hope</span>, <span class="word">the</span> <span class="word">huge</span> <span class="word">grey</span> <span class="word">ex</span>-<span class="word">soldier</span> <span class="word">came</span>, <span class="word">and</span> <span class="word">it</span> <span class="word">was</span> <span class="word">our</span> <span class="word">class</span> <span class="word">teacher</span> <span class="word">Mr</span>. <span class="word">Li</span>. <span class="word">He</span> <span class="word">tried</span> <span class="word">every</span> <span class="word">means</span> <span class="word">to</span> <span class="word">please</span> <span class="word">Mrs</span>. <span class="word">Hou</span>, <span class="word">and</span> <span class="word">said</span> <span class="word">all</span> <span class="word">kinds</span> <span class="word">of</span> <span class="word">nice</span> <span class="word">things</span>. <span class="word">Finally</span>, <span class="word">Mrs</span>. <span class="word">Hou</span> <span class="word">decided</span> <span class="word">that</span> <span class="word">we</span> <span class="word">would</span> <span class="word">have</span> <span class="word">a</span> <span class="word">rematch</span>. <span class="word">What</span> <span class="word">a</span> <span class="word">great</span> <span class="word">class</span> <span class="word">teacher</span>! <span class="word">He</span> <span class="word">also</span> <span class="word">made</span> <span class="word">a</span> <span class="word">great</span> <span class="word">contribution</span> <span class="word">to</span> <span class="word">our</span> <span class="word">winning</span> <span class="word">the</span> <span class="word">double</span> <span class="word">championship</span>.</p>
+    <p><span class="word">On</span> <span class="word">Thursday</span>, <span class="word">Liu</span> <span class="word">Shuhan</span>, <span class="word">one</span> <span class="word">of</span> <span class="word">the</span> <span class="word">female</span> <span class="word">football</span> <span class="word">team</span> <span class="word">members</span> <span class="word">of</span> <span class="word">Class</span> <span class="word">223</span>, <span class="word">said</span>: "<span class="word">We</span> <span class="word">don't</span> <span class="word">need</span> <span class="word">to</span> <span class="word">have</span> <span class="word">a</span> <span class="word">rematch</span> <span class="word">because</span> <span class="word">Liu</span> <span class="word">Qingzi</span> <span class="word">took</span> <span class="word">the</span> <span class="word">initiative</span> <span class="word">to</span> <span class="word">apologize</span> <span class="word">to</span> <span class="word">Mrs</span>. <span class="word">Hou</span>. <span class="word">Duan</span> <span class="word">Yankai</span> <span class="word">has</span> <span class="word">been</span> <span class="word">directly</span> <span class="word">adjusted</span> <span class="word">to</span> <span class="word">the</span> <span class="word">first</span> <span class="word">place</span>!"</p>
+    <p><span class="word">All</span> <span class="word">the</span> <span class="word">students</span> <span class="word">in</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">were</span> <span class="word">very</span> <span class="word">happy</span> <span class="word">because</span> <span class="word">this</span> <span class="word">meant</span> <span class="word">that</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">got</span> <span class="word">two</span> <span class="word">championships</span> <span class="word">again</span>! <span class="word">I</span> <span class="word">hope</span> <span class="word">that</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">is</span> <span class="word">sure</span> <span class="word">to</span> <span class="word">become</span> <span class="word">better</span> <span class="word">in</span> <span class="word">the</span> <span class="word">future</span>!!</p>
 </section>
+
 <section class="card">
-<figure><img src="8.jpg" alt="插画"><img src="6.jpg" alt="插画"><img src="7.jpg" alt="插画"></figure>
+<figure>
+  <img src="8.jpg" alt="插画">
+  <img src="6.jpg" alt="插画">
+  <img src="7.jpg" alt="插画">
+</figure>
 </section>
+
 <section class="card">
-  <h3>注解</h3>
-  <p>be sure to + V原：确信某事发生<br>
-    Be sure to + V原：提醒某人做事（常用于祈使句）<br>
-    be not sure to：不一定会<br>
-    try every means to please：百般讨好<br>
-    say all kinds of nice things：说好话<br>
-    rematch：复赛<br>
-    contribution：贡献<br>
-    take the initiative：主动<br>
-    apologize：道歉<br>
-    rank：排名<br>
-    adjust：调整<br>
-    deeply：深深地<br>
-    launch：发起<br>
-    The December 8th Uprising：一二八起义<br><details>
-    <summary class="d-btn">来自编者吐槽</summary>
-    <div class="card" style="margin-top:12px;">
-      <p>666有意思</p>
-    </div>
-  </details>
-    uprising：起义，暴动<br>
-    male：男性的<br>
-    female：女性的<br>
-    led：lead 的过去式，带领<br>
-    penalty shootout：点球大战<br>
-    judgment：判断，裁定<br>
-    misheard：听错<br>
-    quality：品质<br>
-    reversal：反转，逆转<br>
-    championship：冠军<br>
-    cancel：取消<br>
-    shock：使震惊</p>
-</section>
-<section class="card">
-<h1> - The end - </h1>
+<h1> - <span class="word">The</span> <span class="word">end</span> - </h1>
 </section>
 </div>
+
+<!-- ==============  弹窗卡片 ============== -->
+<div id="overlay"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+
+  <!-- ▼▼▼ 折叠例句 ▼▼▼ -->
+  <details style="margin-top:8px;">
+    <summary class="d-btn" style="display:inline-block;padding:4px 10px;font-size:13px;">
+      🔈 例句
+    </summary>
+    <div class="card" style="margin-top:6px;padding:10px;font-size:13px;color:#666;white-space:pre-line">
+      <span id="wcEg"></span>
+    </div>
+  </details>
+  <!-- ▲▲▲ 折叠例句 ▲▲▲ -->
+
+  <button class="speaker" id="wcSpeaker"><img src="speaker.png" alt="朗读" class="speaker-icon"></button>
+</div>
+<script src="dict.js"></script>
 <script>
-/* 互斥按钮 */
+/* ==========  核心逻辑  ========== */
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if(w){
+    const raw = w.textContent.trim().toLowerCase();
+    const entry = DICT[raw] || { ph:'', zh:'（暂无释义）', eg:'' };
+showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+  }
+});
+
+/* 点遮罩或按 ESC 关闭 */
+overlay.onclick = hideCard;
+document.onkeydown = e => e.key==='Escape' && hideCard();
+
+function showCard(word, phonetic, mean, eg = ''){
+  wcWord.textContent = word;
+  wcPhonetic.textContent = phonetic;
+  wcMean.textContent = mean;
+  wcEg.innerHTML = eg;          // ←←← 新增：例句（支持换行）
+  overlay.style.display = 'block';
+  wordCard.style.display = 'block';
+  speak(word);
+}
+function hideCard(){
+  overlay.style.display = 'none';
+  wordCard.style.display = 'none';
+}
+
+/* 喇叭手动朗读 */
+wcSpeaker.onclick = () => speak(wcWord.textContent);
+
+/* ==========  TTS 朗读  ========== */
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+
+/* 互斥按钮（你原来的） */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.d-btn');
   const group = e.target.closest('.btn-group');
@@ -189,12 +259,6 @@ document.addEventListener('click', e => {
     btn.classList.add('active');
   }
 });
-
-
-/* 日期默认到下周周一 */
-const d = new Date();
-d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7 || 7);
-document.getElementById('memoDate').valueAsDate = d;
 </script>
 </body>
 </html>
