@@ -86,58 +86,42 @@ figure {
             font-size: 14px;
             color: #666;
         }
-		/* 去掉原生三角，换自定义图标 */
-summary{
-  list-style: none; /* 隐藏默认三角 */
-  cursor: pointer;
-}
-summary::before{
-  content: '► ';
-  display: inline-block;
-  margin-right: 6px;
-  transition: transform .2s;
-}
-details[open] summary::before{
-  transform: rotate(90deg);
-}
-
 </style>
 <script src="theme.js"></script>
 </head>
 <body>
 <div class="card">
-<h1>更新日志</h1>
+<h1>贡献者名单及团队</h1>
 
 <!-- 周次选择 -->
 <div class="btn-group">
 
   <button class="switch" onClick="toggleTheme()">切换主题</button>
-  <button class="d-btn active">更新</button>
+  <button class="d-btn active">贡献者名单及团队</button>
   <a class="d-btn" href="index.html">返回</a>
 </div>
 
 <!-- 1. 出勤统计 -->
 <section class="card">
-  <h3>更新了</h3>
-    <p>日期:20025|12|30</p>
-    <!-- 隐藏/展开文本示例 -->
-  <details>
-    <summary class="d-btn">点我查看隐藏内容</summary>
-    <div class="card" style="margin-top:12px;">
-      <p>累</p>
-    </div>
-  </details>
-
+  <h3>贡献者名单</h3>
+  <section class="card">
+    <h3>223内部成员:</h3>
+    <p>最大贡献者:张老师</p>
+    <p>王文钰</p>
+    <p>付梓妤</p>
+    <p>王琦朝</p>
+    <p>宋时慷</p>
+    </section>
+   <section class="card">
+    <h3>外部成员:</h3>
+    <p>郝俊凯</p>
+    </section>
 </section>
-
-<!-- 2. 课堂表现 -->
 <section class="card">
-  <h3>日志</h3>
-    <p>-侧边栏更新</p>
-    <p>-修复已知问题</p>
-    <p>-评论模块up,up,up</p>
- 
+  <h3><strong>团队</strong></h3>
+    <p><img src="log.png" alt="插画"><img src="title.png" alt="插画"></p>
 </section>
+
 </div>
 <script>
 /* 互斥按钮 */
@@ -149,6 +133,8 @@ document.addEventListener('click', e => {
     btn.classList.add('active');
   }
 });
+
+
 /* 日期默认到下周周一 */
 const d = new Date();
 d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7 || 7);

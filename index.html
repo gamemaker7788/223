@@ -4,55 +4,47 @@
 <meta charset="utf-8">
 <title>223 班 Weekly Report 主页</title>
 <style>
-/* ===== 1. 复用 tb.html 全套变量 ===== */
+/* ===== 主题变量 ===== */
 :root[data-theme="bright"]{
-  --bg        : #ffffff;
-  --text      : #333333;
-  --gray1     : #cccccc;
-  --gray2     : #bbbbbb;
-  --bottom-blue: #38bdf8;
-  --blue-glow : #38bdf822;
+  --bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;--danger:#ef4444;
 }
 :root[data-theme="dark"]{
-  --bg        : #1e1e1e;
-  --text      : #e5e5e5;
-  --gray1     : #555555;
-  --gray2     : #333333;
-  --bottom-blue: #38bdf8;
-  --blue-glow : #38bdf833;
+  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;--danger:#ef4444;
 }
-
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
 
-/* ===== 2. tb.html 原版组件 ===== */
-/* 3D 互斥按钮 */
+/* ===== 通用组件 ===== */
 .btn-group{display:flex;gap:8px;padding:16px 24px}
 .d-btn{position:relative;padding:8px 18px;font-size:15px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 4px 0 var(--gray2);transition:all .12s ease}
-.d-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--gray2)}
-.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 4px 0 var(--bottom-blue)}
+.d-btn:hover{transform:translateY(-1px);box-shadow:0 6px 0 var(--gray2)}
 .d-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gray2)}
-
-/* 输入框 */
 .duo-input{width:calc(100% - 48px);margin:0 24px;padding:12px 16px;font-size:16px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s;color:var(--text);}
-.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--blue-glow)}
 
-/* 滚动条区域 */
-.duo-scroll{width:calc(100% - 48px);margin:12px 24px;max-height:160px;overflow:auto;padding:8px 12px;border:2px solid var(--gray1);border-radius:14px}
-.duo-scroll::-webkit-scrollbar{width:8px}
-.duo-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:4px}
-.duo-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
-
-/* ===== 3. 左侧栏 ===== */
+/* ===== 侧边栏 ===== */
 .side-bar{position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);border-right:2px solid var(--gray1);display:flex;flex-direction:column;padding:16px;z-index:9;}
 .side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.side-logo{height:32px;filter:none}
-:root[data-theme="dark"] .side-logo{filter:invert(1) hue-rotate(180deg)}
-.side-nav{flex:1;overflow:auto}
 .side-item{display:block;padding:8px 12px;margin:6px 0;border:2px solid transparent;border-radius:6px;text-decoration:none;color:var(--text);transition:border-color .2s}
 .side-item:hover{border-color:var(--bottom-blue);}
 .side-foot{border-top:2px solid var(--gray1);padding-top:12px}
 
-/* 移动端汉堡 */
+/* 通知中心 */
+.notify-badge{background:var(--danger);color:#fff;font-size:11px;padding:2px 6px;border-radius:10px;min-width:16px;text-align:center;}
+.notify-list{max-height:120px;overflow:auto;font-size:13px;line-height:1.4;}
+.notify-item{padding:6px 8px;margin:4px 0;border-radius:6px;background:var(--blue-glow);cursor:pointer;}
+.notify-item:hover{background:var(--bottom-blue);color:#fff;}
+.notify-item small{color:var(--gray2);}
+
+/* 弹窗 */
+.modal-mask{position:fixed;inset:0;background:#0006;z-index:99;display:flex;align-items:center;justify-content:center}
+.modal-panel{width:90%;max-width:420px;background:var(--bg);border:2px solid var(--gray1);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.modal-title{font-size:18px;font-weight:600;color:var(--bottom-blue)}
+.modal-body{white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto}
+.hidden{display:none}
+
+/* 汉堡 */
 .side-ham{position:fixed;top:12px;left:12px;z-index:10;padding:6px 10px;font-size:18px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;cursor:pointer}
 .side-mask{position:fixed;inset:0;background:#0004;display:none;z-index:8}
 .side-bar.translate{transform:translateX(-100%);transition:transform .3s ease}
@@ -60,14 +52,10 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .side-mask.on{display:block}
 @media (max-width:900px){body{padding-left:16px}.side-bar.translate{display:flex}}
 
-/* ===== 4. 主内容区 ===== */
+/* 主内容 */
 h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 .card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
 .card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
-.cmt-post{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
-.cmt-cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.cmt-cards .card{width:260px;margin:0;box-sizing:border-box;}
-
 /* ===== 5. 隐私条款浮层 ===== */
 .privacy-mask{
   position:fixed;
@@ -90,13 +78,41 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
   transform:translateY(0);
   transition:transform .3s ease;
 }
-.privacy-panel.hide{transform:translateY(-10086px);pointer-events:none}
+.privacy-panel.hide{transform:translateY(-62vh) translateX(57vw);pointer-events:none}
 </style>
 <script src="theme.js"></script>
 <script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
 </head>
 <body>
 
+<!-- 侧边栏 -->
+<aside id="sideBar" class="side-bar translate">
+  <div class="side-head">
+    <button class="d-btn" onClick="closeSide()">✕</button>
+  </div>
+  <nav class="side-nav">
+    <a class="side-item" href="ystk.html">隐私与条款</a>
+    <a class="side-item" href="wud.html">如何点击按钮</a>
+    <a class="side-item" href="gxlog.html">关于更新</a>
+    <a class="side-item" href="gxz.html">贡献者名单及团队</a>
+    <a class="side-item" href="login.html">个人信息</a>
+    <a class="side-item" href="fk.html">反馈</a>
+    
+    <!-- 通知中心 -->
+    <div style="border-top:1px solid var(--gray1);margin:12px 0;padding-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:14px">通知中心</span>
+        <span id="notifyBadge" class="notify-badge hidden">0</span>
+      </div>
+      <div id="notifyList" class="notify-list"></div>
+    </div>
+  </nav>
+  <div class="side-foot">
+    <button class="d-btn" onClick="toggleTheme()">切换主题</button>
+  </div>
+</aside>
+<div id="sideMask" class="side-mask" onClick="closeSide()"></div>
+<button id="sideHam" class="d-btn" onClick="openSide()">☰</button>
 <!-- 遮罩 + 隐私条款浮层 -->
 <div id="privacyMask" class="privacy-mask"></div>
 <section id="privacyPanel" class="card privacy-panel">
@@ -108,7 +124,7 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
     <details>
     <summary class="d-btn">点我查看内容</summary>
     <div class="card" style="margin-top:12px;">
-      <p><a class="side-item" href="ystk.html">隐私与条款</a>点击阅读</p>
+      <p><a class="side-item" href="ystk.html">隐私与条款</a></p>
     </div>
   </details>
     
@@ -119,90 +135,6 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
     <button class="d-btn" id="reselectBtn"style="display:none;" onClick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
   </div>
 </section>
-
-<!-- 侧边栏 -->
-<aside id="sideBar" class="side-bar translate">
-  <div class="side-head">
-    <button class="d-btn" onClick="closeSide()">✕</button>
-  </div>
-  <nav class="side-nav">
-    <a class="side-item" href="ystk.html">隐私与条款</a>
-    <a class="side-item" href="wud.html">如何点击按钮</a>
-    <a class="side-item" href="gxlog.html">关于更新</a>
-  </nav>
-  <div class="side-foot">
-    <button class="d-btn" onClick="toggleTheme()">切换主题</button>
-  </div>
-</aside>
-<div id="sideMask" class="side-mask" onClick="closeSide()"></div>
-<button id="sideHam" class="d-btn" onClick="openSide()">☰</button>
-
-<!-- 主内容 -->
-<h1>223 班 Weekly Report</h1>
-
-<section class="card">
-  <h3>选择期数</h3>
-  <div class="btn-group">
-    <a class="d-btn" href="Week1.html">第 1 周</a>
-    <a class="d-btn" href="Week2.html">第 2 周</a>
-    <a class="d-btn" href="Week3.html">第 3 周</a>
-  </div>
-</section>
-<section class="card">
-  <h3>选择报外</h3>
-  <div class="btn-group">
-    <a class="d-btn" href="fw1.html">元旦特报</a>
-    <a class="d-btn" href="fw2.html">元旦总结</a>
-  </div>
-</section>
-
-<!-- 评论区：同款输入 + 3D按钮 + 滚动条 -->
-<section class="card" id="cmtBox">
-  <h3>留言板</h3>
-  <section class="card">
-    <input id="cname" class="duo-input" placeholder="昵称（必填）" maxlength="40">
-    <textarea id="ctext" class="duo-input" placeholder="说点什么…" maxlength="500" rows="4"></textarea>
-    <button class="d-btn" onClick="submitComment()">发表</button>
-  </section>
-  <section class="card" style="padding:12px 16px;">
-    <div id="cmtCards" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"></div>
-  </section>
-</section>
-
-<script>
-/* ===== 侧边栏 ===== */
-const bar = document.getElementById('sideBar');
-const mask = document.getElementById('sideMask');
-function openSide(){ bar.classList.add('open'); mask.classList.add('on'); }
-function closeSide(){ bar.classList.remove('open'); mask.classList.remove('on'); }
-
-/* ===== Supabase ===== */
-const URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/comments';
-const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
-
-async function submitComment(){
-  const name = document.getElementById('cname').value.trim();
-  const txt  = document.getElementById('ctext').value.trim();
-  if(!name||!txt) return alert('请填写完整');
-  const res = await fetch(URL,{
-    method:'POST',
-    headers:{ 'apikey':KEY, 'Authorization':`Bearer ${KEY}`, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
-    body:JSON.stringify({ username:name, content:txt })
-  });
-  if(!res.ok) return alert('提交失败：'+res.status);
-  document.getElementById('ctext').value='';
-  loadComments();
-}
-async function loadComments(){
-  const res = await fetch(URL+'?select=id,username,content,post_time&order=post_time.desc&limit=200',{headers:{apikey:KEY}});
-  const arr = await res.json();
-  const html = arr.length
-    ? arr.map(c=>`<section class="card" style="position:relative;padding:12px 16px;display:flex;flex-direction:column;gap:6px;"><div style="position:absolute;top:8px;right:12px;font-size:12px;color:var(--gray2)">${new Date(c.post_time).toLocaleString()}</div><div style="margin-top:20px;font-size:15px;line-height:1.5;word-break:break-word;">${c.content}</div><div style="font-size:13px;color:var(--bottom-blue);align-self:flex-end;">— ${c.username}</div></section>`).join('')
-    : '<section class="card"><div style="text-align:center;color:var(--gray2)">暂无留言</div></section>';
-  document.getElementById('cmtCards').innerHTML = html;
-}
-loadComments();
-</script>
 
 <script>
 /* ===== 隐私条款：刷新即渲染已同意 + 重选 ===== */
@@ -250,6 +182,131 @@ loadComments();
     location.reload();
   };
 })();
+</script>
+
+<!-- 主内容 -->
+<h1>223 班 Weekly Report</h1>
+
+<section class="card">
+  <h3>选择期数</h3>
+  <div class="btn-group">
+    <a class="d-btn" href="Week1.html">第 1 周</a>
+    <a class="d-btn" href="Week2.html">第 2 周</a>
+    <a class="d-btn" href="Week3.html">第 3 周</a>
+  </div>
+</section>
+
+<section class="card">
+  <h3>选择报外</h3>
+  <div class="btn-group">
+    <a class="d-btn" href="fw1.html">元旦特报</a>
+    <a class="d-btn" href="fw2.html">元旦总结</a>
+  </div>
+</section>
+
+<!-- 通知详情弹窗 -->
+<div id="notifyModal" class="modal-mask hidden">
+  <div class="modal-panel">
+    <div id="notifyModalTitle" class="modal-title">系统消息</div>
+    <div id="notifyModalBody" class="modal-body"></div>
+    <div class="btn-group">
+      <button class="d-btn danger" onClick="removeNotify()">从列表删除</button>
+      <button class="d-btn" onClick="closeNotifyModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 通知中心 ===== */
+const NOTI_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/notifications';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+let lastCount = 0;
+function getUserId(){ const u = localStorage.getItem('user'); return u ? JSON.parse(u).id : null; }
+
+async function loadNotifications(){
+  const uid = getUserId();
+  if (!uid) return;
+  const res = await fetch(`${NOTI_URL}?user_id=eq.${uid}&type=eq.system&read=eq.false&select=id,title,body,created_at`, {headers:{apikey:ANON_KEY}});
+  const list = res.ok ? await res.json() : [];
+  renderNotifyList(list);
+  updateBadge(list.length);
+}
+function renderNotifyList(list){
+  const box = document.getElementById('notifyList');
+  if (!list.length) { box.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>'; return; }
+  box.innerHTML = list.map(n => `
+    <div class="notify-item" onclick="showNotifyModal('${n.id}','${n.title}','${n.body.replace(/'/g,"\\'")}')">
+      <div>${n.title}</div>
+      <small>${new Date(n.created_at).toLocaleString()}</small>
+    </div>`).join('');
+}
+function updateBadge(count){
+  const badge = document.getElementById('notifyBadge');
+  badge.textContent = count;
+  badge.style.display = count ? 'inline-block' : 'none';
+if (count > lastCount && count > 0) {
+  // 只有用户打开声音才播放
+  if (localStorage.getItem('soundNotify') !== 'false') {
+    new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE').play();
+  }
+}
+  lastCount = count;
+}
+async function markRead(id){
+  const res = await fetch(`${NOTI_URL}?id=eq.${id}`, {method:'PATCH',headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({read:true})});
+  if (res.ok) loadNotifications();
+}
+function removeNotify(){
+  // 1. 标为已读（可选）
+  markRead(currentNotifyId);
+  // 2. 本地隐藏
+  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
+  if (item) item.remove();
+  // 3. 角标减一
+  const badge = document.getElementById('notifyBadge');
+  let count = parseInt(badge.textContent) || 0;
+  count = Math.max(0, count - 1);
+  badge.textContent = count;
+  badge.style.display = count ? 'inline-block' : 'none';
+  closeNotifyModal();
+  // 4. 空列表提示
+  const listBox = document.getElementById('notifyList');
+  if (!listBox.querySelector('.notify-item')) {
+    listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
+  }
+}
+
+function showNotifyModal(id,title,body){
+	currentNotifyId = id;
+  document.getElementById('notifyModalTitle').textContent = title;
+  document.getElementById('notifyModalBody').textContent  = body;
+  document.getElementById('notifyModal').classList.remove('hidden');
+}
+function closeNotifyModal(){
+  document.getElementById('notifyModal').classList.add('hidden');
+}
+function removeNotify(){
+  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
+  if (item) item.remove();
+  const badge = document.getElementById('notifyBadge');
+  let count = parseInt(badge.textContent) || 0;
+  count = Math.max(0, count - 1);
+  badge.textContent = count; badge.style.display = count ? 'inline-block' : 'none';
+  closeNotifyModal();
+  const listBox = document.getElementById('notifyList');
+  if (!listBox.querySelector('.notify-item')) listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
+}
+let currentNotifyId = null;
+
+/* ===== 侧边栏 ===== */
+const bar = document.getElementById('sideBar');
+const mask = document.getElementById('sideMask');
+function openSide(){ bar.classList.add('open'); mask.classList.add('on'); }
+function closeSide(){ bar.classList.remove('open'); mask.classList.remove('on'); }
+
+/* ===== 轮询通知 ===== */
+setInterval(loadNotifications, 5000);
+loadNotifications();
 </script>
 </body>
 </html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>223班 - 个人信息</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+.switch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  width: 60px;
+  height: 26px;
+}
+
+.toggle {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  image-rendering: pixelated;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAEECAYAAAD0wkrNAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAGHaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49J++7vycgaWQ9J1c1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCc/Pg0KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+PHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIj48dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPjwvcmRmOkRlc2NyaXB0aW9uPjwvcmRmOlJERj48L3g6eG1wbWV0YT4NCjw/eHBhY2tldCBlbmQ9J3cnPz4slJgLAAAFd0lEQVR4Xu3YMWpbQRhG0ZGdwqAVJqQzRsYIL8aoSUgppKUJvIaYl346+91Csc+Bab52msu/GWMsAwCAzM08AACwjsACAIgJLACAmMACAIgJLACAmMACAIgJLACAmMACAIgJLACAmMACAIgJLACAmMACAIgJLACAmMACAIgJLACAmMACAIgJLACAmMACAIgJLACA2GaMsczjGsfTeZ4AAK7azx/f52kVFywAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgNhmjLHM4xrH03mersrl8jpPAHzA4fAyT7zDfv88T5/adns3T1fl6XE3T6u4YAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxDZjjGUe1ziezvN0VS6X13kC+BIOh5d5WmW/f54n3uGr/cd2ezdPq9zefpunVXYP9/O0igsWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEA/523t7/pqwksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAICYwAIAiAksAIDYZoyxzOMax9N5nq7K5fI6TwB8wOHwMk+8w37/PE+f2nZ7N09X5elxN0+ruGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQ2Y4xlHtf4/evPPAEApJabzTytsnu4n6dVXLAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGKbMcYyjwAAfJwLFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBA7B+FCmkzoT9HAAAAAABJRU5ErkJggg==);
+  background-size: 100% 100%;
+  transition: 0.3s;
+}
+
+.slider:before {
+  box-sizing: border-box;
+  position: absolute;
+  content: "";
+  height: 32px;
+  width: 28px;
+  bottom: 0px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARgAAAFACAYAAABnU2MWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAGHaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49J++7vycgaWQ9J1c1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCc/Pg0KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+PHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIj48dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPjwvcmRmOkRlc2NyaXB0aW9uPjwvcmRmOlJERj48L3g6eG1wbWV0YT4NCjw/eHBhY2tldCBlbmQ9J3cnPz4slJgLAAAEZElEQVR4Xu3cMWojURBF0WpHQpYXOxivYjBerGWhrCf/aesOFpwTvgVcKqptZvYBCLysA8CjCAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCCzPfon7/V2XyfgSVzOp3U6xAUDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwACZbWb2dTzieruv06/y/f2zTvDfvL29rtOvcjmf1ukQFwyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2S2mdnX8Yjr7b5OwJO4nE/rdIgLBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMtvM7Ot4xN/Pr3UCnsTH+591OsQFA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQEZggIzAABmBATICA2QEBsgIDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAmW1m9nUEeAQXDJARGCAjMEBGYICMwAAZgQEyAgNkBAbICAyQERggIzBARmCAjMAAGYEBMgIDZAQGyAgMkBEYICMwQOYfxHAXdb5V9+0AAAAASUVORK5CYII=);
+  background-size: 28px 32px;
+  transition: 0.3s;
+}
+
+.toggle:checked + .slider {
+  background: url(data:image/png;base64,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);
+  background-size: 100% 100%;
+}
+
+.toggle:checked + .slider:before {
+  transform: translateX(32px);
+}
+:root[data-theme="bright"]{--bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;--bottom-blue:#38bdf8;--blue-glow:#38bdf822;}
+:root[data-theme="dark"]{--bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;--bottom-blue:#38bdf8;--blue-glow:#38bdf833;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{width:360px;padding:32px 24px;border:2px solid var(--gray1);border-radius:14px;background:var(--bg)}
+.card h2{margin:0 0 20px;text-align:center;font-size:20px;color:var(--bottom-blue)}
+.avatar-wrap{position:relative;width:80px;height:80px;margin:0 auto 12px;cursor:pointer}
+.avatar{width:100%;height:100%;border-radius:12px;object-fit:cover;border:2px solid var(--gray1)}
+.avatar-tip{position:absolute;inset:0;background:#0003;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:12px}
+.avatar-wrap:hover .avatar-tip{opacity:1}
+.userLine{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:20px}
+.userName{font-size:18px;font-weight:600}
+.userUUID{font-size:12px;color:var(--gray2);text-align:center;margin-bottom:20px}
+.editInput{font-size:18px;font-weight:600;width:120px;text-align:center;border:1px solid var(--bottom-blue);border-radius:4px;padding:2px 4px}
+.duo-input{width:100%;padding:12px 16px;margin-bottom:12px;font-size:16px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;color:var(--text);box-sizing:border-box}
+.btn-group{display:flex;gap:8px}
+.d-btn{flex:1;padding:10px;font-size:15px;font-weight:600;border:2px solid var(--gray1);border-radius:8px;background:transparent;color:var(--text);cursor:pointer;transition:all .12s ease}
+.d-btn:hover{border-color:var(--bottom-blue);background:var(--blue-glow)}
+.d-btn.danger{border-color:#e74c3c;color:#e74c3c}
+.tips{margin-top:12px;font-size:12px;color:var(--gray2);text-align:center}
+/* 弹窗遮罩 */
+.modal-mask{position:fixed;inset:0;background:#0006;z-index:99;display:flex;align-items:center;justify-content:center}
+.modal-panel{width:90%;max-width:420px;background:var(--bg);border:2px solid var(--gray1);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.hidden{display:none}
+/* ===== 1. 复用 tb.html 全套变量 ===== */
+:root[data-theme="bright"]{
+  --bg        : #ffffff;
+  --text      : #333333;
+  --gray1     : #cccccc;
+  --gray2     : #bbbbbb;
+  --bottom-blue: #38bdf8;
+  --blue-glow : #38bdf822;
+}
+:root[data-theme="dark"]{
+  --bg        : #1e1e1e;
+  --text      : #e5e5e5;
+  --gray1     : #555555;
+  --gray2     : #333333;
+  --bottom-blue: #38bdf8;
+  --blue-glow : #38bdf833;
+}
+
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+
+/* ===== 2. tb.html 原版组件 ===== */
+/* 3D 互斥按钮 */
+.btn-group{display:flex;gap:8px;padding:16px 24px}
+.d-btn{position:relative;padding:8px 18px;font-size:15px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 4px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 4px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gray2)}
+
+/* 输入框 */
+.duo-input{width:calc(100% - 48px);margin:0 24px;padding:12px 16px;font-size:16px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s;color:var(--text);}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
+
+/* 滚动条区域 */
+.duo-scroll{width:calc(100% - 48px);margin:12px 24px;max-height:160px;overflow:auto;padding:8px 12px;border:2px solid var(--gray1);border-radius:14px}
+.duo-scroll::-webkit-scrollbar{width:8px}
+.duo-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:4px}
+.duo-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
+
+/* ===== 3. 左侧栏 ===== */
+.side-bar{position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);border-right:2px solid var(--gray1);display:flex;flex-direction:column;padding:16px;z-index:9;}
+.side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.side-logo{height:32px;filter:none}
+:root[data-theme="dark"] .side-logo{filter:invert(1) hue-rotate(180deg)}
+.side-nav{flex:1;overflow:auto}
+.side-item{display:block;padding:8px 12px;margin:6px 0;border:2px solid transparent;border-radius:6px;text-decoration:none;color:var(--text);transition:border-color .2s}
+.side-item:hover{border-color:var(--bottom-blue);}
+.side-foot{border-top:2px solid var(--gray1);padding-top:12px}
+
+/* 移动端汉堡 */
+.side-ham{position:fixed;top:12px;left:12px;z-index:10;padding:6px 10px;font-size:18px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;cursor:pointer}
+.side-mask{position:fixed;inset:0;background:#0004;display:none;z-index:8}
+.side-bar.translate{transform:translateX(-100%);transition:transform .3s ease}
+.side-bar.open{transform:translateX(0)}
+.side-mask.on{display:block}
+@media (max-width:900px){body{padding-left:16px}.side-bar.translate{display:flex}}
+
+/* ===== 4. 主内容区 ===== */
+h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
+.card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+.cmt-post{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.cmt-cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.cmt-cards .card{width:260px;margin:0;box-sizing:border-box;}
+
+/* ===== 5. 隐私条款浮层 ===== */
+.privacy-mask{
+  position:fixed;
+  inset:0;
+  background:#0006;
+  z-index:19;
+  display:block;
+  opacity:1;
+  transition:opacity .3s ease;
+}
+.privacy-mask.hide{opacity:0;pointer-events:none}
+.privacy-panel{
+  position:fixed;
+  inset:0;
+  max-width:480px;
+  margin:auto;
+  height:fit-content;
+  z-index:20;
+  background:var(--bg);
+  transform:translateY(0);
+  transition:transform .3s ease;
+}
+.privacy-panel.hide{transform:translateY(-10086px);pointer-events:none}
+
+</style>
+<script src="theme.js"></script>
+<script>(function(){
+  const t=localStorage.getItem('theme-223');
+  if(t)document.documentElement.dataset.theme=t;
+})();</script>
+</head>
+<body>
+
+<!-- ====== 登录卡片 ====== -->
+<section id="loginCard" class="card">
+  <h2>周报评论登录</h2>
+  <input id="username" class="duo-input" placeholder="用户名（必填）" maxlength="20">
+  <input id="password" class="duo-input" placeholder="密码（必填）" type="password" maxlength="20">
+  <div class="btn-group">
+    <button class="d-btn" onclick="login()">登录</button>
+    <button class="d-btn" onclick="register()">注册</button>
+  </div>
+  <div class="tips">首次登录将自动注册(刷数据库司马)</div>
+</section>
+
+<!-- ====== 个人信息卡片 ====== -->
+<section id="infoCard" class="card" style="display:none">
+<div class="btn-group">
+
+  
+  <a class="d-btn" href="index.html">返回</a>
+  <button class="d-btn" onClick="toggleTheme()">切换主题</button>
+</div>
+
+  <h2>个人信息</h2>
+  <p>如果此时你在一个周报里,并且你要评论,就刷新</p>
+  <!-- 放在任何需要的地方 -->
+
+  <!-- 头像 -->
+  <div class="avatar-wrap" onclick="selectAvatar()">
+    <img id="avatarImg" class="avatar" src="">
+    <div class="avatar-tip">点击更换</div>
+  </div>
+  <!-- 用户名（可编辑） -->
+  <div class="userLine">
+    <input id="userNameEdit" class="editInput" style="display:none" maxlength="12">
+    <span id="userName" class="userName"></span>
+    <span style="cursor:pointer;font-size:16px" onclick="editName()">✏️</span>
+  </div>
+  <div id="userUUID" class="userUUID"></div>
+
+  <button class="d-btn danger" onclick="logout()">退出登录</button>
+  
+  <h3>消息声音</h3>
+  <!-- 声音开关 -->
+  <label class="switch">
+  <input class="toggle" type="checkbox" id="soundToggle" onchange="saveSoundPref()"/>
+  <span class="slider"></span>
+  <span class="card-side"></span>
+</label>
+<h3>一堆</h3>
+<label class="switch">
+  <input class="toggle" type="checkbox" />
+  <span class="slider"></span>
+  <span class="card-side"></span>
+</label><label class="switch">
+  <input class="toggle" type="checkbox" />
+  <span class="slider"></span>
+  <span class="card-side"></span>
+</label><label class="switch">
+  <input class="toggle" type="checkbox" />
+  <span class="slider"></span>
+  <span class="card-side"></span>
+</label><label class="switch">
+  <input class="toggle" type="checkbox" />
+  <span class="slider"></span>
+  <span class="card-side"></span>
+</label><label class="switch">
+  <input class="toggle" type="checkbox" />
+  <span class="slider"></span>
+  <span class="card-side"></span>
+</label>
+</section>
+
+
+<!-- ====== 隐藏文件选择 ====== -->
+<input id="avatarFile" type="file" accept="image/*" style="display:none" onchange="uploadAvatar()">
+
+
+<script>
+/* ========== 常量 ========== */
+const USER_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/users';
+const BUCKET_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/storage/v1/object/public/avatars/';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+
+let currentUser = null;
+
+/* ========== 初始化 ========== */
+(()=>{
+  const u=localStorage.getItem('user');
+  if(u){ currentUser=JSON.parse(u); showInfo(currentUser); }
+})();
+
+/* ========== 登录 / 注册 ========== */
+async function login(){
+  const u=document.getElementById('username').value.trim();
+  const p=document.getElementById('password').value.trim();
+  if(!u||!p)return alert('请填写完整');
+  const res=await fetch(`${USER_URL}?select=id,username,avatar_url&username=eq.${u}&password=eq.${p}`,{headers:{apikey:ANON_KEY}});
+  const arr=await res.json();
+  if(arr.length!==1)return alert('用户名或密码错误');
+  localStorage.setItem('user',JSON.stringify(arr[0]));
+  currentUser=arr[0];
+  showInfo(currentUser);
+}
+
+async function register(){
+  const u=document.getElementById('username').value.trim();
+  const p=document.getElementById('password').value.trim();
+  if(!u||!p)return alert('请填写完整');
+  const uid=self.crypto.randomUUID();
+  const res=await fetch(USER_URL,{
+    method:'POST',
+    headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({id:uid,username:u,password:p,avatar_url:''})
+  });
+  if(!res.ok)return alert('注册失败：'+res.status);
+  currentUser={id:uid,username:u,avatar_url:''};
+  localStorage.setItem('user',JSON.stringify(currentUser));
+  showInfo(currentUser);
+}
+
+/* ========== 个人信息展示 ========== */
+function showInfo(user){
+  document.getElementById('loginCard').style.display='none';
+  document.getElementById('infoCard').style.display='block';
+  document.getElementById('avatarImg').src=user.avatar_url||`data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0iI2VlZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGV4dCB4PSI1MCUiIHk9IjUwJSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZvbnQtc2l6ZT0iMjBweCI+5LqG77yaPC90ZXh0Pjwvc3ZnPg==`;
+  document.getElementById('userName').textContent=user.username;
+  document.getElementById('userUUID').textContent=user.id;
+  loadSoundPref(); // 已登录时加载开关状态
+}
+
+/* ========== 修改用户名 ========== */
+function editName(){
+  const span=document.getElementById('userName');
+  const input=document.getElementById('userNameEdit');
+  input.value=currentUser.username;
+  span.style.display='none';
+  input.style.display='inline-block';
+  input.focus();
+  input.select();
+  const save=async()=>{
+    const newName=input.value.trim();
+    if(!newName||newName===currentUser.username){input.style.display='none';span.style.display='inline';return;}
+    const res=await fetch(`${USER_URL}?id=eq.${currentUser.id}`,{
+      method:'PATCH',
+      headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({username:newName})
+    });
+    if(!res.ok){alert('修改失败');return;}
+    currentUser.username=newName;
+    localStorage.setItem('user',JSON.stringify(currentUser));
+    span.textContent=newName;
+    input.style.display='none';
+    span.style.display='inline';
+  };
+  input.onblur=save;
+  input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();save();}};
+}
+
+/* ========== 更换头像 ========== */
+function selectAvatar(){
+  document.getElementById('avatarFile').click();
+}
+async function uploadAvatar(){
+  const file=document.getElementById('avatarFile').files[0];
+  if(!file)return;
+  const fileName=`${currentUser.id}.png`;
+  /* 1. 删除旧头像 */
+  await fetch(BUCKET_URL+fileName,{method:'DELETE',headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`}});
+  /* 2. 上传新头像 */
+  const xhr=new XMLHttpRequest();
+  xhr.open('PUT',BUCKET_URL+fileName);
+  xhr.setRequestHeader('apikey',ANON_KEY);
+  xhr.setRequestHeader('Authorization',`Bearer ${ANON_KEY}`);
+  xhr.setRequestHeader('Content-Type','image/png');
+  xhr.onload=async()=>{
+    if(xhr.status!==200){alert('上传失败');return;}
+    const publicURL=BUCKET_URL+fileName;
+    /* 3. 写回用户表 */
+    const patchRes=await fetch(`${USER_URL}?id=eq.${currentUser.id}`,{
+      method:'PATCH',
+      headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({avatar_url:publicURL})
+    });
+    if(!patchRes.ok){alert('更新头像失败');return;}
+    /* 4. 更新本地 */
+    currentUser.avatar_url=publicURL;
+    localStorage.setItem('user',JSON.stringify(currentUser));
+    document.getElementById('avatarImg').src=publicURL;
+  };
+  xhr.send(file);
+}
+
+/* ========== 退出登录 ========== */
+function logout(){
+  localStorage.removeItem('user');
+  location.reload();
+}
+/* ===== 声音偏好 ===== */
+function saveSoundPref(){
+  localStorage.setItem('soundNotify', document.getElementById('soundToggle').checked);
+}
+function loadSoundPref(){
+  const checked = localStorage.getItem('soundNotify') !== 'false'; // 默认开
+  document.getElementById('soundToggle').checked = checked;
+}
+
+</script>
+</body>
+</html>

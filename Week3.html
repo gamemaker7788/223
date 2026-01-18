@@ -185,6 +185,41 @@ details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;paddin
   </details>
   <button class="speaker" id="wcSpeaker"><img src="speaker.png" alt="朗读" class="speaker-icon"></button>
 </div>
+<!-- 父页面任意位置放这一行 -->
+<iframe id="chatFrame" width="100%" height="600" frameborder="0"></iframe>
+
+<script>
+/* ========== 通用检测 + 切换（无刷新版） ========== */
+const LOGIN_SRC = 'login.html';   // 同目录登录页
+const CHAT_SRC  = 'pl/pl_week3.html';      // 同目录聊天页
+const frame = document.getElementById('chatFrame');
+
+/* 首次加载：有登录→聊天页，无登录→登录页 */
+function loadFrame() {
+  const user = localStorage.getItem('user');
+  frame.src = user ? CHAT_SRC : LOGIN_SRC;
+}
+loadFrame();
+
+/* 子页面登录成功后通知父页→换源 */
+window.addEventListener('message', e => {
+  if (e.data.action === 'logged') {
+    // 无闪切换：先隐藏→换源→加载完再显示
+    frame.style.display = 'none';
+    frame.src = CHAT_SRC;
+    frame.onload = () => frame.style.display = 'block';
+  }
+});
+
+/* 可选：统一登出（只换源，不刷新父页） */
+function globalLogout() {
+  localStorage.removeItem('user');
+  frame.style.display = 'none';
+  frame.src = LOGIN_SRC;
+  frame.onload = () => frame.style.display = 'block';
+}
+</script>
+
 
 <script src="dict.js"></script>
 <script>
