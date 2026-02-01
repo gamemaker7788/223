@@ -1,312 +1,158 @@
-<!doctype html>
-<html lang="zh-CN" data-theme="bright">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>223 班 Weekly Report 主页</title>
-<style>
-/* ===== 主题变量 ===== */
-:root[data-theme="bright"]{
-  --bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;
-  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;--danger:#ef4444;
-}
-:root[data-theme="dark"]{
-  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;
-  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;--danger:#ef4444;
-}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
-
-/* ===== 通用组件 ===== */
-.btn-group{display:flex;gap:8px;padding:16px 24px}
-.d-btn{position:relative;padding:8px 18px;font-size:15px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 4px 0 var(--gray2);transition:all .12s ease}
-.d-btn:hover{transform:translateY(-1px);box-shadow:0 6px 0 var(--gray2)}
-.d-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gray2)}
-.duo-input{width:calc(100% - 48px);margin:0 24px;padding:12px 16px;font-size:16px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s;color:var(--text);}
-.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--blue-glow)}
-
-/* ===== 侧边栏 ===== */
-.side-bar{position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);border-right:2px solid var(--gray1);display:flex;flex-direction:column;padding:16px;z-index:9;}
-.side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.side-item{display:block;padding:8px 12px;margin:6px 0;border:2px solid transparent;border-radius:6px;text-decoration:none;color:var(--text);transition:border-color .2s}
-.side-item:hover{border-color:var(--bottom-blue);}
-.side-foot{border-top:2px solid var(--gray1);padding-top:12px}
-
-/* 通知中心 */
-.notify-badge{background:var(--danger);color:#fff;font-size:11px;padding:2px 6px;border-radius:10px;min-width:16px;text-align:center;}
-.notify-list{max-height:120px;overflow:auto;font-size:13px;line-height:1.4;}
-.notify-item{padding:6px 8px;margin:4px 0;border-radius:6px;background:var(--blue-glow);cursor:pointer;}
-.notify-item:hover{background:var(--bottom-blue);color:#fff;}
-.notify-item small{color:var(--gray2);}
-
-/* 弹窗 */
-.modal-mask{position:fixed;inset:0;background:#0006;z-index:99;display:flex;align-items:center;justify-content:center}
-.modal-panel{width:90%;max-width:420px;background:var(--bg);border:2px solid var(--gray1);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px}
-.modal-title{font-size:18px;font-weight:600;color:var(--bottom-blue)}
-.modal-body{white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto}
-.hidden{display:none}
-
-/* 汉堡 */
-.side-ham{position:fixed;top:12px;left:12px;z-index:10;padding:6px 10px;font-size:18px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;cursor:pointer}
-.side-mask{position:fixed;inset:0;background:#0004;display:none;z-index:8}
-.side-bar.translate{transform:translateX(-100%);transition:transform .3s ease}
-.side-bar.open{transform:translateX(0)}
-.side-mask.on{display:block}
-@media (max-width:900px){body{padding-left:16px}.side-bar.translate{display:flex}}
-
-/* 主内容 */
-h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
-.card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
-.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
-/* ===== 5. 隐私条款浮层 ===== */
-.privacy-mask{
-  position:fixed;
-  inset:0;
-  background:#0006;
-  z-index:19;
-  display:block;
-  opacity:1;
-  transition:opacity .3s ease;
-}
-.privacy-mask.hide{opacity:0;pointer-events:none}
-.privacy-panel{
-  position:fixed;
-  inset:0;
-  max-width:480px;
-  margin:auto;
-  height:fit-content;
-  z-index:20;
-  background:var(--bg);
-  transform:translateY(0);
-  transition:transform .3s ease;
-}
-.privacy-panel.hide{transform:translateY(-62vh) translateX(57vw);pointer-events:none}
-</style>
-<script src="theme.js"></script>
-<script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>223班Weekly Report - 最佳体验提示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+        }
+        .header {
+            background: #07C160;
+            color: white;
+            padding: 20px;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        .content {
+            padding: 30px 25px;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .steps {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .step:last-child {
+            margin-bottom: 0;
+        }
+        .step-number {
+            background: #07C160;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .step-text {
+            font-size: 0.9rem;
+        }
+        .browser-button {
+            display: inline-block;
+            background: #07C160;
+            color: white;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .browser-button:hover {
+            background: #06a350;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(7, 193, 96, 0.3);
+        }
+        .footer {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+    </style>
 </head>
 <body>
-
-<!-- 侧边栏 -->
-<aside id="sideBar" class="side-bar translate">
-  <div class="side-head">
-    <button class="d-btn" onClick="closeSide()">✕</button>
-  </div>
-  <nav class="side-nav">
-    <a class="side-item" href="ystk.html">隐私与条款</a>
-    <a class="side-item" href="wud.html">如何点击按钮</a>
-    <a class="side-item" href="gxlog.html">关于更新</a>
-    <a class="side-item" href="gxz.html">贡献者名单及团队</a>
-    <a class="side-item" href="login.html">个人信息</a>
-    <a class="side-item" href="fk.html">反馈</a>
-    
-    <!-- 通知中心 -->
-    <div style="border-top:1px solid var(--gray1);margin:12px 0;padding-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:14px">通知中心</span>
-        <span id="notifyBadge" class="notify-badge hidden">0</span>
-      </div>
-      <div id="notifyList" class="notify-list"></div>
+    <div class="container">
+        <div class="header">
+            <h1>223班 Weekly Report</h1>
+            <p>为获得最佳体验，请在浏览器中打开</p>
+        </div>
+        
+        <div class="content">
+            <div class="icon">📱</div>
+            <h2>温馨提示</h2>
+            <p>由于微信限制，部分功能无法完美呈现。</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">点击右上角 <strong>"..."</strong> 按钮</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">选择 <strong>"在浏览器打开"</strong></div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">即可查看完整周报内容</div>
+                </div>
+            </div>
+            
+            <!-- 将下面的链接替换为您的实际周报页面地址 -->
+            <a href="https://class223weeklyreport.qzz.io/zy.html" class="browser-button" id="directLink">
+                我已打开浏览器，直接访问周报
+            </a>
+            
+            <div class="footer">
+                <p>如果页面没有自动跳转，请点击上方按钮</p>
+            </div>
+        </div>
     </div>
-  </nav>
-  <div class="side-foot">
-    <button class="d-btn" onClick="toggleTheme()">切换主题</button>
-  </div>
-</aside>
-<div id="sideMask" class="side-mask" onClick="closeSide()"></div>
-<button id="sideHam" class="d-btn" onClick="openSide()">☰</button>
-<!-- 遮罩 + 隐私条款浮层 -->
-<div id="privacyMask" class="privacy-mask"></div>
-<section id="privacyPanel" class="card privacy-panel">
-  <h3>隐私条款</h3>
-  <div class="mini-scroll">
-    <p>1. 我们仅收集必要信息用于展示留言。</p>
-    <p>2. 不会将数据分享给第三方。</p>
-    <p>3.同意表明您已阅读《隐私与条款》</p>
-    <details>
-    <summary class="d-btn">点我查看内容</summary>
-    <div class="card" style="margin-top:12px;">
-      <p><a class="side-item" href="ystk.html">隐私与条款</a></p>
-    </div>
-  </details>
-    
-  </div>
-  <div class="btn-group" id="privacyBtns">
-    <button class="d-btn" id="agreeBtn"   onclick="agreePrivacy()">同意</button>
-    <button class="d-btn" id="rejectBtn"  onclick="rejectPrivacy()">不同意</button>
-    <button class="d-btn" id="reselectBtn"style="display:none;" onClick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
-  </div>
-</section>
 
-<script>
-/* ===== 隐私条款：刷新即渲染已同意 + 重选 ===== */
-(function(){
-  const key = 'privacy-agreed-223';
-  const panel = document.getElementById('privacyPanel');
-  const mask  = document.getElementById('privacyMask');
-  const agreeBtn   = document.getElementById('agreeBtn');
-  const rejectBtn  = document.getElementById('rejectBtn');
-  const reselectBtn= document.getElementById('reselectBtn');
-
-  /* 刷新即渲染：已同意 → 显示"已同意条款"+删除不同意+显示重选 */
-  if (localStorage.getItem(key)) {
-    agreeBtn.textContent   = '已同意条款';
-    agreeBtn.disabled      = true;
-    if (rejectBtn) rejectBtn.remove();
-    reselectBtn.style.display = 'inline-block';
-    panel.classList.add('hide');
-    mask.classList.add('hide');
-    return;
-  }
-
-  /* 首次进入：正常双按钮 */
-  window.agreePrivacy = function () {
-    localStorage.setItem(key, '1');
-    agreeBtn.textContent   = '已同意条款';
-    agreeBtn.disabled      = true;
-    if (rejectBtn) rejectBtn.remove();
-    reselectBtn.style.display = 'inline-block';
-    setTimeout(() => {
-      panel.classList.add('hide');
-      mask.classList.add('hide');
-    }, 500);
-  };
-
-  /* 不同意：跳转 */
-  window.rejectPrivacy = function () {
-    localStorage.removeItem(key);
-    location.href = 'wud.html';
-  };
-
-  /* 重选：清除记录 → 刷新页面 → 回到双按钮 */
-  window.reselectPrivacy = function () {
-    localStorage.removeItem(key);
-    location.reload();
-  };
-})();
-</script>
-
-<!-- 主内容 -->
-<h1>223 班 Weekly Report</h1>
-
-<section class="card">
-  <h3>选择期数</h3>
-  <div class="btn-group">
-    <a class="d-btn" href="Week1.html">第 1 周</a>
-    <a class="d-btn" href="Week2.html">第 2 周</a>
-    <a class="d-btn" href="Week3.html">第 3 周</a>
-  </div>
-</section>
-
-<section class="card">
-  <h3>选择报外</h3>
-  <div class="btn-group">
-    <a class="d-btn" href="fw1.html">元旦特报</a>
-    <a class="d-btn" href="fw2.html">元旦总结</a>
-  </div>
-</section>
-
-<!-- 通知详情弹窗 -->
-<div id="notifyModal" class="modal-mask hidden">
-  <div class="modal-panel">
-    <div id="notifyModalTitle" class="modal-title">系统消息</div>
-    <div id="notifyModalBody" class="modal-body"></div>
-    <div class="btn-group">
-      <button class="d-btn danger" onClick="removeNotify()">从列表删除</button>
-      <button class="d-btn" onClick="closeNotifyModal()">关闭</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ===== 通知中心 ===== */
-const NOTI_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/notifications';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
-let lastCount = 0;
-function getUserId(){ const u = localStorage.getItem('user'); return u ? JSON.parse(u).id : null; }
-
-async function loadNotifications(){
-  const uid = getUserId();
-  if (!uid) return;
-  const res = await fetch(`${NOTI_URL}?user_id=eq.${uid}&type=eq.system&read=eq.false&select=id,title,body,created_at`, {headers:{apikey:ANON_KEY}});
-  const list = res.ok ? await res.json() : [];
-  renderNotifyList(list);
-  updateBadge(list.length);
-}
-function renderNotifyList(list){
-  const box = document.getElementById('notifyList');
-  if (!list.length) { box.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>'; return; }
-  box.innerHTML = list.map(n => `
-    <div class="notify-item" onclick="showNotifyModal('${n.id}','${n.title}','${n.body.replace(/'/g,"\\'")}')">
-      <div>${n.title}</div>
-      <small>${new Date(n.created_at).toLocaleString()}</small>
-    </div>`).join('');
-}
-function updateBadge(count){
-  const badge = document.getElementById('notifyBadge');
-  badge.textContent = count;
-  badge.style.display = count ? 'inline-block' : 'none';
-if (count > lastCount && count > 0) {
-  // 只有用户打开声音才播放
-  if (localStorage.getItem('soundNotify') !== 'false') {
-    new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE').play();
-  }
-}
-  lastCount = count;
-}
-async function markRead(id){
-  const res = await fetch(`${NOTI_URL}?id=eq.${id}`, {method:'PATCH',headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({read:true})});
-  if (res.ok) loadNotifications();
-}
-function removeNotify(){
-  // 1. 标为已读（可选）
-  markRead(currentNotifyId);
-  // 2. 本地隐藏
-  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
-  if (item) item.remove();
-  // 3. 角标减一
-  const badge = document.getElementById('notifyBadge');
-  let count = parseInt(badge.textContent) || 0;
-  count = Math.max(0, count - 1);
-  badge.textContent = count;
-  badge.style.display = count ? 'inline-block' : 'none';
-  closeNotifyModal();
-  // 4. 空列表提示
-  const listBox = document.getElementById('notifyList');
-  if (!listBox.querySelector('.notify-item')) {
-    listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
-  }
-}
-
-function showNotifyModal(id,title,body){
-	currentNotifyId = id;
-  document.getElementById('notifyModalTitle').textContent = title;
-  document.getElementById('notifyModalBody').textContent  = body;
-  document.getElementById('notifyModal').classList.remove('hidden');
-}
-function closeNotifyModal(){
-  document.getElementById('notifyModal').classList.add('hidden');
-}
-function removeNotify(){
-  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
-  if (item) item.remove();
-  const badge = document.getElementById('notifyBadge');
-  let count = parseInt(badge.textContent) || 0;
-  count = Math.max(0, count - 1);
-  badge.textContent = count; badge.style.display = count ? 'inline-block' : 'none';
-  closeNotifyModal();
-  const listBox = document.getElementById('notifyList');
-  if (!listBox.querySelector('.notify-item')) listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
-}
-let currentNotifyId = null;
-
-/* ===== 侧边栏 ===== */
-const bar = document.getElementById('sideBar');
-const mask = document.getElementById('sideMask');
-function openSide(){ bar.classList.add('open'); mask.classList.add('on'); }
-function closeSide(){ bar.classList.remove('open'); mask.classList.remove('on'); }
-
-/* ===== 轮询通知 ===== */
-setInterval(loadNotifications, 5000);
-loadNotifications();
-</script>
+    <script>
+        // 检测是否在微信中打开
+        function isWeixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('micromessenger') !== -1;
+        }
+        
+        // 如果不是在微信中打开，自动跳转到周报页面
+        if (!isWeixin()) {
+            // 设置3秒后自动跳转，让用户有时间看到提示页
+            setTimeout(function() {
+                window.location.href = document.getElementById('directLink').href;
+            }, 3000);
+        }
+    </script>
 </body>
 </html>

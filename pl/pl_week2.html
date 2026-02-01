@@ -52,6 +52,27 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .hidden{display:none}
 #notifyToggle{position:fixed;top:12px;right:12px;z-index:50;padding:6px 12px;font-size:13px;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer}
 #notifyBadge{display:none;position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;font-size:11px;padding:2px 6px;border-radius:10px;min-width:16px;text-align:center}
+
+/* ===== 被屏蔽消息模糊遮罩 ===== */
+.msg-banned {
+  position: relative;
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+}
+.msg-banned::after {
+  content: '内容已被屏蔽';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  font-size: 13px;
+  border-radius: 8px;
+  pointer-events: none;
+}
 </style>
 <script src="theme.js"></script>
 <script>(function(){const t=localStorage.getItem('theme-223');if(t)document.documentElement.dataset.theme=t;})();</script>
@@ -86,15 +107,16 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
     </div>
   </div>
 </div>
+
 <script>
 /* ================= 常量 ================= */
 const USER_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/users';
-const CHAT_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/comments';   // ← 表名改为 comments
+const CHAT_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/comments';
 const BANS_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/bans';
 const NOTI_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/notifications';
 const ANON_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
 const CHAT_INTERVAL = 3000;
-const ARTICLE_ID = "week2";                                          // ← 归一：只看/只存 week1
+const ARTICLE_ID = "week2";
 
 /* ========== 通知开关 ========== */
 let notifyOn = localStorage.getItem('notifyOn')==='true';
@@ -275,7 +297,7 @@ async function sendMessage(){
   const res=await fetch(CHAT_URL,{
     method:'POST',
     headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({username:user.username,content:text,sender_id:user.id,sender_avatar:user.avatar_url||'',article_id:ARTICLE_ID})  // ← 新增 article_id
+    body:JSON.stringify({username:user.username,content:text,sender_id:user.id,sender_avatar:user.avatar_url||'',article_id:ARTICLE_ID})
   });
   if(!res.ok)return alert('发送失败：'+res.status);
   document.getElementById('msgText').value='';
@@ -402,4 +424,3 @@ function showLogin(){
 </script>
 </body>
 </html>
-

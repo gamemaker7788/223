@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>223班投票（显示每选项人数）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#fff;--text:#333;--gray:#bbb;--primary:#38bdf8;--danger:#ef4444;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{width:90%;max-width:600px;border:2px solid var(--gray);border-radius:14px;padding:24px}
+h2{margin:0 0 8px}
+.desc{font-size:14px;color:var(--gray);margin-bottom:20px}
+.option{display:flex;align-items:center;justify-content:space-between;margin:10px 0}
+button{padding:10px 20px;font-size:15px;border:2px solid var(--primary);border-radius:6px;background:var(--primary);color:#fff;cursor:pointer}
+button:disabled{background:var(--gray);border-color:var(--gray);cursor:not-allowed}
+.bar{height:8px;background:var(--gray);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar-inner{height:100%;background:var(--primary);transition:width .3s}
+.percent{font-size:13px;color:var(--gray)}
+#tip{height:20px;font-size:13px;color:var(--gray);text-align:center;margin-top:12px}
+.err{color:var(--danger);font-size:13px;text-align:center;margin-bottom:10px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;color:var(--gray)}
+.hide{display:none}
+</style>
+</head>
+<body>
+
+<section class="card">
+  <div class="nav">
+    <button id="prevBtn" onclick="changeRound(-1)">← 上一轮</button>
+    <span id="roundInfo">加载中…</span>
+    <button id="nextBtn" onclick="changeRound(1)">下一轮 →</button>
+  </div>
+
+  <h2 id="voteTitle">加载中…</h2>
+  <p id="voteDesc" class="desc"></p>
+  <div id="err" class="err hide"></div>
+
+  <div id="optionBox"></div>
+
+  <!-- 进度区域：提交后才显示 -->
+  <div id="progressArea" class="hide" style="margin-top:20px">
+    <div style="font-size:13px;color:var(--gray);margin-bottom:6px">
+      共 <span id="totalPeople">0</span> 人投票
+    </div>
+    <div id="progressBox"></div>
+  </div>
+
+  <div class="btn-group" style="display:flex;gap:12px;margin-top:24px">
+    <button id="submitBtn" onclick="submitRound()">提交本轮</button>
+  </div>
+  <p id="tip"></p>
+</section>
+
+<script>
+/* ========== 配置 ========== */
+const SB_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+const TABLE_ROUND = 'voting_rounds';
+const TABLE_VOTE  = 'round_votes';
+
+/* ========== 用户 UUID ========== */
+function uuidv4(){
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>
+    (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+}
+const userId = localStorage.getItem('vote_user_id') || (u=>{localStorage.setItem('vote_user_id',u);return u;})(uuidv4());
+
+/* ========== 全局变量 ========== */
+let allRounds   = [];   // 全部轮次 按 start_at 升序
+let currentIdx  = -1;   // 当前在所有轮中的下标
+
+/* ========== 初始化：拉全部轮次 ========== */
+window.onload = async () => {
+  const res = await fetch(`${SB_URL}/${TABLE_ROUND}?order=start_at.asc`,{headers:{apikey:ANON_KEY}});
+  allRounds = res.ok ? await res.json() : [];
+  if (!allRounds.length){ showErr('暂无投票'); return;}
+  currentIdx = allRounds.length - 1; // 默认最新一轮
+  loadRound(currentIdx);
+};
+
+/* ========== 切换轮次 ========== */
+function changeRound(delta){
+  const newIdx = currentIdx + delta;
+  if (newIdx < 0 || newIdx >= allRounds.length) return; // 边界
+  currentIdx = newIdx;
+  loadRound(currentIdx);
+}
+
+/* ========== 加载指定轮 ========== */
+async function loadRound(idx){
+  const r = allRounds[idx];
+  currentRound = {
+    round_id : r.round_id,
+    title    : r.title,
+    desc     : r.description || '',
+    options  : r.options
+  };
+  // 按钮状态
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === allRounds.length - 1;
+  // 轮次信息
+  document.getElementById('roundInfo').textContent =
+    `共 ${allRounds.length} 轮，当前第 ${idx + 1} 轮（ID: ${currentRound.round_id}）`;
+  // 检查是否已投
+  const voted = await fetch(`${SB_URL}/${TABLE_VOTE}?round_id=eq.${currentRound.round_id}&user_id=eq.${userId}`,{headers:{apikey:ANON_KEY}});
+  const v     = voted.ok ? await voted.json() : [];
+  renderRound(v.length ? v[0].picks : []);
+}
+
+/* ========== 渲染投票区（隐藏进度） ========== */
+function renderRound(prePick){
+  picks = prePick || [];
+  document.getElementById('voteTitle').textContent = currentRound.title;
+  document.getElementById('voteDesc').textContent  = currentRound.desc;
+  const box = document.getElementById('optionBox');
+  box.innerHTML = currentRound.options.map((o,i)=>`
+    <div class="option">
+      <label><input type="checkbox" ${picks.includes(o)?'checked':''} onchange="togglePick('${o.replace(/'/g,"\\'")}')"> ${o}</label>
+    </div>
+  `).join('');
+  document.getElementById('submitBtn').disabled = !!prePick.length;
+  tip.textContent = prePick.length ? '您已提交本轮' : '';
+  // 进度区域
+  const progressArea = document.getElementById('progressArea');
+  if (prePick.length) {
+    // 已投：立即显示
+    progressArea.classList.remove('hide');
+    fetchProgress();
+  } else {
+    // 未投：隐藏
+    progressArea.classList.add('hide');
+  }
+}
+
+/* ========== 勾选 ========== */
+let picks = [];
+function togglePick(opt){
+  const idx = picks.indexOf(opt);
+  idx>-1 ? picks.splice(idx,1) : picks.push(opt);
+}
+
+/* ========== 提交 ========== */
+async function submitRound(){
+  if (!picks.length){ tip.textContent='至少选一项'; return;}
+  const res = await fetch(`${SB_URL}/${TABLE_VOTE}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json',apikey:ANON_KEY,Prefer:'resolution=merge-duplicates'},
+    body:JSON.stringify({
+      user_id   : userId,
+      round_id  : currentRound.round_id,
+      picks     : picks,
+      updated_at: new Date().toISOString()
+    })
+  });
+  if (!res.ok){ tip.textContent='提交失败'; return;}
+  tip.textContent='提交成功！';
+  document.getElementById('submitBtn').disabled = true;
+  // 立即显示进度
+  document.getElementById('progressArea').classList.remove('hide');
+  await fetchProgress();
+}
+
+/* ========== 实时进度（含人数） ========== */
+async function fetchProgress(){
+  const res = await fetch(`${SB_URL}/${TABLE_VOTE}?round_id=eq.${currentRound.round_id}&select=picks`,{headers:{apikey:ANON_KEY}});
+  const rows = res.ok ? await res.json() : [];
+  const cnt={}; let total=0;
+  rows.forEach(r=>{ r.picks.forEach(o=>{ cnt[o]=(cnt[o]||0)+1; total++; }); });
+  // 总人数
+  document.getElementById('totalPeople').textContent = total;
+  // 每条选项：百分比 + 几人
+  const progressBox = document.getElementById('progressBox');
+  progressBox.innerHTML = currentRound.options.map((o,i)=>{
+    const p = total?(cnt[o]||0)/total*100:0;
+    const n = cnt[o]||0;
+    return `
+      <div class="option">
+        <span>${o}</span>
+        <span class="percent">${p.toFixed(1)} % （${n} 人）</span>
+      </div>
+      <div class="bar"><div class="bar-inner" style="width:${p}%"></div></div>`;
+  }).join('');
+}
+
+/* ========== 小工具 ========== */
+function showErr(msg){ const e=document.getElementById('err'); e.textContent=msg; e.classList.remove('hide'); }
+const tip=document.getElementById('tip');
+
+</script>
+</body>
+</html>

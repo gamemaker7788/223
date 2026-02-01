@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)file:///C:/Users/WQC11/Desktop/w3/index.html -->
+<html lang="zh-CN" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>223 班 Weekly Report 主页</title>
+<style>
+:root[data-theme="bright"]{
+  --bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;--danger:#ef4444;
+}
+:root[data-theme="dark"]{
+  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;--danger:#ef4444;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+
+/* ===== 通用组件 ===== */
+.btn-group{display:flex;gap:8px;padding:16px 24px}
+.d-btn{position:relative;padding:8px 18px;font-size:15px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 4px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-1px);box-shadow:0 6px 0 var(--gray2)}
+.d-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gray2)}
+.duo-input{width:calc(100% - 48px);margin:0 24px;padding:12px 16px;font-size:16px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s;color:var(--text);}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--blue-glow)}
+
+/* ===== 侧边栏 ===== */
+.side-bar{position:fixed;inset:0 auto 0 0;width:240px;background:var(--bg);border-right:2px solid var(--gray1);display:flex;flex-direction:column;padding:16px;z-index:9;}
+.side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.side-item{display:block;padding:8px 12px;margin:6px 0;border:2px solid transparent;border-radius:6px;text-decoration:none;color:var(--text);transition:border-color .2s}
+.side-item:hover{border-color:var(--bottom-blue);}
+.side-foot{border-top:2px solid var(--gray1);padding-top:12px}
+
+/* 通知中心 */
+.notify-badge{background:var(--danger);color:#fff;font-size:11px;padding:2px 6px;border-radius:10px;min-width:16px;text-align:center;}
+.notify-list{max-height:120px;overflow:auto;font-size:13px;line-height:1.4;}
+.notify-item{padding:6px 8px;margin:4px 0;border-radius:6px;background:var(--blue-glow);cursor:pointer;}
+.notify-item:hover{background:var(--bottom-blue);color:#fff;}
+.notify-item small{color:var(--gray2);}
+
+/* 弹窗 */
+.modal-mask{position:fixed;inset:0;background:#0006;z-index:99;display:flex;align-items:center;justify-content:center}
+.modal-panel{width:90%;max-width:420px;background:var(--bg);border:2px solid var(--gray1);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.modal-title{font-size:18px;font-weight:600;color:var(--bottom-blue)}
+.modal-body{white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto}
+.hidden{display:none}
+
+/* 汉堡 */
+.side-ham{position:fixed;top:12px;left:12px;z-index:10;padding:6px 10px;font-size:18px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;cursor:pointer}
+.side-mask{position:fixed;inset:0;background:#0004;display:none;z-index:8}
+.side-bar.translate{transform:translateX(-100%);transition:transform .3s ease}
+.side-bar.open{transform:translateX(0)}
+.side-mask.on{display:block}
+@media (max-width:900px){body{padding-left:16px}.side-bar.translate{display:flex}}
+
+/* 主内容 */
+h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
+.card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+.privacy-mask{position:fixed;inset:0;background:#0006;z-index:19;display:block;opacity:1;transition:opacity .3s ease;}
+.privacy-mask.hide{opacity:0;pointer-events:none}
+.privacy-panel{position:fixed;inset:0;max-width:480px;margin:auto;height:fit-content;z-index:20;background:var(--bg);transform:translateY(0);transition:transform .3s ease;}
+
+
+.privacy-panel.hide{transform:translateY(-62vh) translateX(57vw);pointer-events:none}
+</style>
+<script src="./zy_files/theme.js"></script>
+<script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
+</head>
+<body>
+
+<!-- 侧边栏 -->
+<aside id="sideBar" class="side-bar translate">
+  <div class="side-head">
+    <button class="d-btn" onclick="closeSide()">✕</button>
+  </div>
+  <nav class="side-nav">
+    <a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/ystk.html">隐私与条款</a>
+    <a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/wud.html">如何点击按钮</a>
+    <a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/gxlog.html">关于更新</a>
+    <a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/gxz.html">贡献者名单及团队</a>
+    <a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/login.html">个人信息</a>
+    <a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/fk.html">反馈</a>
+    
+    <!-- 通知中心 -->
+    <div style="border-top:1px solid var(--gray1);margin:12px 0;padding-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:14px">通知中心</span>
+        <span id="notifyBadge" class="notify-badge hidden" style="display: none;">0</span>
+      </div>
+      <div id="notifyList" class="notify-list"><p style="color:var(--gray2);font-size:12px">暂无新通知</p></div>
+    </div>
+  </nav>
+  <div class="side-foot">
+    <button class="d-btn" onclick="toggleTheme()">切换主题</button>
+  </div>
+</aside>
+<div id="sideMask" class="side-mask" onclick="closeSide()"></div>
+<button id="sideHam" class="d-btn" onclick="openSide()">☰</button>
+
+<!-- 遮罩 + 隐私条款浮层 -->
+<div id="privacyMask" class="privacy-mask hide"></div>
+<section id="privacyPanel" class="card privacy-panel hide">
+  <h3>隐私条款</h3>
+  <div class="mini-scroll">
+    <p>1. 我们仅收集必要信息用于展示留言。</p>
+    <p>2. 不会将数据分享给第三方。</p>
+    <p>3.同意表明您已阅读《隐私与条款》</p>
+    <details>
+    <summary class="d-btn">点我查看内容</summary>
+    <div class="card" style="margin-top:12px;">
+      <p><a class="side-item" href="file:///C:/Users/WQC11/Desktop/w3/ystk.html">隐私与条款</a></p>
+    </div>
+  </details>
+  </div>
+  <div class="btn-group" id="privacyBtns">
+    <button class="d-btn" id="agreeBtn" onclick="agreePrivacy()" disabled="">已同意条款</button>
+    
+    <button class="d-btn" id="reselectBtn" style="display: inline-block;" onclick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
+  </div>
+</section>
+
+<script>
+/* ===== 隐私条款：刷新即渲染已同意 + 重选 ===== */
+(function(){
+  const key = 'privacy-agreed-223';
+  const panel = document.getElementById('privacyPanel');
+  const mask  = document.getElementById('privacyMask');
+  const agreeBtn   = document.getElementById('agreeBtn');
+  const rejectBtn  = document.getElementById('rejectBtn');
+  const reselectBtn= document.getElementById('reselectBtn');
+
+  if (localStorage.getItem(key)) {
+    agreeBtn.textContent   = '已同意条款';
+    agreeBtn.disabled      = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    panel.classList.add('hide');
+    mask.classList.add('hide');
+    return;
+  }
+
+  window.agreePrivacy = function () {
+    localStorage.setItem(key, '1');
+    agreeBtn.textContent   = '已同意条款';
+    agreeBtn.disabled      = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    setTimeout(() => { panel.classList.add('hide'); mask.classList.add('hide'); }, 500);
+  };
+
+  window.rejectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.href = 'wud.html';
+  };
+
+  window.reselectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.reload();
+  };
+})();
+</script>
+
+<!-- 主内容 -->
+<h1>223 班 Weekly Report</h1>
+
+<section class="card">
+  <h3>选择期数</h3>
+  <div class="btn-group">
+    <a class="d-btn" href="file:///C:/Users/WQC11/Desktop/w3/Week1.html">第 1 周</a>
+    <a class="d-btn" href="file:///C:/Users/WQC11/Desktop/w3/Week2.html">第 2 周</a>
+    <a class="d-btn" href="file:///C:/Users/WQC11/Desktop/w3/Week3.html">第 3 周</a>
+  </div>
+</section>
+
+<section class="card">
+  <h3>选择报外</h3>
+  <div class="btn-group">
+    <a class="d-btn" href="file:///C:/Users/WQC11/Desktop/w3/fw1.html">元旦特报</a>
+    <a class="d-btn" href="file:///C:/Users/WQC11/Desktop/w3/fw2.html">元旦总结</a>
+  </div>
+</section>
+
+<!-- 通知详情弹窗 -->
+<div id="notifyModal" class="modal-mask hidden">
+  <div class="modal-panel">
+    <div id="notifyModalTitle" class="modal-title">系统消息</div>
+    <div id="notifyModalBody" class="modal-body"></div>
+    <div class="btn-group">
+      <button class="d-btn danger" onclick="removeNotify()">从列表删除</button>
+      <button class="d-btn" onclick="closeNotifyModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 通知中心 ===== */
+const NOTI_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/messages';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+let lastCount = 0;
+function getUserId(){ const u = localStorage.getItem('user'); return u ? JSON.parse(u).id : null; }
+
+/* 拉取未读系统消息 – 字段与 messages 表完全一致 */
+async function loadNotifications(){
+  const uid = getUserId();
+  if (!uid) return;
+  const res = await fetch(
+    `${NOTI_URL}?receiver_id=eq.${uid}&read=eq.false&select=id,sender_id,title,body,created_at&order=created_at.desc`,
+    {headers:{apikey:ANON_KEY}}
+  );
+  const list = res.ok ? await res.json() : [];
+  renderNotifyList(list);
+  updateBadge(list.length);
+}
+function renderNotifyList(list){
+  const box = document.getElementById('notifyList');
+  if (!list.length) { box.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>'; return; }
+  box.innerHTML = list.map(n => `
+    <div class="notify-item" onclick="showNotifyModal('${n.id}','${n.title}','${n.body.replace(/'/g,"\\'")}')">
+      <div>${n.title}</div>
+      <small>${new Date(n.created_at).toLocaleString()}</small>
+    </div>`).join('');
+}
+function updateBadge(count){
+  const badge = document.getElementById('notifyBadge');
+  badge.textContent = count;
+  badge.style.display = count ? 'inline-block' : 'none';
+  if (count > lastCount && count > 0) {
+    if (localStorage.getItem('soundNotify') !== 'false') {
+      new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE').play();
+    }
+  }
+  lastCount = count;
+}
+async function markRead(id){
+  const res = await fetch(`${NOTI_URL}?id=eq.${id}`, {
+    method:'PATCH',
+    headers:{'apikey':ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({read:true})
+  });
+  if (res.ok) loadNotifications();
+}
+function removeNotify(){
+  markRead(currentNotifyId);
+  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
+  if (item) item.remove();
+  const badge = document.getElementById('notifyBadge');
+  let count = parseInt(badge.textContent) || 0;
+  count = Math.max(0, count - 1);
+  badge.textContent = count;
+  badge.style.display = count ? 'inline-block' : 'none';
+  closeNotifyModal();
+  const listBox = document.getElementById('notifyList');
+  if (!listBox.querySelector('.notify-item')) {
+    listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
+  }
+}
+function showNotifyModal(id,title,body){
+  currentNotifyId = id;
+  document.getElementById('notifyModalTitle').textContent = title;
+  document.getElementById('notifyModalBody').textContent  = body;
+  document.getElementById('notifyModal').classList.remove('hidden');
+}
+function closeNotifyModal(){
+  document.getElementById('notifyModal').classList.add('hidden');
+}
+let currentNotifyId = null;
+
+/* ===== 侧边栏 ===== */
+const bar = document.getElementById('sideBar');
+const mask = document.getElementById('sideMask');
+function openSide(){ bar.classList.add('open'); mask.classList.add('on'); }
+function closeSide(){ bar.classList.remove('open'); mask.classList.remove('on'); }
+
+/* ===== 轮询通知 ===== */
+setInterval(loadNotifications, 5000);
+loadNotifications();
+</script>
+
+
+</body></html>
