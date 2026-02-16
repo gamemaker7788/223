@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title>游戏下载中心</title>
+<style>
+/* ===== 两套灰蓝主题 ===== */
+:root[data-theme="bright"]{
+  --bg        :#ffffff;
+  --text      :#333333;
+  --gray1     :#cccccc;
+  --gray2     :#bbbbbb;
+  --bottom-blue:#38bdf8;
+  --blue-glow :#38bdf822;
+  --card-bg   :#f5f5f5;
+  --border    :#e0e0e0;
+}
+:root[data-theme="dark"]{
+  --bg        :#1e1e1e;
+  --text      :#e5e5e5;
+  --gray1     :#555555;
+  --gray2     :#333333;
+  --bottom-blue:#38bdf8;
+  --blue-glow :#38bdf833;
+  --card-bg   :#2a2a2a;
+  --border    :#444444;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* 顶部导航 */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 2px solid var(--gray1);
+  background: var(--card-bg);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bottom-blue);
+  text-shadow: 0 2px 4px var(--blue-glow);
+}
+
+.theme-toggle {
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 14px;
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--gray1);
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  border-color: var(--bottom-blue);
+  color: var(--bottom-blue);
+}
+
+/* 主容器 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* 游戏头部信息 */
+.game-header {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+/* 游戏封面 */
+.game-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 2px solid var(--gray1);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 0 var(--gray2);
+  transition: transform 0.2s;
+}
+
+.game-cover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 0 var(--gray2);
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--gray2) 0%, var(--card-bg) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  overflow: hidden;
+}
+
+.cover-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--bottom-blue);
+  color: var(--bg);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  box-shadow: 0 2px 8px var(--blue-glow);
+}
+
+/* 游戏信息 */
+.game-info h1 {
+  margin: 0 0 16px 0;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.game-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  padding: 6px 14px;
+  background: var(--card-bg);
+  border: 2px solid var(--gray1);
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.meta-tag.blue {
+  border-color: var(--bottom-blue);
+  color: var(--bottom-blue);
+  background: var(--blue-glow);
+}
+
+.game-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+/* 下载控制区 */
+.download-section {
+  background: var(--card-bg);
+  border: 2px solid var(--gray1);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.version-select {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* 3D 互斥按钮组 - 改为a标签样式 */
+.d-btn {
+  position: relative;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 2px solid var(--gray1);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  top: 0;
+  box-shadow: 0 4px 0 var(--gray2);
+  transition: all .12s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.d-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--gray2);
+}
+
+.d-btn.active {
+  border-color: var(--bottom-blue);
+  color: var(--bottom-blue);
+  box-shadow: 0 4px 0 var(--bottom-blue);
+  background: var(--blue-glow);
+}
+
+.d-btn.active:hover {
+  box-shadow: 0 6px 0 var(--bottom-blue);
+}
+
+.d-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--gray2);
+}
+
+.d-btn.active:active {
+  box-shadow: 0 1px 0 var(--bottom-blue);
+}
+
+/* 选择状态显示 */
+.select-status {
+  background: var(--bg);
+  border: 2px solid var(--gray1);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.file-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--blue-glow);
+  border: 2px solid var(--bottom-blue);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: var(--bottom-blue);
+}
+
+.file-details {
+  font-size: 13px;
+  opacity: 0.8;
+  display: flex;
+  gap: 16px;
+}
+
+.file-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 下载进度条 */
+.download-progress {
+  margin: 24px 0;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: var(--gray2);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid var(--gray1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bottom-blue) 0%, #0ea5e9 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--blue-glow);
+  width: 0%;
+}
+
+.progress-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.stat-box {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg);
+  border: 2px solid var(--gray1);
+  border-radius: 10px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bottom-blue);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+/* 主下载按钮 */
+.main-download {
+  width: 100%;
+  padding: 18px 32px;
+  font-size: 18px;
+  font-weight: 800;
+  border: 2px solid var(--bottom-blue);
+  border-radius: 10px;
+  background: var(--bottom-blue);
+  color: var(--bg);
+  cursor: pointer;
+  box-shadow: 0 6px 0 #0284c7;
+  transition: all .12s ease;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.main-download:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #0284c7;
+  filter: brightness(1.1);
+}
+
+.main-download:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #0284c7;
+}
+
+.main-download:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* 内容网格 */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 968px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  .game-header {
+    grid-template-columns: 1fr;
+  }
+  .game-cover {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+
+/* 系统要求卡片 */
+.sys-card {
+  background: var(--card-bg);
+  border: 2px solid var(--gray1);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.sys-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sys-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.sys-row:last-child {
+  border-bottom: none;
+}
+
+.sys-label {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.sys-value {
+  font-weight: 700;
+  color: var(--bottom-blue);
+}
+
+/* 更新日志 */
+.changelog {
+  background: var(--card-bg);
+  border: 2px solid var(--gray1);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.changelog h3 {
+  margin: 0 0 16px 0;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.update-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.update-item:last-child {
+  border-bottom: none;
+}
+
+.update-version {
+  font-weight: 800;
+  color: var(--bottom-blue);
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.update-date {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.update-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* 状态标签 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.ready {
+  background: #22c55e22;
+  color: #22c55e;
+  border: 2px solid #22c55e;
+}
+
+.status-badge.downloading {
+  background: var(--blue-glow);
+  color: var(--bottom-blue);
+  border: 2px solid var(--bottom-blue);
+  animation: pulse 2s infinite;
+}
+
+.status-badge.paused {
+  background: #f59e0b22;
+  color: #f59e0b;
+  border: 2px solid #f59e0b;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 页脚 */
+.footer {
+  margin-top: 48px;
+  padding: 24px;
+  text-align: center;
+  border-top: 2px solid var(--gray1);
+  font-size: 14px;
+  opacity: 0.7;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">🎮 游戏下载</div>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 切换主题</button>
+</nav>
+
+<div class="container">
+
+  <!-- 游戏头部 -->
+  <div class="game-header">
+    <div class="game-cover">
+      <div class="cover-img">
+        <img class="title-img" src="icon.png" alt="icon" onerror="this.style.display='none'; this.parentElement.innerHTML='🎮';">
+      </div>
+      <div class="cover-badge">v1.0.0</div>
+    </div>
+    
+    <div class="game-info">
+      <h1>New Year (新年)</h1>
+      <div class="game-meta">
+        <span class="meta-tag blue">独立游戏</span>
+        <span class="meta-tag">角色扮演</span>
+        <span class="meta-tag">单人RPG</span>
+        <span class="meta-tag">★★★★★</span>
+      </div>
+      <p class="game-desc">
+        探索世界，体验全新的冒险旅程。在这个充满挑战的世界中，你将扮演主角展开一段精彩的RPG冒险。
+      </p>
+      
+      <div class="download-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span style="font-weight: 700;">选择版本</span>
+          <span class="status-badge ready" id="statusBadge">准备就绪</span>
+        </div>
+        
+        <div class="version-select" id="versionGroup">
+          <a class="d-btn active" href="newyear.apk" download data-file="newyear.apk" data-size="8.21" data-type="Android" data-icon="📱">
+            安卓版 (8.21 MB)
+          </a>
+          <a class="d-btn" href="newyear.zip" download data-file="newyear.zip" data-size="3.88" data-type="Windows" data-icon="💻">
+            电脑版 ZIP (3.88 MB)
+          </a>
+          <a class="d-btn" href="newyear.exe" download data-file="newyear.exe" data-size="16.9" data-type="Windows" data-icon="🖥️">
+            电脑版安装程序 (16.9 MB)
+          </a>
+        </div>
+
+        <!-- 选择状态显示 -->
+        <div class="select-status" id="selectStatus">
+          <div class="file-icon" id="fileIcon">📱</div>
+          <div class="file-info">
+            <div class="file-name" id="fileName">newyear.apk</div>
+            <div class="file-details">
+              <span class="file-detail-item">📦 <span id="fileSize">8.21 MB</span></span>
+              <span class="file-detail-item">🖥️ <span id="fileType">Android</span></span>
+              <span class="file-detail-item">📋 <span>安装包</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="download-progress" id="progressArea" style="display: none;">
+          <div class="progress-info">
+            <span id="progressText">正在下载...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+          </div>
+          <div class="progress-stats">
+            <div class="stat-box">
+              <div class="stat-value" id="speedStat">0</div>
+              <div class="stat-label">MB/s</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="downloadedStat">0</div>
+              <div class="stat-label">已下载 (MB)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="timeStat">--:--</div>
+              <div class="stat-label">剩余时间</div>
+            </div>
+          </div>
+        </div>
+
+        <a class="main-download" id="downloadBtn" href="newyear.apk" download onclick="handleDownload(event)">
+          立即下载
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内容网格 -->
+  <div class="content-grid">
+    <!-- 系统要求 -->
+    <div class="sys-card">
+      <h3>💻 系统要求</h3>
+      <div class="sys-row">
+        <span class="sys-label">操作系统</span>
+        <span class="sys-value">Windows 7/8/10/11 64位 / Android 5.0+</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-label">内存</span>
+        <span class="sys-value">4 GB RAM</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-label">显卡</span>
+        <span class="sys-value">不做要求</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-label">存储空间</span>
+        <span class="sys-value">需要 1 GB 可用空间</span>
+      </div>
+    </div>
+
+    <!-- 更新日志 -->
+    <div class="changelog">
+      <h3>📋 更新日志</h3>
+      <div class="update-item">
+        <div class="update-version">v1.0.0</div>
+        <div class="update-date">2026年2月16日</div>
+        <div class="update-desc">
+          • 游戏诞生<br>
+          • 新增交互系统<br>
+          • UI 界面设计
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 GameMaker7788 | 保留所有权利。</p>
+  </div>
+
+</div>
+
+<script>
+// 主题切换
+function toggleTheme() {
+  const root = document.documentElement;
+  root.dataset.theme = root.dataset.theme === 'bright' ? 'dark' : 'bright';
+}
+
+// 版本选择（互斥按钮）
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.d-btn');
+  const group = e.target.closest('.version-select');
+  if (btn && group) {
+    e.preventDefault(); // 阻止默认下载，先切换状态
+    group.querySelectorAll('.d-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateSelectStatus(btn);
+    
+    // 更新主下载按钮
+    const mainBtn = document.getElementById('downloadBtn');
+    mainBtn.href = btn.href;
+    
+    // 如果正在下载，重置
+    if (isDownloading) {
+      pauseDownload();
+      resetDownload();
+    }
+  }
+});
+
+// 更新选择状态显示
+function updateSelectStatus(element) {
+  const file = element.dataset.file;
+  const size = element.dataset.size;
+  const type = element.dataset.type;
+  const icon = element.dataset.icon;
+  
+  document.getElementById('fileIcon').textContent = icon;
+  document.getElementById('fileName').textContent = file;
+  document.getElementById('fileSize').textContent = size + ' MB';
+  document.getElementById('fileType').textContent = type;
+  
+  // 添加动画效果
+  const statusEl = document.getElementById('selectStatus');
+  statusEl.style.transform = 'scale(0.98)';
+  setTimeout(() => {
+    statusEl.style.transform = 'scale(1)';
+  }, 100);
+}
+
+// 下载逻辑
+let isDownloading = false;
+let isPaused = false;
+let downloadProgress = 0;
+let downloadInterval = null;
+let currentSpeed = 0;
+
+function handleDownload(e) {
+  e.preventDefault();
+  toggleDownload();
+}
+
+function toggleDownload() {
+  const btn = document.getElementById('downloadBtn');
+  const progressArea = document.getElementById('progressArea');
+  const statusBadge = document.getElementById('statusBadge');
+  
+  if (!isDownloading && !isPaused) {
+    // 开始下载
+    isDownloading = true;
+    btn.textContent = '暂停下载';
+    progressArea.style.display = 'block';
+    statusBadge.className = 'status-badge downloading';
+    statusBadge.textContent = '下载中';
+    startDownload();
+  } else if (isDownloading && !isPaused) {
+    // 暂停
+    pauseDownload();
+    btn.textContent = '继续下载';
+    statusBadge.className = 'status-badge paused';
+    statusBadge.textContent = '已暂停';
+  } else {
+    // 继续
+    isPaused = false;
+    isDownloading = true;
+    btn.textContent = '暂停下载';
+    statusBadge.className = 'status-badge downloading';
+    statusBadge.textContent = '下载中';
+    startDownload();
+  }
+}
+
+function startDownload() {
+  const activeBtn = document.querySelector('.d-btn.active');
+  const totalSize = parseFloat(activeBtn.dataset.size);
+  
+  downloadInterval = setInterval(() => {
+    if (downloadProgress >= 100) {
+      completeDownload();
+      return;
+    }
+    
+    // 模拟下载速度波动（根据文件大小调整速度）
+    const baseSpeed = totalSize > 10 ? 2 : 5; // 大文件速度较慢
+    currentSpeed = (Math.random() * baseSpeed + baseSpeed/2).toFixed(1);
+    downloadProgress += Math.random() * 3;
+    if (downloadProgress > 100) downloadProgress = 100;
+    
+    const downloaded = (totalSize * downloadProgress / 100).toFixed(2);
+    const remainingSecs = ((100 - downloadProgress) / (downloadProgress > 0 ? downloadProgress : 1) * 2);
+    const mins = Math.floor(remainingSecs / 60);
+    const secs = Math.floor(remainingSecs % 60);
+    
+    // 更新UI
+    document.getElementById('progressBar').style.width = downloadProgress + '%';
+    document.getElementById('progressPercent').textContent = Math.floor(downloadProgress) + '%';
+    document.getElementById('speedStat').textContent = currentSpeed;
+    document.getElementById('downloadedStat').textContent = downloaded;
+    document.getElementById('timeStat').textContent = remainingSecs < 1 ? '即将完成' : 
+      (mins > 0 ? mins + '分' + secs + '秒' : secs + '秒');
+    
+  }, 200);
+  
+  window.startTime = Date.now();
+}
+
+function pauseDownload() {
+  isPaused = true;
+  isDownloading = false;
+  clearInterval(downloadInterval);
+  currentSpeed = 0;
+  document.getElementById('speedStat').textContent = '0';
+}
+
+function resetDownload() {
+  downloadProgress = 0;
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('progressPercent').textContent = '0%';
+  document.getElementById('downloadedStat').textContent = '0';
+  document.getElementById('timeStat').textContent = '--:--';
+  document.getElementById('progressArea').style.display = 'none';
+  document.getElementById('downloadBtn').textContent = '立即下载';
+  document.getElementById('statusBadge').className = 'status-badge ready';
+  document.getElementById('statusBadge').textContent = '准备就绪';
+}
+
+function completeDownload() {
+  clearInterval(downloadInterval);
+  isDownloading = false;
+  isPaused = false;
+  downloadProgress = 100;
+  
+  const btn = document.getElementById('downloadBtn');
+  const statusBadge = document.getElementById('statusBadge');
+  const activeBtn = document.querySelector('.d-btn.active');
+  
+  btn.textContent = '下载完成';
+  btn.disabled = true;
+  statusBadge.className = 'status-badge ready';
+  statusBadge.textContent = '已完成';
+  
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressPercent').textContent = '100%';
+  document.getElementById('speedStat').textContent = '0';
+  document.getElementById('timeStat').textContent = '完成';
+  
+  // 触发真实下载
+  setTimeout(() => {
+    const link = document.createElement('a');
+    link.href = activeBtn.href;
+    link.download = activeBtn.dataset.file;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // 3秒后重置按钮
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '立即下载';
+      resetDownload();
+    }, 3000);
+  }, 500);
+}
+
+// 初始化
+updateSelectStatus(document.querySelector('.d-btn.active'));
+</script>
+
+</body>
+</html>
