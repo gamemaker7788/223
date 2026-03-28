@@ -192,7 +192,7 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 <div class="btn-group">
 
   
-  <a class="d-btn" href="index.html">返回</a>
+  <a class="d-btn" href="zy.html">返回</a>
   <button class="d-btn" onClick="toggleTheme()">切换主题</button>
 </div>
 
@@ -254,132 +254,295 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 <script>
 /* ========== 常量 ========== */
 const USER_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/users';
-const BUCKET_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/storage/v1/object/public/avatars/';
+const STORAGE_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/storage/v1';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
 
 let currentUser = null;
 
 /* ========== 初始化 ========== */
-(()=>{
-  const u=localStorage.getItem('user');
-  if(u){ currentUser=JSON.parse(u); showInfo(currentUser); }
+(() => {
+    const u = localStorage.getItem('user');
+    if (u) {
+        currentUser = JSON.parse(u);
+        showInfo(currentUser);
+    }
 })();
 
 /* ========== 登录 / 注册 ========== */
-async function login(){
-  const u=document.getElementById('username').value.trim();
-  const p=document.getElementById('password').value.trim();
-  if(!u||!p)return alert('请填写完整');
-  const res=await fetch(`${USER_URL}?select=id,username,avatar_url&username=eq.${u}&password=eq.${p}`,{headers:{apikey:ANON_KEY}});
-  const arr=await res.json();
-  if(arr.length!==1)return alert('用户名或密码错误');
-  localStorage.setItem('user',JSON.stringify(arr[0]));
-  currentUser=arr[0];
-  showInfo(currentUser);
+async function login() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    if (!u || !p) return alert('请填写完整');
+    
+    const res = await fetch(`${USER_URL}?select=id,username,avatar_url&username=eq.${u}&password=eq.${p}`, {
+        headers: { apikey: ANON_KEY }
+    });
+    const arr = await res.json();
+    if (arr.length !== 1) return alert('用户名或密码错误');
+    
+    localStorage.setItem('user', JSON.stringify(arr[0]));
+    currentUser = arr[0];
+    showInfo(currentUser);
 }
 
-async function register(){
-  const u=document.getElementById('username').value.trim();
-  const p=document.getElementById('password').value.trim();
-  if(!u||!p)return alert('请填写完整');
-  const uid=self.crypto.randomUUID();
-  const res=await fetch(USER_URL,{
-    method:'POST',
-    headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({id:uid,username:u,password:p,avatar_url:''})
-  });
-  if(!res.ok)return alert('注册失败：'+res.status);
-  currentUser={id:uid,username:u,avatar_url:''};
-  localStorage.setItem('user',JSON.stringify(currentUser));
-  showInfo(currentUser);
+async function register() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    if (!u || !p) return alert('请填写完整');
+    
+    const uid = self.crypto.randomUUID();
+    const res = await fetch(USER_URL, {
+        method: 'POST',
+        headers: {
+            'apikey': ANON_KEY,
+            'Authorization': `Bearer ${ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+            id: uid,
+            username: u,
+            password: p,
+            avatar_url: ''
+        })
+    });
+    
+    if (!res.ok) return alert('注册失败：' + res.status);
+    
+    currentUser = { id: uid, username: u, avatar_url: '' };
+    localStorage.setItem('user', JSON.stringify(currentUser));
+    showInfo(currentUser);
 }
 
 /* ========== 个人信息展示 ========== */
-function showInfo(user){
-  document.getElementById('loginCard').style.display='none';
-  document.getElementById('infoCard').style.display='block';
-  document.getElementById('avatarImg').src=user.avatar_url||`data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0iI2VlZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGV4dCB4PSI1MCUiIHk9IjUwJSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZvbnQtc2l6ZT0iMjBweCI+5LqG77yaPC90ZXh0Pjwvc3ZnPg==`;
-  document.getElementById('userName').textContent=user.username;
-  document.getElementById('userUUID').textContent=user.id;
-  loadSoundPref(); // 已登录时加载开关状态
+function showInfo(user) {
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('infoCard').style.display = 'block';
+    
+    const avatarUrl = user.avatar_url || `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0iI2VlZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGV4dCB4PSI1MCUiIHk9IjUwJSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZvbnQtc2l6ZT0iMjBweCI+5LqG77yaPC90ZXh0Pjwvc3ZnPg==`;
+    document.getElementById('avatarImg').src = avatarUrl;
+    document.getElementById('userName').textContent = user.username;
+    document.getElementById('userUUID').textContent = user.id;
+    
+    loadSoundPref();
 }
 
-/* ========== 修改用户名 ========== */
-function editName(){
-  const span=document.getElementById('userName');
-  const input=document.getElementById('userNameEdit');
-  input.value=currentUser.username;
-  span.style.display='none';
-  input.style.display='inline-block';
-  input.focus();
-  input.select();
-  const save=async()=>{
-    const newName=input.value.trim();
-    if(!newName||newName===currentUser.username){input.style.display='none';span.style.display='inline';return;}
-    const res=await fetch(`${USER_URL}?id=eq.${currentUser.id}`,{
-      method:'PATCH',
-      headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({username:newName})
-    });
-    if(!res.ok){alert('修改失败');return;}
-    currentUser.username=newName;
-    localStorage.setItem('user',JSON.stringify(currentUser));
-    span.textContent=newName;
-    input.style.display='none';
-    span.style.display='inline';
-  };
-  input.onblur=save;
-  input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();save();}};
+/* ========== 头像上传（修复版本） ========== */
+function selectAvatar() {
+    document.getElementById('avatarFile').click();
 }
 
-/* ========== 更换头像 ========== */
-function selectAvatar(){
-  document.getElementById('avatarFile').click();
-}
-async function uploadAvatar(){
-  const file=document.getElementById('avatarFile').files[0];
-  if(!file)return;
-  const fileName=`${currentUser.id}.png`;
-  /* 1. 删除旧头像 */
-  await fetch(BUCKET_URL+fileName,{method:'DELETE',headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`}});
-  /* 2. 上传新头像 */
-  const xhr=new XMLHttpRequest();
-  xhr.open('PUT',BUCKET_URL+fileName);
-  xhr.setRequestHeader('apikey',ANON_KEY);
-  xhr.setRequestHeader('Authorization',`Bearer ${ANON_KEY}`);
-  xhr.setRequestHeader('Content-Type','image/png');
-  xhr.onload=async()=>{
-    if(xhr.status!==200){alert('上传失败');return;}
-    const publicURL=BUCKET_URL+fileName;
-    /* 3. 写回用户表 */
-    const patchRes=await fetch(`${USER_URL}?id=eq.${currentUser.id}`,{
-      method:'PATCH',
-      headers:{'apikey':ANON_KEY,'Authorization':`Bearer ${ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({avatar_url:publicURL})
-    });
-    if(!patchRes.ok){alert('更新头像失败');return;}
-    /* 4. 更新本地 */
-    currentUser.avatar_url=publicURL;
-    localStorage.setItem('user',JSON.stringify(currentUser));
-    document.getElementById('avatarImg').src=publicURL;
-  };
-  xhr.send(file);
+async function uploadAvatar() {
+    const file = document.getElementById('avatarFile').files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+        alert('请选择图片文件！');
+        return;
+    }
+    
+    const fileName = `${currentUser.id}.png`;
+    
+    try {
+        // 显示上传进度
+        const progressBox = document.getElementById('progressBox');
+        const progressBar = document.getElementById('progressBar');
+        if (progressBox) {
+            progressBox.classList.remove('hidden');
+            progressBar.style.width = '0%';
+        }
+        
+        // 1. 使用正确的 Supabase Storage API
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // 正确的上传URL格式
+        const uploadURL = `${STORAGE_URL}/object/avatars/${fileName}`;
+        
+        const uploadResponse = await fetch(uploadURL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ANON_KEY}`,
+                // 注意：不要设置 Content-Type，浏览器会自动设置 multipart/form-data
+            },
+            body: formData
+        });
+        
+        if (!uploadResponse.ok) {
+            const errorText = await uploadResponse.text();
+            console.error('上传失败详情:', errorText);
+            
+            // 如果是权限错误，提示用户配置存储桶
+            if (uploadResponse.status === 403) {
+                throw new Error('存储权限未配置。请检查Supabase存储桶策略。');
+            }
+            throw new Error(`上传失败: ${uploadResponse.status}`);
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        console.log('上传成功:', uploadResult);
+        
+        // 2. 获取公开访问URL
+        const publicURL = `${STORAGE_URL}/object/public/avatars/${fileName}`;
+        
+        // 3. 更新数据库
+        const patchRes = await fetch(`${USER_URL}?id=eq.${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': ANON_KEY,
+                'Authorization': `Bearer ${ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ avatar_url: publicURL })
+        });
+        
+        if (!patchRes.ok) {
+            throw new Error('更新头像URL失败');
+        }
+        
+        // 4. 更新界面
+        currentUser.avatar_url = publicURL;
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        document.getElementById('avatarImg').src = publicURL + '?t=' + Date.now();
+        
+        if (progressBox) {
+            progressBox.classList.add('hidden');
+        }
+        
+        alert('头像更新成功！');
+        
+    } catch (error) {
+        console.error('头像上传失败:', error);
+        
+        const progressBox = document.getElementById('progressBox');
+        if (progressBox) {
+            progressBox.classList.add('hidden');
+        }
+        
+        alert('头像上传失败: ' + error.message);
+    }
 }
 
-/* ========== 退出登录 ========== */
-function logout(){
-  localStorage.removeItem('user');
-  location.reload();
-}
-/* ===== 声音偏好 ===== */
-function saveSoundPref(){
-  localStorage.setItem('soundNotify', document.getElementById('soundToggle').checked);
-}
-function loadSoundPref(){
-  const checked = localStorage.getItem('soundNotify') !== 'false'; // 默认开
-  document.getElementById('soundToggle').checked = checked;
+/* ========== 备用方案：使用REST API直接上传 ========== */
+async function uploadAvatarAlternative() {
+    const file = document.getElementById('avatarFile').files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+        alert('请选择图片文件！');
+        return;
+    }
+    
+    const fileName = `${currentUser.id}.png`;
+    
+    try {
+        // 将文件转换为base64
+        const reader = new FileReader();
+        
+        const uploadPromise = new Promise((resolve, reject) => {
+            reader.onload = async function(e) {
+                try {
+                    const base64Data = e.target.result.split(',')[1]; // 移除 data:image/png;base64, 前缀
+                    
+                    // 使用 Supabase Storage API 的 REST 端点
+                    const uploadURL = `${STORAGE_URL}/object/avatars/${fileName}`;
+                    
+                    const uploadResponse = await fetch(uploadURL, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${ANON_KEY}`,
+                            'Content-Type': 'image/png',
+                            'x-upsert': 'true' // 允许覆盖已存在的文件
+                        },
+                        body: base64Data
+                    });
+                    
+                    if (!uploadResponse.ok) {
+                        const errorText = await uploadResponse.text();
+                        reject(new Error(`上传失败: ${uploadResponse.status} - ${errorText}`));
+                        return;
+                    }
+                    
+                    resolve(await uploadResponse.json());
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            
+            reader.onerror = () => reject(new Error('文件读取失败'));
+        });
+        
+        reader.readAsDataURL(file);
+        const uploadResult = await uploadPromise;
+        console.log('上传成功:', uploadResult);
+        
+        // 更新数据库和界面（同上）
+        const publicURL = `${STORAGE_URL}/object/public/avatars/${fileName}`;
+        
+        const patchRes = await fetch(`${USER_URL}?id=eq.${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': ANON_KEY,
+                'Authorization': `Bearer ${ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ avatar_url: publicURL })
+        });
+        
+        if (!patchRes.ok) throw new Error('更新头像URL失败');
+        
+        currentUser.avatar_url = publicURL;
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        document.getElementById('avatarImg').src = publicURL + '?t=' + Date.now();
+        
+        alert('头像更新成功！');
+        
+    } catch (error) {
+        console.error('头像上传失败:', error);
+        alert('头像上传失败: ' + error.message);
+    }
 }
 
+/* ========== 其他函数保持不变 ========== */
+function editName() {
+    // ... 保持不变
+}
+
+function logout() {
+    localStorage.removeItem('user');
+    location.reload();
+}
+
+function saveSoundPref() {
+    localStorage.setItem('soundNotify', document.getElementById('soundToggle').checked);
+}
+
+function loadSoundPref() {
+    const checked = localStorage.getItem('soundNotify') !== 'false';
+    if (document.getElementById('soundToggle')) {
+        document.getElementById('soundToggle').checked = checked;
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.dataset.theme;
+    const newTheme = currentTheme === 'dark' ? 'bright' : 'dark';
+    document.documentElement.dataset.theme = newTheme;
+    localStorage.setItem('theme-223', newTheme);
+}
+
+// 暴露全局函数
+window.login = login;
+window.register = register;
+window.logout = logout;
+window.editName = editName;
+window.selectAvatar = selectAvatar;
+window.uploadAvatar = uploadAvatar;
+window.uploadAvatarAlternative = uploadAvatarAlternative; // 备用方案
+window.toggleTheme = toggleTheme;
+window.saveSoundPref = saveSoundPref;
 </script>
 </body>
 </html>

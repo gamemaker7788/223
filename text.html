@@ -1,8 +1,10 @@
-<!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<!doctype html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
 <title>223 班 Weekly Report 主页</title>
 <style>
+/* ===== 主题变量 ===== */
 :root[data-theme="bright"]{
   --bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;
   --bottom-blue:#38bdf8;--blue-glow:#38bdf822;--danger:#ef4444;
@@ -54,14 +56,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 .card{width:calc(100% - 48px);max-width:680px;margin:0 auto 20px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent}
 .card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+/* ===== 5. 隐私条款浮层 ===== */
 .privacy-mask{position:fixed;inset:0;background:#0006;z-index:19;display:block;opacity:1;transition:opacity .3s ease;}
 .privacy-mask.hide{opacity:0;pointer-events:none}
 .privacy-panel{position:fixed;inset:0;max-width:480px;margin:auto;height:fit-content;z-index:20;background:var(--bg);transform:translateY(0);transition:transform .3s ease;}
-
-
 .privacy-panel.hide{transform:translateY(-62vh) translateX(57vw);pointer-events:none}
 </style>
-<script src="./zy_files/theme.js"></script>
+<script src="theme.js"></script>
 <script>(function(){const s=localStorage.getItem('theme-223');if(s)document.documentElement.dataset.theme=s;})();</script>
 </head>
 <body>
@@ -69,14 +70,13 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 <!-- 侧边栏 -->
 <aside id="sideBar" class="side-bar translate">
   <div class="side-head">
-    <button class="d-btn" onclick="closeSide()">✕</button>
+    <button class="d-btn" onClick="closeSide()">✕</button>
   </div>
   <nav class="side-nav">
     <a class="side-item" href="ystk.html">隐私与条款</a>
     <a class="side-item" href="wud.html">如何点击按钮</a>
     <a class="side-item" href="gxlog.html">关于更新</a>
     <a class="side-item" href="gxz.html">贡献者名单及团队</a>
-    <a class="side-item" href="tp.html">投票</a>
     <a class="side-item" href="login.html">个人信息</a>
     <a class="side-item" href="fk.html">反馈</a>
     
@@ -84,80 +84,39 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
     <div style="border-top:1px solid var(--gray1);margin:12px 0;padding-top:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:14px">通知中心</span>
-        <span id="notifyBadge" class="notify-badge hidden" style="display: none;">0</span>
+        <span id="notifyBadge" class="notify-badge hidden">0</span>
       </div>
-      <div id="notifyList" class="notify-list"><p style="color:var(--gray2);font-size:12px">暂无新通知</p></div>
+      <div id="notifyList" class="notify-list"></div>
     </div>
   </nav>
   <div class="side-foot">
-    <button class="d-btn" onclick="toggleTheme()">切换主题</button>
+    <button class="d-btn" onClick="toggleTheme()">切换主题</button>
   </div>
 </aside>
-<div id="sideMask" class="side-mask" onclick="closeSide()"></div>
-<button id="sideHam" class="d-btn" onclick="openSide()">☰</button>
+<div id="sideMask" class="side-mask" onClick="closeSide()"></div>
+<button id="sideHam" class="d-btn" onClick="openSide()">☰</button>
 
 <!-- 遮罩 + 隐私条款浮层 -->
-<div id="privacyMask" class="privacy-mask hide"></div>
-<section id="privacyPanel" class="card privacy-panel hide">
+<div id="privacyMask" class="privacy-mask"></div>
+<section id="privacyPanel" class="card privacy-panel">
   <h3>隐私条款</h3>
   <div class="mini-scroll">
     <p>1. 我们仅收集必要信息用于展示留言。</p>
     <p>2. 不会将数据分享给第三方。</p>
     <p>3.同意表明您已阅读《隐私与条款》</p>
     <details>
-    <summary class="d-btn">点我查看内容</summary>
-    <div class="card" style="margin-top:12px;">
-      <p><a class="side-item" href="ystk.html">隐私与条款</a></p>
-    </div>
-  </details>
+      <summary class="d-btn">点我查看内容</summary>
+      <div class="card" style="margin-top:12px;">
+        <p><a class="side-item" href="ystk.html">隐私与条款</a></p>
+      </div>
+    </details>
   </div>
   <div class="btn-group" id="privacyBtns">
-    <button class="d-btn" id="agreeBtn" onclick="agreePrivacy()" disabled="">已同意条款</button>
-    
-    <button class="d-btn" id="reselectBtn" style="display: inline-block;" onclick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
+    <button class="d-btn" id="agreeBtn"   onclick="agreePrivacy()">同意</button>
+    <button class="d-btn" id="rejectBtn"  onclick="rejectPrivacy()">不同意</button>
+    <button class="d-btn" id="reselectBtn"style="display:none;" onClick="reselectPrivacy()">同意表明您已阅读《隐私与条款》</button>
   </div>
 </section>
-
-<script>
-/* ===== 隐私条款：刷新即渲染已同意 + 重选 ===== */
-(function(){
-  const key = 'privacy-agreed-223';
-  const panel = document.getElementById('privacyPanel');
-  const mask  = document.getElementById('privacyMask');
-  const agreeBtn   = document.getElementById('agreeBtn');
-  const rejectBtn  = document.getElementById('rejectBtn');
-  const reselectBtn= document.getElementById('reselectBtn');
-
-  if (localStorage.getItem(key)) {
-    agreeBtn.textContent   = '已同意条款';
-    agreeBtn.disabled      = true;
-    if (rejectBtn) rejectBtn.remove();
-    reselectBtn.style.display = 'inline-block';
-    panel.classList.add('hide');
-    mask.classList.add('hide');
-    return;
-  }
-
-  window.agreePrivacy = function () {
-    localStorage.setItem(key, '1');
-    agreeBtn.textContent   = '已同意条款';
-    agreeBtn.disabled      = true;
-    if (rejectBtn) rejectBtn.remove();
-    reselectBtn.style.display = 'inline-block';
-    setTimeout(() => { panel.classList.add('hide'); mask.classList.add('hide'); }, 500);
-  };
-
-  window.rejectPrivacy = function () {
-    localStorage.removeItem(key);
-    location.href = 'wud.html';
-  };
-
-  window.reselectPrivacy = function () {
-    localStorage.removeItem(key);
-    location.reload();
-  };
-})();
-</script>
 
 <!-- 主内容 -->
 <h1>223 班 Weekly Report</h1>
@@ -168,8 +127,6 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
     <a class="d-btn" href="Week1.html">第 1 周</a>
     <a class="d-btn" href="Week2.html">第 2 周</a>
     <a class="d-btn" href="Week3.html">第 3 周</a>
-    <a class="d-btn" href="Week4.html">第 4 周</a>
-    <a class="d-btn" href="Week5.html">第 5 周</a>
   </div>
 </section>
 
@@ -194,33 +151,49 @@ h1{margin:0 0 40px;font-size:28px;font-weight:600;text-align:center}
 </div>
 
 <script>
-/* ===== 通知中心 ===== */
-const NOTI_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1/messages';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
-let lastCount = 0;
-function getUserId(){ const u = localStorage.getItem('user'); return u ? JSON.parse(u).id : null; }
+/* ==========  仅需改这里  ========== */
+const SUPABASE_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co';
+const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+const TABLE        = 'notifications';
+/* ================================== */
 
-/* 拉取未读系统消息 – 字段与 messages 表完全一致 */
+let currentNotifyId = null;
+let lastCount       = 0;
+
+/* 取用户 id（与之前逻辑保持一致）*/
+function getUserId(){
+  const u = localStorage.getItem('user');
+  return u ? JSON.parse(u).id : null;
+}
+
+/* 拉取未读系统通知 */
 async function loadNotifications(){
   const uid = getUserId();
   if (!uid) return;
   const res = await fetch(
-    `${NOTI_URL}?receiver_id=eq.${uid}&read=eq.false&select=id,sender_id,title,body,created_at&order=created_at.desc`,
-    {headers:{apikey:ANON_KEY}}
+    `${SUPABASE_URL}/rest/v1/${TABLE}?user_id=eq.${uid}&type=eq.system&read=eq.false&select=id,title,body,created_at`,
+    { headers: { apikey: ANON_KEY } }
   );
   const list = res.ok ? await res.json() : [];
   renderNotifyList(list);
   updateBadge(list.length);
 }
+
+/* 渲染列表 */
 function renderNotifyList(list){
   const box = document.getElementById('notifyList');
-  if (!list.length) { box.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>'; return; }
+  if (!list.length) {
+    box.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
+    return;
+  }
   box.innerHTML = list.map(n => `
-    <div class="notify-item" onclick="showNotifyModal('${n.id}','${n.title}','${n.body.replace(/'/g,"\\'")}')">
+    <div class="notify-item" onclick="showNotifyModal('${n.id}','${n.title.replace(/'/g,"\\'")}','${n.body.replace(/'/g,"\\'")}')">
       <div>${n.title}</div>
       <small>${new Date(n.created_at).toLocaleString()}</small>
     </div>`).join('');
 }
+
+/* 角标 + 声音 */
 function updateBadge(count){
   const badge = document.getElementById('notifyBadge');
   badge.textContent = count;
@@ -232,30 +205,9 @@ function updateBadge(count){
   }
   lastCount = count;
 }
-async function markRead(id){
-  const res = await fetch(`${NOTI_URL}?id=eq.${id}`, {
-    method:'PATCH',
-    headers:{'apikey':ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({read:true})
-  });
-  if (res.ok) loadNotifications();
-}
-function removeNotify(){
-  markRead(currentNotifyId);
-  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
-  if (item) item.remove();
-  const badge = document.getElementById('notifyBadge');
-  let count = parseInt(badge.textContent) || 0;
-  count = Math.max(0, count - 1);
-  badge.textContent = count;
-  badge.style.display = count ? 'inline-block' : 'none';
-  closeNotifyModal();
-  const listBox = document.getElementById('notifyList');
-  if (!listBox.querySelector('.notify-item')) {
-    listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
-  }
-}
-function showNotifyModal(id,title,body){
+
+/* 弹窗详情 */
+function showNotifyModal(id, title, body){
   currentNotifyId = id;
   document.getElementById('notifyModalTitle').textContent = title;
   document.getElementById('notifyModalBody').textContent  = body;
@@ -264,18 +216,93 @@ function showNotifyModal(id,title,body){
 function closeNotifyModal(){
   document.getElementById('notifyModal').classList.add('hidden');
 }
-let currentNotifyId = null;
 
-/* ===== 侧边栏 ===== */
-const bar = document.getElementById('sideBar');
+/* ① UPDATE 已读 ② 本地移除 ③ 角标-1 */
+async function removeNotify(){
+  if (!currentNotifyId) return;
+  const url = `${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${currentNotifyId}`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'apikey': ANON_KEY,
+      'Authorization': `Bearer ${ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ read: true })
+  });
+  if (!res.ok) { alert('操作失败'); return; }
+
+  /* 本地移除节点 */
+  const item = document.querySelector(`.notify-item[onclick*="${currentNotifyId}"]`);
+  if (item) item.remove();
+
+  /* 角标 -1 */
+  const badge = document.getElementById('notifyBadge');
+  let count = parseInt(badge.textContent) || 0;
+  count = Math.max(0, count - 1);
+  badge.textContent = count;
+  badge.style.display = count ? 'inline-block' : 'none';
+
+  /* 空列表提示 */
+  const listBox = document.getElementById('notifyList');
+  if (!listBox.querySelector('.notify-item')) {
+    listBox.innerHTML = '<p style="color:var(--gray2);font-size:12px">暂无新通知</p>';
+  }
+  closeNotifyModal();
+}
+
+/* ===== 侧边栏开关 ===== */
+const bar  = document.getElementById('sideBar');
 const mask = document.getElementById('sideMask');
 function openSide(){ bar.classList.add('open'); mask.classList.add('on'); }
 function closeSide(){ bar.classList.remove('open'); mask.classList.remove('on'); }
 
-/* ===== 轮询通知 ===== */
+/* ===== 轮询 ===== */
 setInterval(loadNotifications, 5000);
 loadNotifications();
+
+/* ===== 隐私条款浮层（保持原逻辑） ===== */
+(function(){
+  const key = 'privacy-agreed-223';
+  const panel = document.getElementById('privacyPanel');
+  const mask  = document.getElementById('privacyMask');
+  const agreeBtn   = document.getElementById('agreeBtn');
+  const rejectBtn  = document.getElementById('rejectBtn');
+  const reselectBtn= document.getElementById('reselectBtn');
+
+  if (localStorage.getItem(key)) {
+    agreeBtn.textContent   = '已同意条款';
+    agreeBtn.disabled      = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    panel.classList.add('hide');
+    mask.classList.add('hide');
+    return;
+  }
+
+  window.agreePrivacy = function () {
+    localStorage.setItem(key, '1');
+    agreeBtn.textContent   = '已同意条款';
+    agreeBtn.disabled      = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    setTimeout(() => {
+      panel.classList.add('hide');
+      mask.classList.add('hide');
+    }, 500);
+  };
+
+  window.rejectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.href = 'wud.html';
+  };
+
+  window.reselectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.reload();
+  };
+})();
 </script>
-
-
-</body></html>
+</body>
+</html>

@@ -26,9 +26,9 @@ button:disabled{background:var(--gray);border-color:var(--gray);cursor:not-allow
 
 <section class="card">
   <div class="nav">
-    <button id="prevBtn" onclick="changeRound(-1)">← 上一轮</button>
+    <button id="prevBtn" onClick="changeRound(-1)">← 上一轮</button>
     <span id="roundInfo">加载中…</span>
-    <button id="nextBtn" onclick="changeRound(1)">下一轮 →</button>
+    <button id="nextBtn" onClick="changeRound(1)">下一轮 →</button>
   </div>
 
   <h2 id="voteTitle">加载中…</h2>
@@ -46,7 +46,7 @@ button:disabled{background:var(--gray);border-color:var(--gray);cursor:not-allow
   </div>
 
   <div class="btn-group" style="display:flex;gap:12px;margin-top:24px">
-    <button id="submitBtn" onclick="submitRound()">提交本轮</button>
+    <button id="submitBtn" onClick="submitRound()">提交本轮</button>
   </div>
   <p id="tip"></p>
 </section>
@@ -54,7 +54,7 @@ button:disabled{background:var(--gray);border-color:var(--gray);cursor:not-allow
 <script>
 /* ========== 配置 ========== */
 const SB_URL   = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0'
 const TABLE_ROUND = 'voting_rounds';
 const TABLE_VOTE  = 'round_votes';
 
@@ -69,14 +69,25 @@ const userId = localStorage.getItem('vote_user_id') || (u=>{localStorage.setItem
 let allRounds   = [];   // 全部轮次 按 start_at 升序
 let currentIdx  = -1;   // 当前在所有轮中的下标
 
-/* ========== 初始化：拉全部轮次 ========== */
+/* ========== 初始化：没做过的 & id 最小的 ========== */
 window.onload = async () => {
   const res = await fetch(`${SB_URL}/${TABLE_ROUND}?order=start_at.asc`,{headers:{apikey:ANON_KEY}});
   allRounds = res.ok ? await res.json() : [];
   if (!allRounds.length){ showErr('暂无投票'); return;}
-  currentIdx = allRounds.length - 1; // 默认最新一轮
+  currentIdx = await findFirstUnvotedIdx();   // ← 关键修复
+  if (currentIdx === -1) currentIdx = allRounds.length - 1; // 全部投过就最新
   loadRound(currentIdx);
 };
+
+/* ========== 顺序查找：返回第一个没投过的下标 ========== */
+async function findFirstUnvotedIdx(){
+  for (let i = 0; i < allRounds.length; i++){
+    const r = allRounds[i];
+    const voted = await fetch(`${SB_URL}/${TABLE_VOTE}?round_id=eq.${r.round_id}&user_id=eq.${userId}&select=1`,{headers:{apikey:ANON_KEY}});
+    if (voted.ok && (await voted.json()).length === 0) return i; // 没投过
+  }
+  return -1; // 全部已投
+}
 
 /* ========== 切换轮次 ========== */
 function changeRound(delta){
