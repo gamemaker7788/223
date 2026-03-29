@@ -4,6 +4,19 @@
 <meta charset="utf-8">
 <title>班级 Weekly Report - Week3</title>
 <style>
+.mask-box {
+           display: inline-block;
+           padding: 10px 20px;
+           background-color: black;
+           color: white;
+           cursor: pointer;
+           border-radius: 4px;
+           user-select: none;
+       }
+       
+       .mask-box.hidden {
+           color: black;
+       }
 /* ===== 继承 tb.html 的灰蓝变量 ===== */
 :root[data-theme="bright"]{
   --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
@@ -165,6 +178,7 @@ details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;paddin
     <p><span class="word">Many</span> <span class="word">artists</span> <span class="word">appeared</span> <span class="word">in</span> <span class="word">Class</span> <span class="word">223</span> <span class="word">during</span> <span class="word">the</span> <span class="word">art</span> <span class="word">lesson</span> <span class="word">on</span> <span class="word">the</span> <span class="word">morning</span> <span class="word">of</span> <span class="word">the</span> <span class="word">26th</span>.<br>
     <span class="word">Here</span> <span class="word">are</span> <span class="word">some</span> <span class="word">of</span> <span class="word">the</span> <span class="word">pictures</span> <span class="word">they</span> <span class="word">drew</span>.</p>
 </section>
+<span class="mask-box hidden" onclick="this.classList.toggle('hidden')"><h1>警告:请备好胰岛素</h1></span>
 <section class="card">
 <figure><img src="1.jpg" alt="插画"><img src="2.jpg" alt="插画"><img src="3.jpg" alt="插画"><img src="4.jpg" alt="插画"><img src="5.jpg" alt="插画"></figure>
 </section>
@@ -173,7 +187,33 @@ details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;paddin
   <h1>- The end -</h1>
 </section>
 </div>
-
+<section class="card">
+<h1>参考译文</h1>
+<p>——————————</p>
+<details>
+    <summary class="d-btn">你不会翻译才能看</summary>
+<section class="card">
+<h3>第三版出版物</h3>
+<p>主编：王文钅玉
+  </p>
+<p>副主编：付木辛女予
+  </p>
+<p>网站建设者：王王奇龺月
+  </p>
+<p>欢迎所有贡献者参与讨论!!
+  </p>
+  </section>
+  <section class="card">
+      <p><h1>爆笑人物画</h1></p>
+      <p>在26号上午美术课期间223班涌现出大量的画家。
+        这里是一些他们画的画: </p>
+      </p>
+  </section>
+  <section class="card">
+  <p><h1>- 结束 -</h1></p>
+  </section>
+  </details>
+</section>
 <!-- 弹窗结构 -->
 <div id="overlay"></div>
 <div id="wordCard">
