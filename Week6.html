@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>班级 Weekly Report - Week6</title>
+<style>
+.mask-box {
+           display: inline-block;
+           padding: 10px 20px;
+           background-color: black;
+           color: white;
+           cursor: pointer;
+           border-radius: 4px;
+           user-select: none;
+       }
+       
+       .mask-box.hidden {
+           color: black;
+       }
+/* ===== 继承 tb.html 的灰蓝变量 ===== */
+:root[data-theme="bright"]{
+  --bg:#ffffff;--text:#333333;--gray1:#cccccc;--gray2:#bbbbbb;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf822;
+}
+:root[data-theme="dark"]{
+  --bg:#1e1e1e;--text:#e5e5e5;--gray1:#555555;--gray2:#333333;
+  --bottom-blue:#38bdf8;--blue-glow:#38bdf833;
+}
+* {box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
+.toolbar{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	padding:0px;
+	margin: 0px;
+	height: 30vh;
+	width: 100%;
+}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+
+/* ===== 1. 3D 互斥按钮组（周次选择）===== */
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+
+/* ===== 2. 滚动条列表 ===== */
+.mini-scroll{max-height:140px;overflow:auto;padding-right:8px}
+.mini-scroll::-webkit-scrollbar{width:6px}
+.mini-scroll::-webkit-scrollbar-thumb{background:var(--bottom-blue);border-radius:3px}
+.mini-scroll{scrollbar-width:thin;scrollbar-color:var(--bottom-blue) transparent}
+
+/* ===== 3. 统计数字 ===== */
+.stat{display:flex;justify-content:space-around;text-align:center;margin-top:12px}
+.stat div{font-size:24px;font-weight:700;color:var(--bottom-blue)}
+.stat small{display:block;font-size:13px;font-weight:400;color:var(--text);margin-top:4px}
+
+/* ===== 4. 下周备忘输入 ===== */
+.duo-input{width:100%;padding:10px 14px;font-size:15px;border:2px solid var(--gray1);border-bottom:4px solid var(--bottom-blue);border-radius:14px;background:transparent;outline:none;transition:border-color .25s,box-shadow .25s}
+.duo-input:focus{border-color:var(--bottom-blue);box-shadow:0 6px 12px -4px var(--bottom-blue)}
+
+/* ===== 5. 日期选择器 ===== */
+.duo-date{padding:6px 12px;font-size:15px;border:2px solid var(--gray1);border-radius:14px;background:transparent;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999'%3E%3Cpath d='M4 6h8l-4 4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:14px;cursor:pointer}
+.duo-date:focus{border-color:var(--bottom-blue);box-shadow:0 0 0 4px var(--blue-glow)}
+.title-img{
+  height:100%;          /* 根据实际图高调整 */
+  width:100%;
+  display:block;
+  object-fit:contain;   /* 防止拉伸 */
+}
+/* 暗色主题下反白，让深色 LOGO 可见 */
+:root[data-theme="dark"] .title-img{
+  filter:invert(1) hue-rotate(180deg);   /* 简易反色，可换成你自己的白版 LOGO */
+}
+figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figure img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0,0,0,.08);
+	width: 30vw;
+	margin: 5px;
+	border: 2px solid #FFF;
+        }
+        figcaption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+		
+
+/* ===== 主题变量 ===== */
+:root[data-theme="bright"]{--bg:#fff;--text:#333;--gray1:#ccc;--gray2:#bbb;--bottom-blue:#38bdf8;--blue-glow:#38bdf822;}
+:root[data-theme="dark"]{--bg:#1e1e1e;--text:#e5e5e5;--gray1:#555;--gray2:#333;--bottom-blue:#38bdf8;--blue-glow:#38bdf833;}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* 顶部栏 */
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:0;margin:0;height:30vh;width:100%;}
+.toolbar h1{margin:0;font-size:20px;font-weight:600}
+.switch{cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);border:none;border-radius:6px;padding:6px 12px}
+
+/* 卡片容器 */
+.card{margin:16px 24px;padding:18px 22px;border:2px solid var(--gray1);border-radius:14px;background:transparent;}
+.card h3{margin:0 0 12px;font-size:17px;font-weight:600;color:var(--bottom-blue)}
+.btn-group{display:flex;gap:8px;margin-bottom:12px}
+.d-btn{position:relative;padding:6px 14px;font-size:14px;font-weight:600;border:2px solid var(--gray1);border-radius:6px;background:transparent;color:var(--text);cursor:pointer;top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2)}
+.d-btn.active{border-color:var(--bottom-blue);color:var(--bottom-blue);box-shadow:0 3px 0 var(--bottom-blue)}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2)}
+
+/* 不连续下划线 */
+.word{border-bottom:1px dotted var(--bottom-blue);cursor:pointer;transition:border-color .2s}
+.word:hover{border-bottom-style:dashed}
+
+/* 弹窗卡片 */
+#wordCard{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg);border:2px solid var(--bottom-blue);border-radius:12px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;display:none;min-width:220px}
+#wordCard h4{margin:0 0 6px;font-size:20px;color:var(--bottom-blue)}
+#wordCard .phonetic{font-size:15px;color:var(--text)}
+#wordCard .mean{font-size:14px;margin-top:8px;color:var(--text)}
+#wordCard .speaker{width:36px;height:36px;border:2px solid var(--bottom-blue);border-radius:50%;background:transparent;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center}
+#wordCard .speaker:hover{background:var(--blue-glow)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;display:none}
+details.eg-box{margin-top:8px}details.eg-box summary{display:inline-block;padding:4px 10px;font-size:13px;cursor:pointer}details.eg-box .card{margin-top:6px;padding:10px;font-size:13px;color:#666;white-space:pre-line}
+/* 自定义喇叭图标 */
+.speaker-icon {
+  width: 20px;          /* 按需调整 */
+  height: 20px;
+  display: block;
+}
+/* 暗色主题反白 */
+:root[data-theme="dark"] .speaker-icon {
+  filter: invert(1);    /* 黑图变白图 */
+}
+
+</style>
+<script src="theme.js"></script>
+</head>
+<body>
+<div class="card">
+<div class="toolbar">
+  <img class="title-img" src="title.png" alt="班级 Weekly Report">
+</div>
+<div class="btn-group">
+  <button class="switch" onClick="toggleTheme()">切换主题</button>
+  <button class="d-btn active">第 6 周</button>
+  
+  <a class="d-btn" href="zy.html">返回</a>
+</div>
+
+<!-- 1. 出勤统计 -->
+<section class="card">
+<h1><span class="mask-box hidden" onClick="this.classList.toggle('hidden')"><p>⚠警告️:此文章可能含有性暗示内容,部分已经打码处理.</p><p>——————————————</p></span></h1>
+  <h3><span class="word">The</span> <span class="word">sixth</span>  <span class="word">publication</span></h3>
+    <p><span class="word">Chief</span> <span class="word">editor</span>:<span class="word">Wang</span> <span class="word">Wenyu</span></p>
+    <p><span class="word">Associate</span> <span class="word">editor</span>:<span class="word">Fu</span> <span class="word">Ziyu</span></p>
+    <p><span class="word">Website</span> <span class="word">Builder</span>:<span class="word">Wang</span> <span class="word">Qizhao</span></p>
+    <p><span class="word">ALL</span> <span class="word">CONTRIBUTOR</span> <span class="word">ARE</span> <span class="word">WELCOME</span>!!!</p>
+</section>
+
+<section class="card">
+  <h1><span class="word">The</span> <span class="word">Voice</span> <span class="word">of</span> <span class="word">the</span> <span class="word">People</span></h1>
+  <h3><span class="word">Time</span>: <span class="word">April 6th</span>, <span class="word">2026</span></h3>
+  <p><span class="word">Writer</span>: <span class="word">Wang</span> <span class="word">Wenyu</span></p>
+  <p><span class="word">Helper</span>: <span class="word">Fu</span> <span class="word">Ziyu</span></p>
+  <p>——————————</p>
+
+  <p><span class="word">April 1st</span>, <span class="word">2026</span>, <span class="word">is</span> <span class="word">a</span> <span class="word">day</span> <span class="word">for</span> <span class="word">playing</span> <span class="word">jokes</span>, <span class="word">but</span> <span class="word">don't</span> <span class="word">go</span> <span class="word">too</span> <span class="word">far</span>. <span class="word">In</span> <span class="word">the</span> <span class="word">afternoon</span> <span class="word">of</span> <span class="word">that</span> <span class="word">day</span>, <span class="word">during</span> <span class="word">the</span> <span class="word">jog</span>, <span class="word">many</span> <span class="word">girls</span> <span class="word">chose</span> <span class="word">to</span> <span class="word">stay</span> <span class="word">in</span> <span class="word">the</span> <span class="word">classroom</span> <span class="word">to</span> <span class="word">avoid</span> <span class="word">it</span>, <span class="word">and</span> <span class="word">their</span> <span class="word">reason</span> <span class="word">was:</span> "<span class="word">I</span> <span class="word">have</span> <span class="mask-box hidden" onClick="this.classList.toggle('hidden')"><span class="word">period</span></span></span>." <span class="word">So</span> <span class="word">in</span> <span class="word">the</span> <span class="word">maths</span> <span class="word">class</span> <span class="word">lesson</span> <span class="word">after</span> <span class="word">the</span> <span class="word">jog</span>, <span class="word">the</span> <span class="word">class</span> <span class="word">teacher</span> <span class="word">belittled</span> <span class="word">crazily</span> <span class="word">these</span> <span class="word">girls</span>. <span class="word">Because</span> <span class="word">the</span> <span class="word">remarks</span> <span class="word">were</span> <span class="word">too</span> <span class="word">extreme</span>, <span class="word">they</span> <span class="word">aroused</span> <span class="word">the</span> <span class="word">dissatisfaction</span> <span class="word">of</span> <span class="word">Hao</span> <span class="word">who</span> <span class="word">could</span> <span class="word">not</span> <span class="word">join</span> <span class="word">the</span> <span class="word">jog</span> <span class="word">because</span> <span class="word">she</span> <span class="word">had</span> <span class="word">stomachache</span>. <span class="word">At</span> <span class="word">first</span>, <span class="word">she</span> <span class="word">just</span> <span class="word">tried</span> <span class="word">her</span> <span class="word">best</span> <span class="word">to</span> <span class="word">argue</span>, <span class="word">and</span> <span class="word">finally</span>, <span class="word">when</span> <span class="word">the</span> <span class="word">class</span> <span class="word">teacher</span> <span class="word">mentioned</span> <span class="word">her</span> <span class="word">name</span> <span class="word">again</span>, <span class="word">she</span> <span class="word">exploded</span>. <span class="word">This</span> <span class="word">is</span> <span class="word">the</span> <span class="word">first</span> <span class="word">student</span> <span class="word">in</span> <span class="word">Class</span> <span class="word">223</span>. <span class="word">The</span> <span class="word">next</span> <span class="word">second</span>, <span class="word">the</span> <span class="word">class</span> <span class="word">teacher's</span> <span class="word">disposition</span> <span class="word">is</span> <span class="word">wonderfully</span> <span class="mask-box hidden" onClick="this.classList.toggle('hidden')"><span class="word">bad</span></span></span>.<span class="word">It's</span> <span class="word">just</span> <span class="word">that</span> <span class="word">in</span> <span class="word">the</span> <span class="word">second</span> <span class="word">half</span> <span class="word">of</span> <span class="word">the</span> <span class="word">lesson</span>, <span class="word">the</span> <span class="word">"Hao"</span> <span class="word">in</span> <span class="word">the</span> <span class="word">class</span> <span class="word">teacher's</span> <span class="word">mouth</span> <span class="word">turned</span> <span class="word">into</span> "<span class="word">black</span>".</p>
+
+</section>
+
+<section class="card">
+  <p><span class="word">On</span> <span class="word">the</span> <span class="word">April</span> <span class="word">3rd</span>, <span class="word">2026</span>, <span class="word">the</span> <span class="word">class</span> <span class="word">teacher</span> <span class="word">took</span> <span class="word">the</span> <span class="word">apologize</span> <span class="word">to</span> <span class="word">Hao</span>.</section>
+<section class="card">
+<h1> - <span class="word">The</span> <span class="word">end</span>？ - </h1>
+</section>
+<section class="card">
+<h1>采访记录</h1>​
+<P>​W:​​ 郝，咱们做个采访吧？敞开心扉说说就行，不会<span class="mask-box hidden" onClick="this.classList.toggle('hidden')">外泄给hz</span>。
+<P>H：是要写进周报吗？
+  ​
+<P>W:​​ 对。
+  ​
+<P>W:​​ 首先，你当时是不是真的生病，不舒服了？（没有不信你的意思，正常流程。）
+  ​
+<P>H:​​ 是的，我现在也不舒服，肚子疼死了。救命！！！真的痛痛痛！！！！！！！！！
+  ​
+<P>W:​​ 当时你对峙，甚至骂hz时是什么想法？
+  ​
+<P>H:​​ 1. 我没有骂人。2. 我是实话实说。3. 我最近心情很不稳定，加上<span class="mask-box hidden" onClick="this.classList.toggle('hidden')">月经</span>内分泌失调之类的...以及我本身的火爆脾气.....
+<P> ​W:​​ 你是否害怕过？是什么让你继续说下去的？
+<P>​H:​​ 当然（害怕过）。冲动？我不清楚。我早就想说这些了。
+    ​
+<P>W:​​ 你
+<P>认为hz做的对吗？为什么？
+<P>​H:​​ 不对，生病不舒服就该休息，强行（运动）只会让身体更加难受。每个人总会有不舒服的时候（装病除外）。
+    ​
+<P>W:​​ 对于hz强行将跑操（或）生病请假与抗日扯上关系，你认为怎么样？
+<P>​H:​​ 嗯.....这个不太好说，不作评价。
+    ​  
+<P>W:​​ 谢谢配合！
+</section>
+<section class="card">
+<h1>问题[选择]</h1>
+<iframe src="tp1.html?id=6" width="100%" height="700" frameborder="0"></iframe>
+<iframe src="tp1.html?id=7" width="100%" height="700" frameborder="0"></iframe>
+<iframe src="tp1.html?id=8" width="100%" height="700" frameborder="0"></iframe>
+</section>
+<section class="card">
+<h1>问题[简答]</h1><p>郝某顶撞班主任时是否害怕过？</p>
+<p>你对这件事看法如何？为什么？</p>
+</section>
+</div>
+<section class="card">
+<h1>参考译文</h1>
+<p>——————————</p>
+<details>
+    <summary class="d-btn">你不会翻译才能看</summary>
+<section class="card">
+<h3>第六版出版物</h3>
+<p>主编：王文钅玉
+  </p>
+<p>副主编：付木辛女予
+  </p>
+<p>网站建设者：王王奇龺月
+  </p>
+<p>欢迎所有贡献者参与讨论!!
+  </p>
+  </section>
+  <section class="card">
+<p><h1>人民之声</h1>
+  </p>
+<p><h3>时间：2026年4月6日</h3>
+  </p>
+<p>编剧：王文钅玉</p>
+<p>助手：付木辛女予
+  </p>
+<p>——————————</p>
+<p>2026年4月1日，是一个开玩笑的日子，但是&ldquo;玩笑不可过头&rdquo;。在当天下午，跑操其间，许多女生选择留在教室里去逃避跑操，并且她们的理由是：&ldquo;我来<span class="mask-box hidden" onClick="this.classList.toggle('hidden')">月经</span>了。&rdquo;于是在跑操后的数学课中，班主任疯狂贬低这些女生。因为言辞过于极端，这引起了因肚子疼而未能参加跑操的郝某的不满。起初，她只是尽力争辩，终于，在班主任又一次提到她的名字时，她爆发了。这是223班第一位敢于顶撞班主任的同学。下一秒，班主任的心性是毋庸置疑的<span class="mask-box hidden" onClick="this.classList.toggle('hidden')">恶劣</span>。只不过在课堂的后半段，班主任口中的&ldquo;郝&rdquo;变成了&ldquo;黑&rdquo;。</p>
+  </section>
+  <section class="card">
+    <p>在2026年4月3日，班主任主动向郝某道歉。</p>
+  </section>
+  <section class="card">
+  <p><h1>- 结束？ -</h1></p>
+  </section>
+  </details>
+</section>
+<!-- 弹窗结构 -->
+<div id="overlay"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+  <details class="eg-box">
+    <summary class="d-btn">🔈 例句</summary>
+    <div class="card"><span id="wcEg"></span></div>
+  </details>
+  <button class="speaker" id="wcSpeaker"><img src="speaker.png" alt="朗读" class="speaker-icon"></button>
+</div>
+<!-- 父页面任意位置放这一行 -->
+<iframe id="chatFrame" width="100%" height="600" frameborder="0"></iframe>
+
+<script>
+/* ========== 通用检测 + 切换（无刷新版） ========== */
+const LOGIN_SRC = 'login.html';   // 同目录登录页
+const CHAT_SRC  = 'pl/pl_week6.html';      // 同目录聊天页
+const frame = document.getElementById('chatFrame');
+
+/* 首次加载：有登录→聊天页，无登录→登录页 */
+function loadFrame() {
+  const user = localStorage.getItem('user');
+  frame.src = user ? CHAT_SRC : LOGIN_SRC;
+}
+loadFrame();
+
+/* 子页面登录成功后通知父页→换源 */
+window.addEventListener('message', e => {
+  if (e.data.action === 'logged') {
+    // 无闪切换：先隐藏→换源→加载完再显示
+    frame.style.display = 'none';
+    frame.src = CHAT_SRC;
+    frame.onload = () => frame.style.display = 'block';
+  }
+});
+
+/* 可选：统一登出（只换源，不刷新父页） */
+function globalLogout() {
+  localStorage.removeItem('user');
+  frame.style.display = 'none';
+  frame.src = LOGIN_SRC;
+  frame.onload = () => frame.style.display = 'block';
+}
+</script>
+
+
+<script src="dict_wk6.js"></script>
+<script>
+/* ---------- 点词弹窗 ---------- */
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if (!w) return;
+  const raw = w.textContent.trim().toLowerCase();
+  const entry = DICT[raw] || { ph: '', zh: '（暂无释义）', eg: '' };
+  showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+});
+const overlay = document.getElementById('overlay');
+const wordCard = document.getElementById('wordCard');
+const wcWord = document.getElementById('wcWord');
+const wcPhonetic = document.getElementById('wcPhonetic');
+const wcMean = document.getElementById('wcMean');
+const wcEg = document.getElementById('wcEg');
+const wcSpeaker = document.getElementById('wcSpeaker');
+
+function showCard(word, phonetic, mean, eg = '') {
+  wcWord.textContent = word;
+  wcPhonetic.textContent = phonetic;
+  wcMean.textContent = mean;
+  wcEg.innerHTML = eg;
+  overlay.style.display = 'block';
+  wordCard.style.display = 'block';
+  speak(word);
+}
+function hideCard() {
+  overlay.style.display = 'none';
+  wordCard.style.display = 'none';
+}
+overlay.onclick = hideCard;
+document.onkeydown = e => e.key === 'Escape' && hideCard();
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+wcSpeaker.onclick = () => speak(wcWord.textContent);
+
+/* 互斥按钮 */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.d-btn');
+  const group = e.target.closest('.btn-group');
+  if (btn) {
+    group.querySelectorAll('.d-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+});
+</script>
+</body>
+</html>

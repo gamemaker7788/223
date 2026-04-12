@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>班级投票</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--primary:#38bdf8;--success:#22c55e;--danger:#ef4444;--warning:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.container{max-width:700px;margin:0 auto}
+header{text-align:center;margin-bottom:30px}
+h1{font-size:26px;margin-bottom:8px;color:var(--primary)}
+.sub{color:var(--muted);font-size:14px}
+
+/* 模式指示器 */
+.mode-bar{background:var(--card);padding:12px 16px;border-radius:8px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;border-left:3px solid var(--primary)}
+.mode-text{font-size:13px;color:var(--muted)}
+.mode-text span{color:var(--primary);font-weight:600}
+.back-btn{padding:6px 12px;background:rgba(56,189,248,0.1);border:1px solid var(--primary);color:var(--primary);border-radius:6px;cursor:pointer;font-size:12px}
+
+/* 已投列表 */
+.voted-list{background:var(--card);padding:16px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(148,163,184,0.1)}
+.voted-list h3{font-size:14px;color:var(--muted);margin-bottom:12px}
+.voted-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:8px;font-size:13px}
+.voted-item a{color:var(--primary);text-decoration:none}
+.voted-item a:hover{text-decoration:underline}
+.clear-btn{background:var(--danger);color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+
+.vote-card{background:var(--card);border-radius:16px;padding:24px;margin-bottom:20px;border:1px solid rgba(56,189,248,0.1)}
+.vote-header{margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid rgba(148,163,184,0.2)}
+.vote-header h2{font-size:20px;margin-bottom:6px}
+.vote-header p{color:var(--muted);font-size:14px}
+.badge{display:inline-block;background:rgba(56,189,248,0.15);color:var(--primary);padding:4px 12px;border-radius:12px;font-size:12px;margin-top:8px;margin-right:6px}
+.badge-multi{background:rgba(245,158,11,0.15);color:var(--warning)}
+.badge-voted{background:rgba(34,197,94,0.15);color:var(--success)}
+
+.options{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.opt{display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,0.03);border:2px solid rgba(148,163,184,0.2);border-radius:12px;cursor:pointer;transition:all 0.2s}
+.opt:hover{border-color:var(--primary);background:rgba(56,189,248,0.05)}
+.opt.selected{border-color:var(--primary);background:rgba(56,189,248,0.1)}
+.opt-voted{opacity:0.6;cursor:default;pointer-events:none}
+.opt-check{width:22px;height:22px;border:2px solid var(--muted);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s}
+.opt.selected .opt-check{background:var(--primary);border-color:var(--primary)}
+.opt-text{flex:1;font-size:15px}
+
+.btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--primary);color:#0f172a;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 25px rgba(56,189,248,0.3)}
+.btn:disabled{background:var(--muted);cursor:not-allowed}
+.btn-voted{background:var(--success);color:#fff}
+
+.results{margin-top:24px;padding-top:20px;border-top:1px solid rgba(148,163,184,0.2)}
+.results h3{font-size:16px;margin-bottom:16px;color:var(--muted)}
+.total{text-align:right;font-size:14px;color:var(--primary);margin-bottom:12px}
+.result-item{margin-bottom:14px}
+.result-top{display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px}
+.result-bar{height:8px;background:rgba(148,163,184,0.2);border-radius:4px;overflow:hidden}
+.result-fill{height:100%;background:var(--primary);border-radius:4px;transition:width 0.5s}
+.result-pct{text-align:right;font-size:12px;color:var(--muted);margin-top:4px}
+.my-choice{color:var(--success);font-size:12px;margin-left:8px}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card);padding:14px 28px;border-radius:12px;border:2px solid var(--success);opacity:0;transition:all 0.3s;z-index:100}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.error{border-color:var(--danger)}
+
+.loading{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>&nbsp;</h1>
+</header>
+  
+  <!-- 模式指示 -->
+  <div class="mode-bar">
+    <span class="mode-text" id="modeText">加载中...</span>
+    <button class="back-btn" id="backBtn" style="display:none" onclick="clearSpecificId()">返回列表</button>
+  </div>
+  
+  <!-- 已投列表（首页显示） -->
+  <div class="voted-list" id="votedList" style="display:none">
+    <h3>✓ 您已参与的投票</h3>
+    <div id="votedItems"></div>
+  </div>
+
+  <div id="voteList"><div class="empty"><div class="empty-icon">⏳</div>加载中...</div></div>
+</div>
+
+<div class="toast" id="toast"><span id="toastText">操作成功</span></div>
+
+<script>
+// ==================== 配置 ====================
+const CONFIG={
+  URL:'https://jbcrkuwnlmdmwwmiimhr.supabase.co/rest/v1',
+  KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0',
+  VOTE_TABLE:'class_votes',
+  LOG_TABLE:'class_vote_logs',
+  STORAGE_KEY:'voted_vote_ids'  // 存储已投的vote_id数组
+};
+
+// ==================== 本地存储管理 ====================
+function getVotedIds(){
+  const data=localStorage.getItem(CONFIG.STORAGE_KEY);
+  return data?JSON.parse(data):[];
+}
+
+function addVotedId(voteId){
+  const ids=getVotedIds();
+  if(!ids.includes(voteId)){
+    ids.push(voteId);
+    localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(ids));
+  }
+}
+
+function hasVoted(voteId){
+  return getVotedIds().includes(voteId);
+}
+
+function clearAllVoted(){
+  if(confirm('确定清空所有投票记录？')){
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    location.reload();
+  }
+}
+
+function clearSpecificId(){
+  // 清除URL参数，返回列表
+  history.pushState({},'',window.location.pathname);
+  location.reload();
+}
+
+// ==================== URL参数 ====================
+const params=new URLSearchParams(window.location.search);
+const specificId=params.get('id');
+
+// ==================== API ====================
+async function api(endpoint,opts={}){
+  const isWrite=opts.method&&['POST','PATCH','DELETE'].includes(opts.method);
+  const headers={
+    'apikey':CONFIG.KEY,
+    'Authorization':`Bearer ${CONFIG.KEY}`
+  };
+  
+  if(isWrite&&opts.body){
+    headers['Content-Type']='application/json';
+  }
+  
+  if(isWrite&&!opts.headers?.['Prefer']){
+    headers['Prefer']=opts.method==='POST'?'return=representation':'return=minimal';
+  }
+  
+  const res=await fetch(`${CONFIG.URL}/${endpoint}`,{
+    method:opts.method||'GET',
+    headers,
+    body:opts.body
+  });
+  
+  if(res.status===204)return null;
+  const text=await res.text();
+  if(!text)return null;
+  if(!res.ok)throw new Error(text||`HTTP ${res.status}`);
+  
+  try{return JSON.parse(text);}catch(e){return text;}
+}
+
+// ==================== 主逻辑 ====================
+let currentVote=null;
+let selections=new Set();
+
+async function init(){
+  // 模式1: 指定ID，显示单个投票
+  if(specificId){
+    document.getElementById('modeText').innerHTML=`指定投票 <span>#${specificId}</span>`;
+    document.getElementById('backBtn').style.display='block';
+    await loadSpecificVote(specificId);
+  }else{
+    // 模式2: 显示列表和已投记录
+    document.getElementById('modeText').innerHTML=`浏览模式 <span>全部投票</span>`;
+    await loadVoteList();
+  }
+}
+
+// 加载指定ID的投票
+
+async function loadSpecificVote(id){
+  try{
+    const data=await api(`${CONFIG.VOTE_TABLE}?id=eq.${id}`);
+    if(!data||data.length===0){
+      document.getElementById('voteList').innerHTML='<div class="empty"><div class="empty-icon">❌</div>找不到该投票</div>';
+      return;
+    }
+    currentVote=data[0];
+    const voted=hasVoted(currentVote.id);
+    renderSingleVote(currentVote,voted);
+  }catch(e){
+    document.getElementById('voteList').innerHTML=`<div class="empty"><div class="empty-icon">❌</div>加载失败: ${e.message}</div>`;
+  }
+}
+
+// 加载投票列表
+async function loadVoteList(){
+  try{
+    const data=await api(`${CONFIG.VOTE_TABLE}?is_active=eq.true&order=sort_order.asc`);
+    if(!data||data.length===0){
+      document.getElementById('voteList').innerHTML='<div class="empty"><div class="empty-icon">📭</div>暂无进行中的投票</div>';
+      return;
+    }
+    
+    // 显示已投列表
+    const votedIds=getVotedIds();
+    if(votedIds.length>0){
+      document.getElementById('votedList').style.display='block';
+      const votedData=data.filter(v=>votedIds.includes(v.id));
+      document.getElementById('votedItems').innerHTML=votedData.map(v=>`
+        <div class="voted-item">
+          <span>${escapeHtml(v.title)}</span>
+          <a href="?id=${v.id}">查看结果 →</a>
+        </div>
+      `).join('')||'<div style="color:var(--muted);font-size:12px">已投的投票可能已下架</div>';
+    }
+    
+    // 显示未投列表
+    const unvotedData=data.filter(v=>!votedIds.includes(v.id));
+    if(unvotedData.length===0){
+      document.getElementById('voteList').innerHTML='<div class="empty"><div class="empty-icon">✓</div>您已参与所有投票</div>';
+    }else{
+      renderVoteList(unvotedData);
+    }
+  }catch(e){
+    document.getElementById('voteList').innerHTML=`<div class="empty"><div class="empty-icon">❌</div>加载失败: ${e.message}</div>`;
+  }
+}
+
+// ==================== 渲染 ====================
+function renderSingleVote(v,voted){
+  const box=document.getElementById('voteList');
+  box.innerHTML=createVoteCard(v,voted,true);
+}
+
+function renderVoteList(list){
+  const box=document.getElementById('voteList');
+  box.innerHTML=list.map(v=>createVoteCard(v,false,false)).join('');
+}
+
+function createVoteCard(v,voted,isSingle){
+  const opts=getOptions(v);
+  const total=calculateTotal(v);
+  const mySelection=voted?getStoredSelection(v.id):null;
+  
+  return `
+    <div class="vote-card" data-id="${v.id}">
+      <div class="vote-header">
+        <h2>${escapeHtml(v.title)}</h2>
+        <p>${escapeHtml(v.description||'')}</p>
+        <div style="margin-top:8px">
+          <span class="badge">${v.allow_multi?'多选':'单选'} · ${opts.length}项</span>
+          ${v.allow_multi?'<span class="badge badge-multi">可选多项</span>':''}
+          ${voted?'<span class="badge badge-voted">已参与</span>':''}
+          <span class="badge" style="background:rgba(148,163,184,0.1);color:var(--muted)">ID:${v.id}</span>
+        </div>
+      </div>
+      
+      <div class="options" id="opts-${v.id}">
+        ${opts.map(opt=>{
+          const isSelected=voted&&mySelection&&mySelection.includes(opt.letter);
+          return `
+          <div class="opt ${voted?'opt-voted':''} ${isSelected?'selected':''}" 
+               onclick="${voted?'':'toggleOpt(\''+opt.letter+'\','+v.allow_multi+')'}" 
+               id="opt-${v.id}-${opt.letter}">
+            <div class="opt-check">${isSelected?'✓':''}</div>
+            <div class="opt-text">${escapeHtml(opt.text)}</div>
+          </div>
+        `}).join('')}
+      </div>
+      
+      ${voted?`
+        <button class="btn btn-voted" disabled>✓ 您已投票</button>
+        <div class="results" style="margin-top:20px">
+          <h3>📊 实时结果（共 ${total} 人参与）</h3>
+          ${renderResults(v,opts,total,mySelection)}
+        </div>
+      `:`<button class="btn" onclick="submitVote(${v.id})" id="btn-${v.id}">提交投票</button>`}
+      
+      ${!isSingle&&!voted?`<div style="margin-top:12px;text-align:center"><a href="?id=${v.id}" style="color:var(--primary);font-size:13px;text-decoration:none">单独打开此投票 →</a></div>`:''}
+    </div>
+  `;
+}
+
+function getOptions(v){
+  const opts=[];
+  opts.push({letter:'A',text:v.option_a});
+  opts.push({letter:'B',text:v.option_b});
+  if(v.enable_c&&v.option_c)opts.push({letter:'C',text:v.option_c});
+  if(v.enable_d&&v.option_d)opts.push({letter:'D',text:v.option_d});
+  return opts;
+}
+
+function calculateTotal(v){
+  let t=v.count_a+v.count_b;
+  if(v.enable_c&&v.count_c)t+=v.count_c;
+  if(v.enable_d&&v.count_d)t+=v.count_d;
+  return t;
+}
+
+function renderResults(v,opts,total,mySelection){
+  return opts.map(opt=>{
+    const count=v[`count_${opt.letter.toLowerCase()}`]||0;
+    const pct=total?((count/total)*100).toFixed(1):0;
+    const isMine=mySelection&&mySelection.includes(opt.letter);
+    return `
+      <div class="result-item">
+        <div class="result-top">
+          <span>${escapeHtml(opt.text)}${isMine?'<span class="my-choice">✓ 你的选择</span>':''}</span>
+          <span>${count} 票</span>
+        </div>
+        <div class="result-bar"><div class="result-fill" style="width:${pct}%"></div></div>
+        <div class="result-pct">${pct}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// 临时存储本次选择（提交前）
+function toggleOpt(letter,isMulti){
+  if(isMulti){
+    selections.has(letter)?selections.delete(letter):selections.add(letter);
+  }else{
+    selections.clear();
+    selections.add(letter);
+    // 更新UI
+    document.querySelectorAll('.opt').forEach(el=>{
+      el.classList.remove('selected');
+      el.querySelector('.opt-check').textContent='';
+    });
+  }
+  
+  const el=document.getElementById(`opt-${currentVote?.id||''}-${letter}`);
+  if(el){
+    const isSel=selections.has(letter);
+    el.classList.toggle('selected',isSel);
+    el.querySelector('.opt-check').textContent=isSel?'✓':'';
+  }
+}
+
+// 存储选择到localStorage（可选，用于显示"你的选择"）
+function storeSelection(voteId,selection){
+  const key=`vote_selection_${voteId}`;
+  localStorage.setItem(key,JSON.stringify(selection));
+}
+
+function getStoredSelection(voteId){
+  const key=`vote_selection_${voteId}`;
+  const data=localStorage.getItem(key);
+  return data?JSON.parse(data):null;
+}
+
+// ==================== 提交 ====================
+async function submitVote(voteId){
+  if(selections.size===0){
+    showToast('请至少选择一项','error');
+    return;
+  }
+  
+  const btn=document.getElementById(`btn-${voteId}`);
+  btn.disabled=true;
+  btn.innerHTML='<span class="loading"></span> 提交中...';
+  
+  try{
+    const picks=Array.from(selections).sort();
+    
+    // 1. 记录日志
+    await api(CONFIG.LOG_TABLE,{
+      method:'POST',
+      headers:{'Prefer':'return=minimal'},
+      body:JSON.stringify({
+        vote_id:voteId,
+        picks:picks
+      })
+    });
+    
+    // 2. 更新计数
+    for(const letter of picks){
+      const field=`count_${letter.toLowerCase()}`;
+      const v=currentVote||votesData?.find(x=>x.id===voteId);
+      const current=v?v[field]:0;
+      await api(`${CONFIG.VOTE_TABLE}?id=eq.${voteId}`,{
+        method:'PATCH',
+        headers:{'Prefer':'return=minimal'},
+        body:JSON.stringify({[field]:(current||0)+1})
+      });
+    }
+    
+    // 3. 保存到本地
+    addVotedId(voteId);
+    storeSelection(voteId,picks);
+    
+    showToast('投票成功！');
+    
+    // 4. 刷新
+    setTimeout(()=>{
+      if(specificId){
+        location.reload();
+      }else{
+        init();
+      }
+    },500);
+    
+  }catch(e){
+    showToast('提交失败: '+e.message,'error');
+    btn.disabled=false;
+    btn.textContent='提交投票';
+  }
+}
+
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  document.getElementById('toastText').textContent=msg;
+  t.className='toast '+(isError?'error':'')+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function escapeHtml(t){
+  return (t||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+}
+
+// 启动
+init();
+</script>
+
+</body>
+</html>
