@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>班级 Weekly Report - Week10</title>
+<link rel="stylesheet" href="main.css">
+<script src="theme.js"></script>
+<script src="dict_7113084e.js"></script>
+<style>
+/* 朗读词样式 */
+.word {
+    border-bottom: 1px dotted var(--bottom-blue);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.word:hover {
+    border-bottom-style: dashed;
+    background: var(--blue-glow);
+}
+
+/* 打码样式 - 行内，只包裹单词 */
+.mask-box {
+    background-color: black;
+    color: black;
+    padding: 0 2px;
+    border-radius: 2px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s;
+}
+.mask-box:hover {
+    box-shadow: 0 0 0 1px var(--bottom-blue);
+}
+.mask-box.hidden {
+    color: black;
+}
+.mask-box:not(.hidden) {
+    color: white;
+    background-color: #333;
+}
+
+/* 既是朗读词又是打码 */
+.word.mask-box {
+    border-bottom: 1px dotted var(--bottom-blue);
+}
+.word.mask-box:not(.hidden) {
+    color: white;
+    background-color: #333;
+}
+</style>
+</head>
+<body>
+<div id="editableRoot"><section class="card section-card">
+                    <!-- 标题图片区（带上传功能） -->
+                    <div class="toolbar">
+                        <img class="title-img" id="headerImage" src="title.png" alt="班级 Weekly Report">
+                        
+                    </div>
+                    
+                    <div class="btn-group-h" style="margin: 16px 24px;">
+                        <button class="switch" onclick="toggleTheme()">切换主题</button>
+                        <button class="d-btn active">第 <span id="weekNum">10</span> 周</button>
+                        <a class="d-btn" href="zy.html">返回</a>
+                    </div>
+                    
+                    <!-- 可编辑根容器 -->
+                    <section class="card section-card"><h3 class=""><span class="word" data-raw="the">The</span> <span class="word" data-raw="tenth">tenth</span> <span class="word" data-raw="publication">publication</span></h3><p class="">Writer: 王文钰</p><p class="">Helper: 勇勇</p></section><section class="card section-card"><h1 class=""><span class="word" data-raw="liar">Liar</span>!</h1><p class=""><span class="word" data-raw="this">This</span> <span class="word" data-raw="is">is</span> <span class="word" data-raw="a">a</span> <span class="word" data-raw="complete">complete</span> <span class="mask-box hidden" data-raw="w">Fucking</span> <span class="word" data-raw="lie">lie</span>!</p><p class=""><span class="word" data-raw="before">Before</span> <span class="word" data-raw="this">this</span> <span class="word" data-raw="mid-term">mid-term</span> <span class="word" data-raw="exam">exam</span>, <span class="word" data-raw="our">our</span> <span class="word" data-raw="class">class</span> <span class="word" data-raw="teacher">teacher</span> <span class="word" data-raw="told">told</span> <span class="word" data-raw="us">us</span>: "<span class="word" data-raw="seats">Seats</span> <span class="word" data-raw="will">will</span> <span class="word" data-raw="be">be</span> <span class="word" data-raw="arranged">arranged</span> <span class="word" data-raw="according">according</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="grades">grades</span>." <span class="word" data-raw="after">After</span> <span class="word" data-raw="this">this</span> <span class="word" data-raw="new">new</span> <span class="word" data-raw="spread">spread</span>, <span class="word" data-raw="our">our</span> <span class="word" data-raw="class">class</span> <span class="word" data-raw="went">went</span> <span class="word" data-raw="crazy">crazy</span>, <span class="word" data-raw="and">and</span> <span class="word" data-raw="they">they</span> <span class="word" data-raw="even">even</span> <span class="word" data-raw="reserved">reserved</span> <span class="word" data-raw="all">all</span> <span class="word" data-raw="seats">seats</span>. <span class="word" data-raw="what">What</span>'<span class="word" data-raw="s">s</span> <span class="word" data-raw="more">more</span>, <span class="word" data-raw="thanks">thanks</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="this">this</span> <span class="word" data-raw="news">news</span>, <span class="word" data-raw="many">many</span> <span class="word" data-raw="students">students</span> <span class="word" data-raw="studied">studied</span> <span class="word" data-raw="hard">hard</span> <span class="word" data-raw="and">and</span> <span class="word" data-raw="got">got</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="satisfactory">satisfactory</span> <span class="word" data-raw="grades">grades</span><span class="mask-box hidden" data-raw="w">评论：并非所有人，姓张的除外。</span>.</p><p class=""><span class="word" data-raw="however">However</span>, <span class="word" data-raw="whether">whether</span> <span class="word" data-raw="because">because</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="students">students</span> <span class="word" data-raw="were">were</span> <span class="word" data-raw="too">too</span> <span class="word" data-raw="excited">excited</span>, <span class="word" data-raw="or">or</span> <span class="word" data-raw="because">because</span> <span class="word" data-raw="it">it</span> <span class="word" data-raw="was">was</span> <span class="word" data-raw="simply">simply</span> <span class="word" data-raw="a">a</span> <span class="word" data-raw="lie">lie</span>! <span class="word" data-raw="our">Our</span> <span class="word" data-raw="class">class</span> <span class="word" data-raw="teacher">teacher</span> <span class="word" data-raw="said">said</span> <span class="word" data-raw="in">in</span> <span class="word" data-raw="a">a</span> <span class="word" data-raw="maths">maths</span> <span class="word" data-raw="lesson">lesson</span>: "<span class="word" data-raw="it">It</span>'<span class="word" data-raw="s">s</span> <span class="word" data-raw="not">not</span> <span class="word" data-raw="up">up</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="you">you</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="choose">choose</span> <span class="word" data-raw="your">your</span> <span class="word" data-raw="seats">seats</span>. <span class="word" data-raw="they">They</span> <span class="word" data-raw="will">will</span> <span class="word" data-raw="be">be</span> <span class="word" data-raw="arranged">arranged</span> <span class="word" data-raw="uniformly">uniformly</span>." <span class="word" data-raw="his">His</span> <span class="word" data-raw="words">words</span> <span class="word" data-raw="made">made</span> <span class="word" data-raw="many">many</span> <span class="word" data-raw="students">students</span> <span class="word" data-raw="feel">feel</span> <span class="word" data-raw="unsatisfactory">unsatisfactory</span>.</p><p class=""><span class="word" data-raw="although">Although</span> <span class="word" data-raw="this">this</span> <span class="word" data-raw="action">action</span> <span class="word" data-raw="encouraged">encouraged</span> <span class="word" data-raw="students">students</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="study">study</span> <span class="word" data-raw="hard">hard</span>, <span class="word" data-raw="the">the</span> <span class="word" data-raw="action">action</span> <span class="word" data-raw="of">of</span> <span class="word" data-raw="breaking">breaking</span> <span class="word" data-raw="promises">promises</span> <span class="word" data-raw="hurt">hurt</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="students">students</span>' <span class="word" data-raw="enthusiasm">enthusiasm</span> <span class="word" data-raw="and">and</span> <span class="word" data-raw="trust">trust</span><span class="mask-box hidden" data-raw="w">评论：Yes!!!</span>.</p><p class=""><span class="word" data-raw="but">But</span> <span class="word" data-raw="according">according</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="newest">newest</span> <span class="word" data-raw="news">news</span>, <span class="word" data-raw="the">the</span> <span class="word" data-raw="class">class</span> <span class="word" data-raw="teacher">teacher</span> <span class="word" data-raw="made">made</span> <span class="word" data-raw="each">each</span> <span class="word" data-raw="group">group</span> <span class="word" data-raw="leader">leader</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="choose">choose</span> <span class="word" data-raw="team">team</span> <span class="word" data-raw="members">members</span> <span class="word" data-raw="and">and</span> <span class="word" data-raw="we">we</span> <span class="word" data-raw="rearranged">rearranged</span> <span class="word" data-raw="seats">seats</span> <span class="word" data-raw="successfully">successfully</span>.</p><p class=""><span class="word" data-raw="it">It</span> <span class="word" data-raw="is">is</span> <span class="word" data-raw="quite">quite</span> <span class="word" data-raw="different">different</span> <span class="word" data-raw="from">from</span> <span class="word" data-raw="what">what</span> <span class="word" data-raw="we">we</span> <span class="word" data-raw="thought">thought</span>, <span class="word" data-raw="however">however</span>, <span class="word" data-raw="looking">looking</span> <span class="word" data-raw="on">on</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="bright">bright</span> <span class="word" data-raw="side">side</span>, <span class="word" data-raw="he">he</span> <span class="word" data-raw="did">did</span> <span class="word" data-raw="what">what</span> <span class="word" data-raw="he">he</span> <span class="word" data-raw="said">said</span> <span class="word" data-raw="at">at</span> <span class="word" data-raw="least">least</span>.
+                      <iframe src="tp1.html?id=9" width="100%" height="700" frameborder="0"></iframe>
+                    </p>
+                    </section><section class="card section-card"><h1 class="">- <span class="word" data-raw="the">The</span> <span class="word" data-raw="end">end</span> -</h1><h2 class=""><span class="word" data-raw="please">Please</span> <span class="word" data-raw="stay">stay</span> <span class="word" data-raw="tuned">tuned</span> !!!</h2></section><section class="card section-card"><h1 class="">参考译文</h1><p class="">——————————</p><details>
+    <summary class="d-btn">你不会翻译才能看</summary><section class="card section-card"><section class="card section-card"><h1 class="">说谎者！</h1><p class="">这是一个彻头彻尾的谎言！</p><p class="">在此次期中考试前，我们班主任曾告诉我们说：“座位将按照成绩来安排。”在该消息传出后，我们班陷入疯狂之中，他们甚至预订好了所有座位。更重要的是，多亏了这则消息，许多同学都努力学习并取得了令人满意的成绩。</p><p class="">然而，不知道是因为同学们太过兴奋了，还是因为这根本就是个谎言！我们在一次数学课上，班主任说：“坐什么位置不是由你们说了算的，是有统一的调配。”此番言辞，激起诸多同学的不满！</p><p class="">此举虽激励同学们努力复习，但这出卖东家的行为实在挫伤同学们的激情与信任。</p><p class="">新但是根据最新消息，班主任让每位组长选择组员，并且我们成功地换了座位。</p><p class="">虽然这与我们预想中的相差较大，但从好的方面想，他至少做到了他所说的。</p></section><section class="card section-card"><h1 class="">- 结束 -</h1><h2 class="">敬请关注！！！</h2></section></section></details></section></section></div>
+                
+
+<div id="overlay" onclick="hideCard()"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+  <details class="eg-box">
+    <summary class="d-btn">🔈 例句</summary>
+    <div class="card"><span id="wcEg"></span></div>
+  </details>
+  <button class="speaker" onclick="speak(wcWord.textContent)">🔊</button>
+</div>
+<!-- 父页面任意位置放这一行 -->
+<iframe id="chatFrame" width="100%" height="600" frameborder="0"></iframe>
+
+<script>
+/* ========== 通用检测 + 切换（无刷新版） ========== */
+const LOGIN_SRC = 'login.html';   // 同目录登录页
+const CHAT_SRC  = 'pl/pl_week10.html';      // 同目录聊天页
+const frame = document.getElementById('chatFrame');
+
+/* 首次加载：有登录→聊天页，无登录→登录页 */
+function loadFrame() {
+  const user = localStorage.getItem('user');
+  frame.src = user ? CHAT_SRC : LOGIN_SRC;
+}
+loadFrame();
+
+/* 子页面登录成功后通知父页→换源 */
+window.addEventListener('message', e => {
+  if (e.data.action === 'logged') {
+    // 无闪切换：先隐藏→换源→加载完再显示
+    frame.style.display = 'none';
+    frame.src = CHAT_SRC;
+    frame.onload = () => frame.style.display = 'block';
+  }
+});
+
+/* 可选：统一登出（只换源，不刷新父页） */
+function globalLogout() {
+  localStorage.removeItem('user');
+  frame.style.display = 'none';
+  frame.src = LOGIN_SRC;
+  frame.onload = () => frame.style.display = 'block';
+}
+</script>
+<script>
+// 朗读词点击
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if (!w) return;
+  const raw = w.dataset.raw || w.textContent.trim().toLowerCase();
+  const entry = (typeof DICT !== 'undefined' && DICT[raw]) ? DICT[raw] : { ph: '', zh: '（暂无释义）', eg: '' };
+  showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+});
+
+// 打码点击
+document.addEventListener('click', e => {
+  const m = e.target.closest('.mask-box');
+  if (m) {
+    m.classList.toggle('hidden');
+  }
+});
+
+function showCard(word, phonetic, mean, eg) {
+  document.getElementById('wcWord').textContent = word;
+  document.getElementById('wcPhonetic').textContent = phonetic;
+  document.getElementById('wcMean').textContent = mean;
+  document.getElementById('wcEg').textContent = eg;
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('wordCard').style.display = 'block';
+  speak(word);
+}
+
+function hideCard() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('wordCard').style.display = 'none';
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+
+document.onkeydown = e => e.key === 'Escape' && hideCard();
+</script>
+</body>
+</html>
