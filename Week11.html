@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>班级 Weekly Report - Week11</title>
+<link rel="stylesheet" href="cz/main.css">
+<script src="cz/theme.js"></script>
+<script src="cz/dict_da3178e7.js"></script>
+<style>
+/* 朗读词样式 */
+.word {
+    border-bottom: 1px dotted var(--bottom-blue);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.word:hover {
+    border-bottom-style: dashed;
+    background: var(--blue-glow);
+}
+
+/* 打码样式 - 行内，只包裹单词 */
+.mask-box {
+    background-color: black;
+    color: black;
+    padding: 0 2px;
+    border-radius: 2px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s;
+}
+.mask-box:hover {
+    box-shadow: 0 0 0 1px var(--bottom-blue);
+}
+.mask-box.hidden {
+    color: black;
+}
+.mask-box:not(.hidden) {
+    color: white;
+    background-color: #333;
+}
+
+/* 既是朗读词又是打码 */
+.word.mask-box {
+    border-bottom: 1px dotted var(--bottom-blue);
+}
+.word.mask-box:not(.hidden) {
+    color: white;
+    background-color: #333;
+}
+</style>
+</head>
+<body>
+<div id="editableRoot"><section class="card section-card">
+                    <!-- 标题图片区（带上传功能） -->
+                    <div class="toolbar">
+                        <img class="title-img" id="headerImage" src="cz/title.png" alt="班级 Weekly Report">
+                        
+                    </div>
+                    
+                    <div class="btn-group-h" style="margin: 16px 24px;">
+                        <button class="switch" onclick="toggleTheme()">切换主题</button>
+                        <button class="d-btn active">第 <span id="weekNum">11</span> 周</button>
+                        <a class="d-btn" href="cz/zy.html">返回</a>
+                    </div>
+                    
+                    <!-- 可编辑根容器 -->
+                    <section class="card section-card"><h3 class=""><span class="word" data-raw="time">Time</span>: <span class="word" data-raw="may">May</span> 8<span class="word" data-raw="th">th</span>, 2026</h3><p class=""><span class="word" data-raw="writer">Writer</span>: 王文钰</p><p class=""><span class="word" data-raw="helper">Helper</span>: 李晨毅</p></section><section class="card section-card"><h1 class=""><span class="word">Miss</span> <span class="word">the</span> <span class="word">Double</span> <span class="word">Championships</span>……</h1><p class=""><span class="word" data-raw="when">When</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="competition">competition</span> <span class="word" data-raw="reached">reached</span> <span class="word" data-raw="its">its</span> <span class="word" data-raw="climax">climax</span> <span class="word" data-raw="bit">bit</span> <span class="word" data-raw="by">by</span> <span class="word" data-raw="bit">bit</span>, <span class="word" data-raw="class">Class</span> 223 <span class="word" data-raw="received">received</span> <span class="word" data-raw="terrible">terrible</span> <span class="word" data-raw="news">news</span>.</p><p class=""><span class="word" data-raw="on">On</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="afternoon">afternoon</span> <span class="word" data-raw="of">of</span> <span class="word" data-raw="may">May</span> 8<span class="word" data-raw="th">th</span>, 2026, <span class="word" data-raw="class">Class</span> 223 <span class="word" data-raw="boys">boys</span>' <span class="word" data-raw="football">football</span> <span class="word" data-raw="team">team</span> <span class="word" data-raw="lost">lost</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="class">Class</span> 210 <span class="word" data-raw="in">in</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="semi-final">semi-final</span>.</p><p class=""><span class="word" data-raw="this">This</span> <span class="word" data-raw="broke">broke</span> <span class="word" data-raw="class">Class</span> 223'<span class="word" data-raw="s">s</span> <span class="word" data-raw="dream">dream</span> <span class="word" data-raw="of">of</span> <span class="word" data-raw="defending">defending</span> <span class="word" data-raw="double">double</span> <span class="word" data-raw="championships">championships</span> <span class="word" data-raw="for">for</span> <span class="word" data-raw="four">four</span> <span class="word" data-raw="straight">straight</span> <span class="word" data-raw="competitions">competitions</span>, <span class="word" data-raw="and">and</span> <span class="word" data-raw="warned">warned</span> <span class="word" data-raw="all">all</span> <span class="word" data-raw="students">students</span> <span class="word" data-raw="of">of</span> <span class="word" data-raw="class">Class</span> 223 —— <span class="word" data-raw="never">Never</span> <span class="word" data-raw="slack">slack</span>!</p><p class=""><span class="word" data-raw="and">And</span> <span class="word" data-raw="according">according</span> <span class="word" data-raw="to">to</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="newest">newest</span> <span class="word" data-raw="news">news</span>, <span class="word" data-raw="on">on</span> <span class="word" data-raw="the">the</span> <span class="word" data-raw="afternoon">afternoon</span> <span class="word" data-raw="of">of</span> <span class="word" data-raw="may">May</span> 9<span class="word" data-raw="th">th</span> 2026, <span class="word" data-raw="the">the</span> <span class="word" data-raw="girls">girls</span>' <span class="word" data-raw="football">football</span> <span class="word" data-raw="team">team</span> <span class="word" data-raw="in">in</span> <span class="word" data-raw="class">Class</span> 223 <span class="word" data-raw="got">got</span> <span class="word" data-raw="championship">championship</span>. <span class="word" data-raw="let">Let</span>'<span class="word" data-raw="s">s</span> <span class="word" data-raw="congratulate">congratulate</span>!</p></section>
+<section class="card section-card"><iframe src="tp1.html?id=13" width="100%" height="700" frameborder="0"></iframe></section>
+                    <section class="card section-card"><h1 class="">- <span class="word" data-raw="the">The</span> <span class="word" data-raw="end">end</span> -</h1><h2 class=""><span class="word" data-raw="please">Please</span> <span class="word" data-raw="stay">stay</span> <span class="word" data-raw="tuned">tuned</span>!!!</h2></section><section class="card section-card"><h1 class="">参考译文</h1><p class="">——————————</p><details>
+    <summary class="d-btn">你不会翻译才能看</summary><section class="card section-card"><section class="card section-card"><p class="">随着赛事渐渐进入高潮，223班迎来了一个糟糕的消息。</p><p class="">在2026年5月8日下午，223班男子足球队在半决赛中输给210班。</p><p class="">这打破了223班蝉联四届双冠的梦想，并且警醒了223班全体同学——不要松懈！</p><p class="">并且根据最新消息，在2026年5月9日下午，223班女子足球队赢得了冠军。让我们庆祝！</p></section><section class="card section-card"><h1 class="">- 结束 -</h1><h2 class="">敬请关注！！！</h2></section></section></section></details></section></div>
+                
+
+<div id="overlay" onclick="hideCard()"></div>
+<div id="wordCard">
+  <h4 id="wcWord"></h4>
+  <div class="phonetic" id="wcPhonetic"></div>
+  <div class="mean" id="wcMean"></div>
+  <details class="eg-box">
+    <summary class="d-btn">🔈 例句</summary>
+    <div class="card"><span id="wcEg"></span></div>
+  </details>
+  <button class="speaker" onclick="speak(wcWord.textContent)">🔊</button>
+</div>
+<!-- 父页面任意位置放这一行 -->
+<iframe id="chatFrame" width="100%" height="600" frameborder="0"></iframe>
+
+<script>
+/* ========== 通用检测 + 切换（无刷新版） ========== */
+const LOGIN_SRC = 'login.html';   // 同目录登录页
+const CHAT_SRC  = 'pl/pl_week11.html';      // 同目录聊天页
+const frame = document.getElementById('chatFrame');
+
+/* 首次加载：有登录→聊天页，无登录→登录页 */
+function loadFrame() {
+  const user = localStorage.getItem('user');
+  frame.src = user ? CHAT_SRC : LOGIN_SRC;
+}
+loadFrame();
+
+/* 子页面登录成功后通知父页→换源 */
+window.addEventListener('message', e => {
+  if (e.data.action === 'logged') {
+    // 无闪切换：先隐藏→换源→加载完再显示
+    frame.style.display = 'none';
+    frame.src = CHAT_SRC;
+    frame.onload = () => frame.style.display = 'block';
+  }
+});
+
+/* 可选：统一登出（只换源，不刷新父页） */
+function globalLogout() {
+  localStorage.removeItem('user');
+  frame.style.display = 'none';
+  frame.src = LOGIN_SRC;
+  frame.onload = () => frame.style.display = 'block';
+}
+</script>
+<script>
+// 朗读词点击
+document.addEventListener('click', e => {
+  const w = e.target.closest('.word');
+  if (!w) return;
+  const raw = w.dataset.raw || w.textContent.trim().toLowerCase();
+  const entry = (typeof DICT !== 'undefined' && DICT[raw]) ? DICT[raw] : { ph: '', zh: '（暂无释义）', eg: '' };
+  showCard(w.textContent, entry.ph, entry.zh, entry.eg);
+});
+
+// 打码点击
+document.addEventListener('click', e => {
+  const m = e.target.closest('.mask-box');
+  if (m) {
+    m.classList.toggle('hidden');
+  }
+});
+
+function showCard(word, phonetic, mean, eg) {
+  document.getElementById('wcWord').textContent = word;
+  document.getElementById('wcPhonetic').textContent = phonetic;
+  document.getElementById('wcMean').textContent = mean;
+  document.getElementById('wcEg').textContent = eg;
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('wordCard').style.display = 'block';
+  speak(word);
+}
+
+function hideCard() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('wordCard').style.display = 'none';
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+
+document.onkeydown = e => e.key === 'Escape' && hideCard();
+</script>
+</body>
+</html>
