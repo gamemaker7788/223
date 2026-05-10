@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+<meta charset="utf-8">
+<title>223班音频播放</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- ① 主题初始化（先于CSS） -->
+<script>
+(function(){
+  const key = 'theme-223-radio';
+  const th = localStorage.getItem(key);
+  if (th) document.documentElement.dataset.theme = th;
+})();
+</script>
+
+<style>
+/* ========= 灰蓝双色主题 ========= */
+:root[data-theme="bright"]{
+  --bg        : #ffffff;
+  --panel     : #f6f8fa;
+  --text      : #333333;
+  --gray1     : #cccccc;
+  --gray2     : #bbbbbb;
+  --bottom-blue:#38bdf8;
+  --blue-glow : #38bdf822;
+  --visualizer: #38bdf8;
+}
+:root[data-theme="dark"]{
+  --bg        : #1e1e1e;
+  --panel     : #252525;
+  --text      : #e5e5e5;
+  --gray1     : #555555;
+  --gray2     : #333333;
+  --bottom-blue:#38bdf8;
+  --blue-glow : #38bdf833;
+  --visualizer: #38bdf8;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  overflow-x:hidden;
+}
+
+/* ===== 顶部固定栏 ===== */
+.toolbar{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:48px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;
+  background:var(--panel);
+  border-bottom:1px solid var(--gray1);
+  z-index:10;
+}
+.toolbar h5{margin:0;font-size:14px;font-weight:600;color:var(--bottom-blue)}
+.switch{
+  cursor:pointer;font-size:14px;background:var(--gray1);color:var(--text);
+  border:none;border-radius:6px;padding:6px 12px;
+}
+
+/* ===== 入口页面：音频列表网格 ===== */
+#entryPage{
+  padding-top:48px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:48px 20px 40px;
+}
+#entryPage h2{
+  margin:24px 0 20px;
+  font-size:22px;
+  color:var(--bottom-blue);
+}
+.track-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+  width:100%;
+  max-width:900px;
+}
+.track-card{
+  background:var(--panel);
+  border:2px solid var(--gray1);
+  border-radius:12px;
+  padding:20px;
+  cursor:pointer;
+  position:relative;
+  top:0;
+  box-shadow:0 3px 0 var(--gray2);
+  transition:all .12s ease;
+  text-decoration:none;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.track-card:hover{
+  border-color:var(--bottom-blue);
+  transform:translateY(-2px);
+  box-shadow:0 5px 0 var(--gray2);
+}
+.track-card:active{
+  transform:translateY(2px);
+  box-shadow:0 1px 0 var(--gray2);
+}
+.track-card h4{
+  font-size:16px;
+  color:var(--bottom-blue);
+  margin:0;
+}
+.track-card p{
+  font-size:13px;
+  color:var(--gray1);
+  margin:0;
+}
+.track-card .track-num{
+  position:absolute;
+  top:12px;
+  right:12px;
+  font-size:12px;
+  background:var(--bottom-blue);
+  color:#000;
+  padding:2px 8px;
+  border-radius:4px;
+  font-weight:600;
+}
+
+/* ===== 播放页面：仅中间面板 ===== */
+#playPage{
+  display:none;
+  height:100vh;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:48px 20px 20px;
+}
+#playPage.active{
+  display:flex;
+}
+
+/* ===== 音频可视化面板 ===== */
+#audioPanel{
+  width:100%;max-width:500px;
+  background:var(--panel);
+  border:2px solid var(--gray1);
+  border-radius:16px;
+  padding:32px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+}
+
+/* 音频可视化条 */
+#visualizer{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:4px;
+  height:120px;
+  width:100%;
+  padding:0 20px;
+}
+.bar{
+  width:8px;
+  background:var(--visualizer);
+  border-radius:4px;
+  transition:height 0.1s ease;
+  opacity:0.8;
+}
+.bar:nth-child(odd){opacity:0.6;}
+
+/* 当前播放信息 */
+#trackInfo{
+  text-align:center;
+  width:100%;
+}
+#trackName{
+  font-size:20px;
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:8px;
+  word-break:break-all;
+}
+#trackMeta{
+  font-size:13px;
+  color:var(--gray1);
+}
+
+/* ===== 进度条 ===== */
+#progress{height:5px;background:var(--gray1);border-radius:3px;cursor:pointer;position:relative;width:100%;}
+#progressBar{height:100%;background:var(--bottom-blue);border-radius:3px;width:0;transition:width .1s;}
+#time{font-size:12px;white-space:nowrap;min-width:100px;text-align:center;}
+
+/* ===== 控制栏 ===== */
+#bot{
+  width:100%;
+  background:transparent;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+#ctrl{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-size:13px;
+  color:var(--text);
+  flex-wrap:wrap;
+}
+
+/* ===== 3D 按钮 ===== */
+.d-btn{
+  position:relative;padding:6px 10px;font-size:14px;font-weight:600;
+  border:2px solid var(--gray1);border-radius:6px;
+  background:transparent;color:var(--text);cursor:pointer;
+  top:0;box-shadow:0 3px 0 var(--gray2);transition:all .12s ease;
+}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--gray2);}
+.d-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gray2);}
+
+/* 大播放按钮 */
+.d-btn-lg{
+  padding:12px 20px;
+  font-size:16px;
+  background:var(--bottom-blue);
+  color:#000;
+  border-color:var(--bottom-blue);
+  box-shadow:0 3px 0 #0284c7;
+}
+.d-btn-lg:hover{
+  box-shadow:0 5px 0 #0284c7;
+  transform:translateY(-2px);
+}
+.d-btn-lg:active{
+  box-shadow:0 1px 0 #0284c7;
+  transform:translateY(2px);
+}
+
+/* 循环按钮激活状态 */
+.d-btn.loop-on{
+  background:var(--bottom-blue);
+  color:#000;
+  border-color:var(--bottom-blue);
+  box-shadow:0 3px 0 #0284c7;
+}
+
+/* ===== 手绘图标 ===== */
+.icon{position:relative;display:inline-block;width:18px;height:18px;}
+.icon-play::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:12px solid var(--text);border-top:7px solid transparent;border-bottom:7px solid transparent;}
+.icon-pause::before,.icon-pause::after{content:'';position:absolute;top:50%;transform:translateY(-50%);width:3px;height:12px;background:var(--text);}
+.icon-pause::before{left:4px;}
+.icon-pause::after{right:4px;}
+.icon-rev::before,.icon-rev::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.icon-rev::before{width:0;height:0;border-right:9px solid var(--text);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.icon-rev::after{width:5px;height:2px;background:var(--text);margin-left:3px;}
+.icon-fwd::before,.icon-fwd::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.icon-fwd::before{width:0;height:0;border-left:9px solid var(--text);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.icon-fwd::after{width:5px;height:2px;background:var(--text);margin-left:-3px;}
+.icon-loop::before{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:14px;height:14px;
+  border:2px solid var(--text);
+  border-radius:50%;
+  border-top-color:transparent;
+}
+.icon-loop::after{
+  content:'';
+  position:absolute;
+  top:20%;left:60%;
+  transform:rotate(-45deg);
+  width:0;height:0;
+  border-left:4px solid var(--text);
+  border-top:3px solid transparent;
+  border-bottom:3px solid transparent;
+}
+.icon-back::before{
+  content:'';
+  position:absolute;
+  top:50%;left:30%;
+  transform:translateY(-50%);
+  width:0;height:0;
+  border-right:8px solid var(--text);
+  border-top:5px solid transparent;
+  border-bottom:5px solid transparent;
+}
+.icon-back::after{
+  content:'';
+  position:absolute;
+  top:50%;left:55%;
+  transform:translateY(-50%);
+  width:2px;height:10px;
+  background:var(--text);
+}
+
+/* ===== 旋钮 ===== */
+input[type=range]{-webkit-appearance:none;height:4px;background:var(--gray1);border-radius:2px;outline:none;flex:1;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--bottom-blue);border-radius:50%;cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--bottom-blue);border-radius:50%;cursor:pointer;border:none;}
+
+/* ===== 倍速下拉 ===== */
+#speedSel{padding:4px 8px;font-size:13px;border:2px solid var(--gray1);border-radius:6px;background:var(--panel);color:var(--text);cursor:pointer;outline:none;}
+#speedSel:focus{border-color:var(--bottom-blue);box-shadow:0 0 0 2px var(--blue-glow);}
+
+/* ===== 隐私条款浮层 ===== */
+.privacy-mask{
+  position:fixed;
+  inset:0;
+  background:#000000;
+  z-index:19;
+  display:block;
+  opacity:1;
+  transition:opacity .3s ease;
+}
+.privacy-mask.hide{
+  opacity:0;
+  pointer-events:none;
+}
+.privacy-panel{
+  position:fixed;
+  inset:0;
+  margin:auto;
+  max-width:480px;
+  height:fit-content;
+  background:var(--bg);
+  border: 2px solid var(--gray1);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  z-index:20;
+  transform:translateY(0);
+  transition:transform .3s ease;
+}
+.privacy-panel.hide{
+  transform:translateY(-10086px);
+  pointer-events:none;
+}
+
+/* 卡片样式 */
+.card {
+  width: calc(100% - 48px);
+  max-width: 680px;
+  margin: 0 auto 20px;
+  padding: 18px 22px;
+  border: 2px solid var(--gray1);
+  border-radius: 14px;
+  background: transparent;
+}
+.card h3 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--bottom-blue);
+}
+.mini-scroll{
+  max-height:200px;
+  overflow:auto;
+  padding:8px 0;
+}
+
+/* 按钮组 */
+.btn-group{
+  display:flex;
+  gap:8px;
+  padding:16px 24px;
+  justify-content:center;
+}
+
+/* 隐私条款特定样式 */
+.privacy-panel .card {
+  width: 100%;
+  margin: 0;
+  padding: 16px;
+  background: var(--panel);
+}
+.privacy-panel a {
+  color: var(--bottom-blue);
+  text-decoration: none;
+}
+.privacy-panel a:hover {
+  text-decoration: underline;
+}
+
+/* 隐私面板内部样式 */
+.privacy-panel h3 {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--gray1);
+}
+
+.privacy-panel .mini-scroll {
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid var(--gray1);
+}
+
+.privacy-panel details {
+  margin-top: 16px;
+}
+
+.privacy-panel summary {
+  cursor: pointer;
+  padding: 8px 12px;
+  background: var(--panel);
+  border-radius: 6px;
+  border: 1px solid var(--gray1);
+}
+
+.privacy-panel details[open] summary {
+  margin-bottom: 12px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.privacy-panel details .card {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
+}
+
+/* 响应式 */
+@media (max-width: 600px) {
+  .track-grid{grid-template-columns:1fr;}
+  #audioPanel{padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ① 隐私浮层（最前，层级最高） -->
+<div id="privacyMask" class="privacy-mask"></div>
+<section id="privacyPanel" class="card privacy-panel">
+  <h3>音频播放器隐私条款</h3>
+  <div class="mini-scroll">
+    <p>1. 本播放器仅用于班级内部音频播放，不收集任何个人信息。</p>
+    <p>2. 播放历史仅保存在您的设备本地，不会上传到任何服务器。</p>
+    <p>3. 音频文件存储在本地服务器或公共存储，不会与第三方共享您的收听记录。</p>
+    <p>4. 同意即表示您了解并接受以上条款。</p>
+    <details>
+      <summary class="d-btn">详细条款说明</summary>
+      <div class="card" style="margin-top:12px;">
+        <p>一、转载行为规范<br>
+          未经音频著作权人书面授权，任何单位或个人不得擅自转载、引用、二次传播本平台或他人原创音频内容；经授权转载的，必须完整保留音频原始信息（含作者署名、来源标识、版权声明），不得删减或修改来源标注。<br>
+          禁止以商业盈利为目的转载未授权音频，包括但不限于嵌入广告、付费传播、捆绑销售等行为；非商业转载需严格遵守原作者设定的使用范围，不得超出授权期限或用途使用。<br>
+          二、恶意搬运禁止条款<br>
+          严禁任何形式的恶意搬运行为，包括但不限于：去除原音频版权标识、作者署名后重新发布；下载他人音频后更换账号、水印直接上传；拆分多段音频拼接为"新内容"传播；跨平台批量盗用音频内容获利等。<br>
+          禁止通过技术手段破解音频保护措施进行搬运，不得规避平台版权监测机制重复上传盗用内容。<br>
+          恶意搬运行为一经核实，视为侵犯著作权及平台管理规定，将依法追究删除、赔偿等责任，情节严重的移交司法机关处理。<br>
+          三、丑化行为限制条款<br>
+          不得对原音频中的人物声音、内容进行丑化处理，包括但不限于：添加侮辱性音效、恶意变声；配加侮辱性字幕或旁白；截取人物不雅片段并放大传播；以恶搞名义篡改音频内容贬损他人形象。<br>
+          禁止将音频内容与淫秽、暴力、血腥等不良信息结合，或通过拼接、渲染等方式制造负面联想，损害音频当事人的名誉权、肖像权。<br>
+          四、扭曲事实禁止条款<br>
+          严禁通过剪辑、拼接、篡改等手段扭曲音频原始事实，包括但不限于：断章取义删除关键语境，导致原意误解；移花接木颠倒事件时间线、虚构因果关系；使用AI变声、声音克隆等技术伪造音频内容；恶意配文、消音重配等曲解原始信息的行为。<br>
+          不得传播经篡改后可能误导公众、扰乱公共秩序的音频，包括但不限于虚假事件记录、伪造政策解读、编造灾难信息等内容。<br>
+          明知音频内容已被扭曲事实仍进行传播、转发的，视为共同侵权，需承担相应法律责任。<br>
+          五、法律责任与维权条款<br>
+          违反上述条款者，需立即停止侵权行为（包括删除侵权音频、停止传播），并承担由此造成的经济损失（含版权费、维权成本）及精神损害赔偿。<br>
+          情节严重的侵权行为，将依据《民法典》《网络安全法》《治安管理处罚法》等规定，追究行政责任；构成犯罪的，依法移交司法机关追究刑事责任。<br>
+          著作权人或利害关系人可凭合法证明材料向平台或监管部门投诉，平台将在核实后24小时内采取删除、屏蔽、断开链接等措施，并配合维权调查。</p>
+      </div>
+    </details>
+  </div>
+  <div class="btn-group" id="privacyBtns">
+    <button class="d-btn" id="agreeBtn" onclick="agreePrivacy()">同意并开始使用</button>
+    <button class="d-btn" id="rejectBtn" onclick="rejectPrivacy()">不同意</button>
+    <button class="d-btn" id="reselectBtn" style="display:none;" onclick="reselectPrivacy()">重新选择</button>
+  </div>
+</section>
+
+<!-- ② 顶部栏 -->
+<div class="toolbar">
+  <h5>223班音频播放</h5>
+  <div class="btn-group">
+    <button class="switch" onClick="toggleTheme()">切换主题</button>
+    <button class="d-btn" onclick="goHome()">返回列表</button>
+    <a class="d-btn" href="radio/zy.html">返回主页</a>
+  </div>
+</div>
+
+<!-- ③ 入口页面：音频列表 -->
+<div id="entryPage">
+  <h2>🎵 选择要播放的音频</h2>
+  <div class="track-grid" id="trackGrid"></div>
+</div>
+
+<!-- ④ 播放页面：仅中间面板 -->
+<div id="playPage">
+  <div id="audioPanel">
+    <!-- 音频可视化 -->
+    <div id="visualizer"></div>
+    
+    <!-- 当前播放信息 -->
+    <div id="trackInfo">
+      <div id="trackName">请选择音频</div>
+      <div id="trackMeta">00:00 / 00:00</div>
+    </div>
+    
+    <!-- 进度条 -->
+    <div id="progress"><div id="progressBar"></div></div>
+    
+    <!-- 控制栏 -->
+    <div id="bot">
+      <div id="ctrl">
+        <button class="d-btn d-btn-lg" id="playBtn"><span class="icon icon-play"></span></button>
+        <button class="d-btn d-btn-lg" id="pauseBtn" style="display:none"><span class="icon icon-pause"></span></button>
+        
+        <button class="d-btn" id="revBtn" title="后退10秒"><span class="icon icon-rev"></span></button>
+        <button class="d-btn" id="fwdBtn" title="前进10秒"><span class="icon icon-fwd"></span></button>
+        
+        <span id="time">00:00 / 00:00</span>
+        
+        <label>倍速</label>
+        <select id="speedSel">
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+        
+        <label>音量</label>
+        <input type="range" id="volIn" max="100" value="70" style="width:80px;">
+        
+        <button class="d-btn" id="loopBtn" title="单曲循环"><span class="icon icon-loop"></span></button>
+        
+        <button class="d-btn" id="backBtn" onclick="goHome()" title="返回列表"><span class="icon icon-back"></span></button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 隐藏的实际audio元素 -->
+  <audio id="a" preload="metadata"></audio>
+</div>
+
+<script>
+/* ========= 音频数据 ========= */
+const TRACKS = [
+  {id:1, name:"Radio1", src : "https://fezxhcmiefdbvqmhczut.supabase.co/storage/v1/object/public/2/radio1.mp3", desc:"机密文件1"},
+  {id:2, name:"None", src:"none.mp3", desc:"None"}
+];
+
+/* ========= 隐私条款控制 ========= */
+(function(){
+  const key = 'privacy-agreed-223-radio';
+  const mask  = document.getElementById('privacyMask');
+  const panel = document.getElementById('privacyPanel');
+  const agreeBtn    = document.getElementById('agreeBtn');
+  const rejectBtn   = document.getElementById('rejectBtn');
+  const reselectBtn = document.getElementById('reselectBtn');
+
+  if (localStorage.getItem(key)) {
+    agreeBtn.textContent = '已同意条款';
+    agreeBtn.disabled = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    panel.classList.add('hide');
+    mask.classList.add('hide');
+    return;
+  }
+
+  window.agreePrivacy = function () {
+    localStorage.setItem(key, '1');
+    agreeBtn.textContent = '已同意条款';
+    agreeBtn.disabled = true;
+    if (rejectBtn) rejectBtn.remove();
+    reselectBtn.style.display = 'inline-block';
+    setTimeout(() => {
+      panel.classList.add('hide');
+      mask.classList.add('hide');
+    }, 500);
+  };
+
+  window.rejectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.href = 'wud.html';
+  };
+
+  window.reselectPrivacy = function () {
+    localStorage.removeItem(key);
+    location.reload();
+  };
+})();
+
+/* ========= 主题切换 ========= */
+function toggleTheme(){
+  const root = document.documentElement;
+  const key  = 'theme-223-radio';
+  const cur  = root.dataset.theme;
+  const next = cur === 'bright' ? 'dark' : 'bright';
+  root.dataset.theme = next;
+  localStorage.setItem(key, next);
+}
+
+/* ========= 页面路由控制 ========= */
+const entryPage = document.getElementById('entryPage');
+const playPage = document.getElementById('playPage');
+
+// 解析URL参数
+function getTrackIdFromUrl(){
+  const hash = window.location.hash;
+  if(hash.startsWith('#track=')){
+    return parseInt(hash.replace('#track=', ''));
+  }
+  return null;
+}
+
+// 生成音频卡片链接（动态生成独立地址）
+function generateTrackUrl(trackId){
+  return `${window.location.pathname}#track=${trackId}`;
+}
+
+// 渲染入口列表
+function renderEntryPage(){
+  const grid = document.getElementById('trackGrid');
+  grid.innerHTML = '';
+  
+  TRACKS.forEach((track, idx) => {
+    const card = document.createElement('a');
+    card.className = 'track-card';
+    card.href = generateTrackUrl(track.id);
+    card.innerHTML = `
+      <span class="track-num">#${track.id}</span>
+      <h4>${track.name}</h4>
+      <p>${track.desc}</p>
+      <p style="font-size:11px;color:var(--gray1);margin-top:4px;">点击播放 →</p>
+    `;
+    card.onclick = (e) => {
+      e.preventDefault();
+      navigateToTrack(track.id);
+    };
+    grid.appendChild(card);
+  });
+}
+
+// 导航到指定音频
+function navigateToTrack(trackId){
+  window.location.hash = `track=${trackId}`;
+  showPlayPage(trackId);
+}
+
+// 显示播放页面
+function showPlayPage(trackId){
+  const track = TRACKS.find(t => t.id === trackId);
+  if(!track) return;
+  
+  entryPage.style.display = 'none';
+  playPage.classList.add('active');
+  
+  // 加载音频
+  loadTrack(track);
+}
+
+// 返回列表
+function goHome(){
+  window.location.hash = '';
+  playPage.classList.remove('active');
+  entryPage.style.display = 'flex';
+  stopAudio();
+}
+
+// 停止播放
+function stopAudio(){
+  a.pause();
+  a.src = '';
+  stopVisualizer();
+}
+
+/* ========= 音频可视化 ========= */
+const visualizer = document.getElementById('visualizer');
+const barCount = 20;
+const bars = [];
+
+for(let i=0; i<barCount; i++){
+  const bar = document.createElement('div');
+  bar.className = 'bar';
+  bar.style.height = '4px';
+  visualizer.appendChild(bar);
+  bars.push(bar);
+}
+
+let visualizerInterval = null;
+function startVisualizer(){
+  if(visualizerInterval) clearInterval(visualizerInterval);
+  visualizerInterval = setInterval(() => {
+    bars.forEach((bar, i) => {
+      const base = Math.sin(Date.now()/200 + i/2) * 30 + 40;
+      const random = Math.random() * 40;
+      const height = Math.max(4, Math.min(100, base + random));
+      bar.style.height = height + 'px';
+    });
+  }, 100);
+}
+function stopVisualizer(){
+  if(visualizerInterval) clearInterval(visualizerInterval);
+  bars.forEach(bar => {
+    bar.style.height = '4px';
+  });
+}
+
+/* ========= 播放器逻辑 ========= */
+const a = document.getElementById('a');
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const revBtn = document.getElementById('revBtn');
+const fwdBtn = document.getElementById('fwdBtn');
+const loopBtn = document.getElementById('loopBtn');
+const time = document.getElementById('time');
+const trackName = document.getElementById('trackName');
+const trackMeta = document.getElementById('trackMeta');
+const speedSel = document.getElementById('speedSel');
+const volIn = document.getElementById('volIn');
+const progress = document.getElementById('progress');
+const progressBar = document.getElementById('progressBar');
+
+let isPlaying = false;
+let isLooping = false;
+
+function loadTrack(track){
+  a.pause();
+  a.currentTime = 0;
+  a.src = track.src;
+  a.load();
+  trackName.textContent = track.name;
+  trackMeta.textContent = track.desc;
+  time.textContent = '00:00 / 00:00';
+  progressBar.style.width = '0';
+  
+  // 尝试自动播放
+  const playPromise = a.play();
+  if(playPromise !== undefined){
+    playPromise.catch(e => {
+      console.log('自动播放被阻止，等待用户点击播放');
+      isPlaying = false;
+      updatePlayBtn();
+    });
+  }
+}
+
+function updatePlayBtn(){
+  if(isPlaying){
+    playBtn.style.display = 'none';
+    pauseBtn.style.display = 'inline-block';
+  } else {
+    playBtn.style.display = 'inline-block';
+    pauseBtn.style.display = 'none';
+  }
+}
+
+playBtn.onclick = ()=> a.play();
+pauseBtn.onclick = ()=> a.pause();
+
+a.onplay = ()=>{ 
+  isPlaying = true; 
+  updatePlayBtn();
+  startVisualizer();
+};
+a.onpause = ()=>{ 
+  isPlaying = false; 
+  updatePlayBtn();
+  stopVisualizer();
+};
+
+// 单曲循环控制
+loopBtn.onclick = ()=>{
+  isLooping = !isLooping;
+  a.loop = isLooping;
+  loopBtn.classList.toggle('loop-on', isLooping);
+  loopBtn.title = isLooping ? '单曲循环：开' : '单曲循环：关';
+};
+
+// 播放结束处理（非循环模式下停止）
+a.onended = ()=>{
+  if(!isLooping){
+    isPlaying = false;
+    updatePlayBtn();
+    stopVisualizer();
+  }
+};
+
+revBtn.onclick = ()=>{ a.currentTime = Math.max(0,a.currentTime-10); };
+fwdBtn.onclick = ()=>{ a.currentTime = Math.min(a.duration||0,a.currentTime+10); };
+
+speedSel.onchange = ()=>{ a.playbackRate = speedSel.value; };
+volIn.oninput = ()=>{ a.volume = volIn.value/100; };
+
+let isDragging = false;
+progress.addEventListener('mousedown',()=>isDragging=true);
+document.addEventListener('mouseup',()=>isDragging=false);
+progress.addEventListener('click',seek);
+progress.addEventListener('mousemove',e=>{if(isDragging)seek(e);});
+function seek(e){
+  const rect = progress.getBoundingClientRect();
+  const ratio = Math.max(0,Math.min(1,(e.clientX - rect.left)/rect.width));
+  if(a.duration) a.currentTime = ratio*a.duration;
+}
+
+a.addEventListener('loadedmetadata',()=>{
+  time.textContent = `00:00 / ${fmt(a.duration)}`;
+});
+a.addEventListener('timeupdate',()=>{
+  time.textContent = `${fmt(a.currentTime)} / ${fmt(a.duration||0)}`;
+  progressBar.style.width = a.duration ? (a.currentTime/a.duration*100)+'%' : '0';
+});
+
+function fmt(t){
+  if(!isFinite(t) || isNaN(t)) return '00:00';
+  const m = Math.floor(t/60).toString().padStart(2,'0');
+  const s = Math.floor(t%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+// 键盘快捷键
+document.addEventListener('keydown',(e)=>{
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  switch(e.code){
+    case 'Space':
+      e.preventDefault();
+      isPlaying ? a.pause() : a.play();
+      break;
+    case 'ArrowLeft':
+      a.currentTime = Math.max(0,a.currentTime-5);
+      break;
+    case 'ArrowRight':
+      a.currentTime = Math.min(a.duration||0,a.currentTime+5);
+      break;
+    case 'ArrowUp':
+      a.volume = Math.min(1,a.volume+0.1);
+      volIn.value = Math.round(a.volume*100);
+      break;
+    case 'ArrowDown':
+      a.volume = Math.max(0,a.volume-0.1);
+      volIn.value = Math.round(a.volume*100);
+      break;
+    case 'KeyL':
+      loopBtn.click();
+      break;
+  }
+});
+
+/* ========= 初始化 ========= */
+window.addEventListener('DOMContentLoaded',()=>{
+  renderEntryPage();
+  
+  // 检查URL是否有指定音频
+  const trackId = getTrackIdFromUrl();
+  if(trackId){
+    const track = TRACKS.find(t => t.id === trackId);
+    if(track){
+      showPlayPage(trackId);
+    }
+  }
+});
+
+// 监听hash变化（浏览器前进后退）
+window.addEventListener('hashchange',()=>{
+  const trackId = getTrackIdFromUrl();
+  if(trackId){
+    const track = TRACKS.find(t => t.id === trackId);
+    if(track){
+      showPlayPage(trackId);
+    }
+  } else {
+    goHome();
+  }
+});
+</script>
+</body>
+</html>
