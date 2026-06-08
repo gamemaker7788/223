@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="bright">
+<head>
+    <meta charset="utf-8">
+    <title>周报编辑器 IDE v7 - 完整拖拽版</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="theme.js"></script>
+<script src="export-style.js"></script>
+<script src="export-html.js"></script>
+<script src="export-app.js"></script>
+    <!-- 在 <head> 或 <body> 底部引入 -->
+    <style>
+        :root {
+            --ide-bg: #f0f0f0;
+            --ide-panel: #ffffff;
+            --ide-border: #ddd;
+            --accent: #38bdf8;
+            --accent-glow: #38bdf822;
+            --danger: #ff4444;
+            --drag-bg: #e3f2fd;
+            --drop-indicator: #2196f3;
+            --drop-zone-bg: #e8f5e9;
+        }
+        :root[data-theme="dark"] {
+            --ide-bg: #2d2d2d;
+            --ide-panel: #1e1e1e;
+            --ide-border: #444;
+            --drag-bg: #1e3a5f;
+            --drop-zone-bg: #1b5e20;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--ide-bg);
+            color: var(--text);
+        }
+        
+        .ide-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* 左侧面板 */
+        .ide-files {
+            width: 260px;
+            background: var(--ide-panel);
+            border-right: 2px solid var(--ide-border);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            gap: 15px;
+            overflow-y: auto;
+        }
+        
+        .file-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: var(--bottom-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .file-item {
+            padding: 8px 12px;
+            background: var(--bg);
+            border: 1px solid var(--gray1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .file-item:hover, .file-item.active {
+            border-color: var(--bottom-blue);
+            background: var(--blue-glow);
+        }
+        
+        /* 中间编辑器 */
+        .ide-editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .editor-toolbar {
+            padding: 10px 20px;
+            background: var(--ide-panel);
+            border-bottom: 2px solid var(--ide-border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .editor-toolbar h1 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: auto;
+        }
+        
+        .editor-canvas {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            background: var(--bg);
+        }
+        
+        .canvas-content {
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 600px;
+        }
+        
+        /* ===== 拖拽相关样式 ===== */
+        
+        /* Section 拖拽 */
+        .section-card {
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .section-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+        
+        /* Section 作为放置目标 */
+        .section-card.drag-over-section {
+            border-color: var(--drop-indicator);
+            background: var(--drop-zone-bg);
+            box-shadow: inset 0 0 0 2px var(--drop-indicator);
+        }
+        
+        .section-card.drag-over-section::after {
+            content: '⬇ 放置到此处（成为最后一个子元素）';
+            display: block;
+            text-align: center;
+            padding: 8px;
+            background: var(--drop-indicator);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+        
+        /* 子元素拖拽 */
+        .child-tag {
+            position: relative;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .child-tag.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        /* 子元素作为放置目标（排序） */
+        .child-tag.drag-over-child {
+            border-top: 3px solid var(--drop-indicator);
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        
+        .child-tag.drag-over-child::before {
+            content: '⬇ 插入到此前';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--drop-indicator);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        
+        /* 拖拽手柄 */
+        .drag-handle {
+            position: absolute;
+            left: -24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        
+        .drag-handle:hover {
+            background: var(--blue-glow);
+        }
+        
+        .drag-handle::before,
+        .drag-handle::after {
+            content: '';
+            width: 14px;
+            height: 2px;
+            background: var(--bottom-blue);
+            border-radius: 1px;
+        }
+        
+        .drag-handle::before {
+            box-shadow: 0 4px 0 var(--bottom-blue), 0 8px 0 var(--bottom-blue);
+        }
+        
+        .edit-mode .section-card:hover > .drag-handle,
+        .edit-mode .child-tag:hover > .drag-handle {
+            opacity: 0.6;
+        }
+        
+        .edit-mode .section-card > .drag-handle:hover,
+        .edit-mode .child-tag > .drag-handle:hover {
+            opacity: 1;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        /* 编辑模式标记 */
+        .edit-mode .section-card:hover {
+            outline: 1px dashed var(--bottom-blue);
+            cursor: pointer;
+        }
+        
+        .edit-mode .section-card.selected {
+            outline: 2px solid var(--bottom-blue);
+            outline-offset: 2px;
+        }
+        
+        .edit-mode .section-card.selected::before {
+            content: 'SELECTED';
+            position: absolute;
+            top: -25px;
+            right: 0;
+            background: var(--bottom-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        .edit-mode .child-tag:hover {
+            outline: 1px dashed #ff9800;
+            cursor: pointer;
+        }
+        
+        .edit-mode .child-tag.selected {
+            outline: 2px solid #ff9800;
+            outline-offset: 1px;
+        }
+        
+        .edit-mode .child-tag.selected::before {
+            content: attr(data-tag-type);
+            position: absolute;
+            top: -20px;
+            right: 0;
+            background: #ff9800;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        /* 朗读词样式 - 行内，只包裹单词 */
+        .word {
+            border-bottom: 1px dotted var(--bottom-blue);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline;
+        }
+        .word:hover {
+            border-bottom-style: dashed;
+            background: var(--blue-glow);
+        }
+        
+        /* 打码样式 - 行内，只包裹单词，不占整行 */
+        .mask-box {
+            background-color: black;
+            color: black;
+            padding: 0 2px;
+            border-radius: 2px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s;
+            display: inline;
+        }
+        .mask-box:hover {
+            box-shadow: 0 0 0 1px var(--bottom-blue);
+        }
+        .mask-box.hidden {
+            color: black;
+        }
+        .mask-box:not(.hidden) {
+            color: white;
+            background-color: #333;
+        }
+        
+        /* 既是朗读词又是打码 */
+        .word.mask-box {
+            border-bottom: 1px dotted var(--bottom-blue);
+        }
+        .word.mask-box:not(.hidden) {
+            color: white;
+            background-color: #333;
+        }
+        
+        /* 图片上传控件 */
+        .image-upload-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(56, 189, 248, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            z-index: 5;
+        }
+        
+        .edit-mode .title-img-container:hover .image-upload-overlay {
+            display: flex;
+        }
+        
+        .image-upload-btn {
+            padding: 8px 16px;
+            background: white;
+            color: var(--bottom-blue);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .title-img-container {
+            position: relative;
+            height: 30vh;
+            width: 100%;
+        }
+        
+        /* 右侧面板 */
+        .ide-props {
+            width: 340px;
+            background: var(--ide-panel);
+            border-left: 2px solid var(--ide-border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .props-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--ide-border);
+        }
+        
+        .prop-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .prop-tab.active {
+            color: var(--bottom-blue);
+            border-bottom-color: var(--bottom-blue);
+        }
+        
+        .props-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .prop-panel { display: none; }
+        .prop-panel.active { display: block; }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--gray1);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13px;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--bottom-blue);
+        }
+        
+        .form-textarea {
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .tag-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--blue-glow);
+            color: var(--bottom-blue);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        /* 属性开关 */
+        .prop-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--bg);
+            border: 2px solid var(--gray1);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .prop-toggle:hover {
+            border-color: var(--bottom-blue);
+        }
+        
+        .prop-toggle.active {
+            background: var(--blue-glow);
+            border-color: var(--bottom-blue);
+        }
+        
+        .prop-toggle-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .prop-toggle-info {
+            flex: 1;
+        }
+        
+        .prop-toggle-title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .prop-toggle-desc {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+        
+        .prop-toggle-switch {
+            width: 40px;
+            height: 22px;
+            background: var(--gray1);
+            border-radius: 11px;
+            position: relative;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .prop-toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .prop-toggle.active .prop-toggle-switch {
+            background: var(--bottom-blue);
+        }
+        
+        .prop-toggle.active .prop-toggle-switch::after {
+            left: 20px;
+        }
+        
+        /* 图片管理列表 */
+        .image-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .image-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: 6px;
+            border: 1px solid var(--gray1);
+        }
+        
+        .image-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--gray1);
+        }
+        
+        .image-info {
+            flex: 1;
+            font-size: 11px;
+        }
+        
+        .image-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .image-size {
+            opacity: 0.6;
+            font-size: 10px;
+        }
+        
+        /* 底部状态栏 */
+        .ide-status {
+            padding: 6px 20px;
+            background: var(--ide-panel);
+            border-top: 2px solid var(--ide-border);
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* 预览模式隐藏编辑UI */
+        body.preview-active .ide-files,
+        body.preview-active .ide-props,
+        body.preview-active .editor-toolbar .hide-in-preview {
+            display: none;
+        }
+        
+        body.preview-active .editor-canvas {
+            padding: 0;
+        }
+        
+        body.preview-active .canvas-content {
+            max-width: none;
+        }
+        
+        body.preview-active .edit-mode .section-card:hover,
+        body.preview-active .edit-mode .section-card.selected,
+        body.preview-active .edit-mode .child-tag:hover,
+        body.preview-active .edit-mode .child-tag.selected {
+            outline: none;
+        }
+        
+        body.preview-active .edit-mode .section-card.selected::before,
+        body.preview-active .edit-mode .child-tag.selected::before {
+            display: none;
+        }
+        
+        body.preview-active .drag-handle {
+            display: none !important;
+        }
+        
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal-content {
+            background: var(--ide-panel);
+            border-radius: 12px;
+            padding: 25px;
+            min-width: 500px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--bottom-blue);
+        }
+        
+        /* 文件拖放区 */
+        .drop-zone {
+            border: 3px dashed var(--gray1);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        
+        .drop-zone.dragover {
+            border-color: var(--bottom-blue);
+            background: var(--blue-glow);
+        }
+        
+        /* 按钮组 */
+        .btn-group-v {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .btn-group-h {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .d-btn {
+            position: relative;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 2px solid var(--gray1);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            top: 0;
+            box-shadow: 0 3px 0 var(--gray2);
+            transition: all .12s ease;
+            text-align: center;
+        }
+        
+        .d-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 var(--gray2);
+        }
+        
+        .d-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--gray2);
+        }
+        
+        .d-btn.primary {
+            border-color: var(--bottom-blue);
+            color: var(--bottom-blue);
+            box-shadow: 0 3px 0 var(--bottom-blue);
+        }
+        
+        .d-btn.danger {
+            border-color: var(--danger);
+            color: var(--danger);
+            box-shadow: 0 3px 0 var(--danger);
+        }
+        
+        .d-btn.small {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        
+        .d-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 3px 0 var(--gray2) !important;
+        }
+        
+        /* 结构树 */
+        .structure-tree {
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        
+        .tree-item {
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .tree-item:hover {
+            background: var(--blue-glow);
+        }
+        
+        .tree-item.active {
+            background: var(--blue-glow);
+            border-left: 3px solid var(--bottom-blue);
+        }
+        
+        .tree-indent {
+            width: 16px;
+            display: inline-block;
+        }
+        
+        .tree-toggle {
+            width: 16px;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        /* 提示条 */
+        .hint-bar {
+            background: var(--blue-glow);
+            border: 1px solid var(--bottom-blue);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        
+        .hint-bar.show {
+            display: block;
+        }
+        
+        /* 文本编辑区特殊样式 */
+        .text-content-display {
+            background: var(--bg);
+            border: 2px solid var(--gray1);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.8;
+            min-height: 60px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .text-content-display .word {
+            display: inline;
+        }
+        
+        .text-content-display .mask-box {
+            display: inline;
+        }
+        
+        /* 拖拽提示 */
+        .drag-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bottom-blue);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .drag-hint.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="edit-mode">
+
+    <div class="ide-container">
+        <!-- 左侧：文件与结构 -->
+        <div class="ide-files">
+            <div class="file-section">
+                <h3>📁 项目文件</h3>
+                <div class="file-list">
+                    <div class="file-item active">
+                        <span>📄</span>
+                        <span id="mainFileName">Week6.html</span>
+                    </div>
+                    <div class="file-item">
+                        <span>📚</span>
+                        <span id="dictFileName">dict_xxxx.js</span>
+                    </div>
+                    <div class="file-item" id="imgFileItem" style="display:none;">
+                        <span>🖼️</span>
+                        <span>images/ (资源文件夹)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="file-section">
+                <h3>🌳 文档结构</h3>
+                <div class="hint-bar show" id="structureHint">
+                    💡 点击选中，拖拽手柄移动<br>
+                    💡 子元素可跨 Section 拖拽
+                </div>
+                <div class="structure-tree" id="structureTree">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div>暂无章节</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="file-section">
+                <h3>⚡ 操作</h3>
+                <div class="btn-group-v">
+                    <button class="d-btn" onclick="newProject()">🆕 新建项目</button>
+                    <button class="d-btn" onclick="addSectionCard()">➕ 添加 Section</button>
+                    <button class="d-btn" onclick="addChildElement('h1')">➕ 添加 H1</button>
+                    <button class="d-btn" onclick="addChildElement('h2')">➕ 添加 H2</button>
+                    <button class="d-btn" onclick="addChildElement('h3')">➕ 添加 H3</button>
+                    <button class="d-btn" onclick="addChildElement('h4')">➕ 添加 H4</button>
+                    <button class="d-btn" onclick="addChildElement('h5')">➕ 添加 H5</button>
+                    <button class="d-btn" onclick="addChildElement('h6')">➕ 添加 H6</button>
+                    <button class="d-btn" onclick="addChildElement('p')">➕ 添加段落</button>
+                    <button class="d-btn" onclick="addChildElement('img')">➕ 添加图片</button>
+                    <button class="d-btn" onclick="addChildElement('section')">➕ 嵌套 Section</button>
+                </div>
+            </div>
+            
+            <div class="file-section">
+                <h3>📊 统计</h3>
+                <div style="font-size: 12px; line-height: 1.8;">
+                    <div>词汇: <strong id="wordCount">0</strong></div>
+                    <div>章节: <strong id="sectionCount">0</strong></div>
+                    <div>图片: <strong id="imageCount">0</strong></div>
+                    <div style="margin-top: 8px; font-size: 11px; opacity: 0.7;">
+                        UUID: <code id="fileUuid">-</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间：编辑器 -->
+        <div class="ide-editor">
+            <div class="editor-toolbar">
+                <h1 class="hide-in-preview">📝 周报编辑器 v0.9.1</h1>
+                <button class="d-btn hide-in-preview" onclick="showExportModal()">💾 导出</button>
+                <button class="d-btn" onclick="toggleTheme()">🌓 主题</button>
+                <button class="d-btn hide-in-preview" onclick="toggleMode()" id="modeBtn">👁️ 预览</button>
+            </div>
+            
+            <div class="editor-canvas" id="editorCanvas">
+                <div class="canvas-content edit-mode" id="canvasContent">
+                    <!-- 标题图片区（带上传功能） -->
+                    <div class="toolbar title-img-container" data-editable="false">
+                        <img class="title-img" id="headerImage" src="title.png" alt="班级 Weekly Report">
+                        <div class="image-upload-overlay" onclick="selectImageFile('header')">
+                            <div style="font-size: 24px;">🖼️</div>
+                            <div>点击更换标题图片</div>
+                            <button class="image-upload-btn">选择文件</button>
+                            <input type="file" id="file-input-header" style="display:none" accept="image/*" onchange="handleImageSelect(this, 'header')">
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group-h" style="margin: 16px 24px;" data-editable="false">
+                        <button class="switch" onclick="toggleTheme()">切换主题</button>
+                        <button class="d-btn active">第 <span id="weekNum">6</span> 周</button>
+                        <a class="d-btn" href="zy.html">返回</a>
+                    </div>
+                    
+                    <!-- 可编辑根容器 -->
+                    <div id="editableRoot">
+                        <section class="card section-card" data-id="sec-1">
+                            <div class="drag-handle" title="拖拽移动 Section" draggable="true"></div>
+                            <h1 class="child-tag" data-tag-type="h1" data-is-word="false" data-is-mask="false">
+                                <div class="drag-handle" title="拖拽移动" draggable="true"></div>
+                                The sixth publication
+                            </h1>
+                            <p class="child-tag" data-tag-type="p" data-is-word="false" data-is-mask="false">
+                                <div class="drag-handle" title="拖拽移动" draggable="true"></div>
+                                Chief editor: Wang Wenyu
+                            </p>
+                            <p class="child-tag" data-tag-type="p" data-is-word="false" data-is-mask="false">
+                                <div class="drag-handle" title="拖拽移动" draggable="true"></div>
+                                Associate editor: Fu Ziyu
+                            </p>
+                        </section>
+                        
+                        <section class="card section-card" data-id="sec-2">
+                            <div class="drag-handle" title="拖拽移动 Section" draggable="true"></div>
+                            <h2 class="child-tag" data-tag-type="h2" data-is-word="false" data-is-mask="false">
+                                <div class="drag-handle" title="拖拽移动" draggable="true"></div>
+                                Website Builder: Wang Qizhao
+                            </h2>
+                            <p class="child-tag" data-tag-type="p" data-is-word="false" data-is-mask="false">
+                                <div class="drag-handle" title="拖拽移动" draggable="true"></div>
+                                ALL CONTRIBUTOR ARE WELCOME!!!
+                            </p>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：属性面板 -->
+        <div class="ide-props">
+            <div class="props-tabs">
+                <div class="prop-tab active" onclick="switchTab('props')">⚙️ 属性</div>
+                <div class="prop-tab" onclick="switchTab('dict')">📚 词典</div>
+                <div class="prop-tab" onclick="switchTab('images')">🖼️ 图片</div>
+                <div class="prop-tab" onclick="switchTab('files')">📂 文件</div>
+            </div>
+            
+            <div class="props-content">
+                <!-- 属性面板 -->
+                <div class="prop-panel active" id="panel-props">
+                    <div id="noSelection" style="text-align:center; padding:40px; opacity:0.5;">
+                        <div style="font-size:48px; margin-bottom:15px;">👆</div>
+                        <div>点击左侧结构树或画布中的元素编辑<br>拖拽手柄移动位置</div>
+                    </div>
+                    
+                    <!-- Section 属性 -->
+                    <div id="sectionProps" style="display: none;">
+                        <div class="form-group">
+                            <label>元素类型</label>
+                            <input type="text" class="form-input" value="&lt;section class=&quot;card&quot;&gt;" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Section ID</label>
+                            <input type="text" class="form-input" id="secId" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>包含的子元素</label>
+                            <div class="tag-list" id="secChildren"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>CSS 类名（额外）</label>
+                            <input type="text" class="form-input" id="secClass" onchange="updateSectionClass(this.value)">
+                        </div>
+                        <div class="hint-bar show">
+                            💡 拖拽左侧手柄可移动 Section 位置<br>
+                            💡 子元素可拖拽到其他 Section 内
+                        </div>
+                        <button class="d-btn danger" onclick="deleteSelected()" style="width: 100%; margin-top: 10px;">🗑️ 删除此 Section</button>
+                    </div>
+                    
+                    <!-- 子元素属性 -->
+                    <div id="childProps" style="display: none;">
+                        <div class="form-group">
+                            <label>元素类型</label>
+                            <input type="text" class="form-input" id="childTagType" readonly>
+                        </div>
+                        
+                        <!-- 文本内容编辑 -->
+                        <div class="form-group" id="textContentGroup">
+                            <label>文本内容（纯文本，自动分词）</label>
+                            <textarea class="form-textarea" id="childText" oninput="updateChildText(this.value)" placeholder="输入文本，单词将被自动识别..."></textarea>
+                            <small style="font-size: 11px; opacity: 0.6; margin-top: 4px; display: block;">
+                                提示：连续字母（含连字符）视为一个单词，标点和空格保持原样
+                            </small>
+                        </div>
+                        
+                        <!-- 实时预览 -->
+                        <div class="form-group" id="previewGroup">
+                            <label>实时预览（标色 = 朗读词, 黑块 = 打码）</label>
+                            <div class="text-content-display" id="textPreview"></div>
+                        </div>
+                        
+                        <!-- 图片特有 -->
+                        <div class="form-group" id="imgGroup" style="display: none;">
+                            <label>图片设置</label>
+                            <div class="btn-group-h" style="margin-bottom: 8px;">
+                                <button class="d-btn small" onclick="changeImageFile()">📁 更换</button>
+                                <button class="d-btn small" onclick="convertImageToBase64()">🔒 内嵌</button>
+                            </div>
+                            <input type="text" class="form-input" id="imgSrc" readonly placeholder="图片路径或 base64">
+                            <input type="text" class="form-input" id="imgAlt" placeholder="alt 文本" style="margin-top: 6px;" onchange="updateImgAlt(this.value)">
+                        </div>
+                        
+                        <!-- 功能属性开关 -->
+                        <div class="form-group">
+                            <label>功能属性（作用于所有单词）</label>
+                            
+                            <!-- 朗读词开关 -->
+                            <div class="prop-toggle" id="toggleWord" onclick="toggleWordProperty()">
+                                <span class="prop-toggle-icon">🔊</span>
+                                <div class="prop-toggle-info">
+                                    <div class="prop-toggle-title">朗读词</div>
+                                    <div class="prop-toggle-desc">每个单词可点击发音并查看词典</div>
+                                </div>
+                                <div class="prop-toggle-switch"></div>
+                            </div>
+                            
+                            <!-- 打码开关 -->
+                            <div class="prop-toggle" id="toggleMask" onclick="toggleMaskProperty()">
+                                <span class="prop-toggle-icon">🙈</span>
+                                <div class="prop-toggle-info">
+                                    <div class="prop-toggle-title">打码</div>
+                                    <div class="prop-toggle-desc">每个单词单独打码，点击显示</div>
+                                </div>
+                                <div class="prop-toggle-switch"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>CSS 类名（额外）</label>
+                            <input type="text" class="form-input" id="childClass" onchange="updateChildClass(this.value)">
+                        </div>
+                        
+                        <button class="d-btn danger" onclick="deleteSelected()" style="width: 100%; margin-top: 10px;">🗑️ 删除此元素</button>
+                    </div>
+                </div>
+                
+                <!-- 词典面板 -->
+                <div class="prop-panel" id="panel-dict">
+                    <div class="btn-group-h" style="margin-bottom: 12px;">
+                        <button class="d-btn" onclick="addDictEntry()" style="flex: 1;">➕ 添加词汇</button>
+                        <button class="d-btn" onclick="scanWords()" style="flex: 1;">🔍 扫描词汇</button>
+                    </div>
+                    <div class="image-list" id="dictList"></div>
+                    <div id="dictEditor" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--ide-border);">
+                        <h4 style="margin: 0 0 12px 0; color: var(--bottom-blue); font-size: 14px;">编辑词汇</h4>
+                        <div class="form-group">
+                            <label>单词</label>
+                            <input type="text" class="form-input" id="editDictWord" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>音标</label>
+                            <input type="text" class="form-input" id="editDictPhonetic" placeholder="/ˈfəʊnətɪk/">
+                        </div>
+                        <div class="form-group">
+                            <label>中文释义</label>
+                            <input type="text" class="form-input" id="editDictZh" placeholder="中文翻译">
+                        </div>
+                        <div class="form-group">
+                            <label>例句</label>
+                            <textarea class="form-textarea" id="editDictEg" placeholder="Example sentence..."></textarea>
+                        </div>
+                        <div class="btn-group-h">
+                            <button class="d-btn primary" onclick="saveDictEntry()" style="flex: 1;">💾 保存</button>
+                            <button class="d-btn" onclick="cancelDictEdit()" style="flex: 1;">❌ 取消</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 图片管理面板 -->
+                <div class="prop-panel" id="panel-images">
+                    <div class="drop-zone" id="dropZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div style="font-size: 36px; margin-bottom: 8px;">📤</div>
+                        <div style="font-weight: 600; margin-bottom: 4px; font-size: 13px;">拖放图片到此处</div>
+                        <div style="font-size: 11px; opacity: 0.6;">或点击选择文件</div>
+                        <input type="file" id="bulkImageInput" style="display:none" accept="image/*" multiple onchange="handleBulkImages(this)">
+                    </div>
+                    <div class="image-list" id="imageList">
+                        <div class="empty-state" style="padding: 20px;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">🖼️</div>
+                            <div style="font-size: 12px;">暂无图片资源</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文件设置面板 -->
+                <div class="prop-panel" id="panel-files">
+                    <div class="form-group">
+                        <label>项目 UUID</label>
+                        <input type="text" class="form-input" id="projectUuid" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>HTML 文件名</label>
+                        <input type="text" class="form-input" id="htmlFilename" value="Week6.html">
+                    </div>
+                    <div class="form-group">
+                        <label>页面标题</label>
+                        <input type="text" class="form-input" id="pageTitle" value="班级 Weekly Report - Week6">
+                    </div>
+                    <div class="form-group">
+                        <label>周次数字</label>
+                        <input type="number" class="form-input" id="weekNumber" value="6" min="1" max="52">
+                    </div>
+                    <div class="form-group">
+                        <label>导出选项</label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:normal; cursor:pointer; font-size: 13px;">
+                            <input type="checkbox" id="embedImages" checked> 内嵌所有图片为 Base64（单文件版）
+                        </label>
+                    </div>
+                    <button class="d-btn primary" onclick="updateProjectSettings()" style="width: 100%;">📝 应用设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 拖拽提示 -->
+    <div class="drag-hint" id="dragHint">🖱 释放以放置到此处</div>
+    
+    <!-- 状态栏 -->
+    <div class="ide-status">
+        <div>
+            <span>📄 <span id="statusFile">Week6.html</span></span>
+            <span style="margin-left:15px;">🔤 <span id="statusWords">0</span> 词汇</span>
+            <span style="margin-left:15px;">🖼️ <span id="statusImages">0</span> 图片</span>
+            <span style="margin-left:15px;">📦 <span id="statusSections">2</span> 章节</span>
+        </div>
+        <div>
+            <span class="d-btn small" style="padding:2px 8px;" id="statusBadge">EDIT MODE</span>
+        </div>
+    </div>
+
+    <!-- 导出模态框 -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">📦 导出项目文件</div>
+            
+            <div style="background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; line-height: 1.6;">
+                <div style="margin-bottom: 10px;"><strong>文件结构：</strong></div>
+                <div id="exportStructure" style="font-family: monospace; line-height: 1.8; font-size: 12px;">
+                    Week6.html (主文件，引用 theme.js)<br>
+                    dict_abc123.js (词典数据)<br>
+                    images/ (图片文件夹，如未选择内嵌)
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; padding: 10px; background: var(--blue-glow); border-radius: 6px;">
+                    <input type="checkbox" id="exportEmbedImages" checked onchange="updateExportPreview()">
+                    <div>
+                        <div style="font-weight: 600;">内嵌所有图片为 Base64</div>
+                        <div style="font-size: 12px; opacity: 0.7;">生成单个 HTML 文件，无需额外图片文件</div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="btn-group-h">
+                <button class="d-btn primary" onclick="confirmExport()" style="flex: 1;">✅ 确认导出</button>
+                <button class="d-btn" onclick="closeExportModal()" style="flex: 1;">❌ 取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片选择输入（全局） -->
+    <input type="file" id="globalImageInput" style="display:none" accept="image/*" onchange="handleGlobalImageSelect(this)">
+
+    <script>
+        // ===== Supabase Storage 配置 =====
+const EDITOR_SUPABASE_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+        const SUPABASE_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co';
+        const STORAGE_BUCKET = '1';
+        const STORAGE_UPLOAD_URL = SUPABASE_URL + '/storage/v1/object/' + STORAGE_BUCKET + '/';
+
+/**
+ * 上传文本内容到 Supabase Storage
+ */
+async function uploadTextToStorage(content, path) {
+    const blob = new Blob([content], { type: 'text/html' });
+    
+    const res = await fetch(STORAGE_UPLOAD_URL + path, {
+        method: 'PUT',
+        headers: {
+            'apikey': ANON_KEY,
+            'Authorization': `Bearer ${ANON_KEY}`,
+            'Content-Type': 'text/html',
+            'x-upsert': 'true'
+        },
+        body: blob
+    });
+    
+    if (!res.ok && res.status !== 200 && res.status !== 201) {
+        throw new Error(`上传失败: ${res.status} ${res.statusText}`);
+    }
+    
+    return `${EDITOR_SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
+}
+
+        // ===== 项目状态 =====
+        const Project = {
+            uuid: '',
+            htmlName: '',
+            dictName: '',
+            title: '',
+            weekNum: 6,
+            dict: {},
+            images: new Map(),
+            nextId: 2,
+            
+            init() {
+                this.uuid = this.generateUUID();
+                this.weekNum = new Date().getWeek();
+                this.htmlName = `Week${this.weekNum}.html`;
+                this.dictName = `dict_${this.uuid}.js`;
+                this.title = `班级 Weekly Report - Week${this.weekNum}`;
+                this.updateUI();
+            },
+            
+            generateUUID() {
+                return 'xxxxxxxx'.replace(/[xy]/g, c => {
+                    const r = Math.random() * 16 | 0;
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+            },
+            
+            updateUI() {
+                document.getElementById('projectUuid').value = this.uuid;
+                document.getElementById('fileUuid').textContent = this.uuid;
+                document.getElementById('htmlFilename').value = this.htmlName;
+                document.getElementById('pageTitle').value = this.title;
+                document.getElementById('weekNumber').value = this.weekNum;
+                document.getElementById('mainFileName').textContent = this.htmlName;
+                document.getElementById('dictFileName').textContent = this.dictName;
+                document.getElementById('statusFile').textContent = this.htmlName;
+                document.getElementById('weekNum').textContent = this.weekNum;
+                this.updateExportPreview();
+            },
+            
+            updateExportPreview() {
+                const embed = document.getElementById('exportEmbedImages')?.checked ?? true;
+                const structure = embed 
+                    ? `${this.htmlName} (主文件，包含内嵌图片)<br>dict_${this.uuid}.js (词典)<br>theme.js (主题，同目录引用)`
+                    : `${this.htmlName} (主文件)<br>dict_${this.uuid}.js (词典)<br>images/ (图片文件夹)<br>theme.js (主题，同目录引用)`;
+                document.getElementById('exportStructure').innerHTML = structure;
+            }
+        };
+
+        // ===== 文本处理工具 =====
+        const TextProcessor = {
+            splitToSegments(text) {
+                if (!text) return [];
+                const regex = /[a-zA-Z]+(?:-[a-zA-Z]+)*|[^a-zA-Z]/g;
+                return text.match(regex) || [];
+            },
+            
+            isWord(segment) {
+                return /^[a-zA-Z]+(?:-[a-zA-Z]+)*$/.test(segment);
+            },
+            
+            renderHTML(text, isWord, isMask) {
+                const segments = this.splitToSegments(text);
+                return segments.map(seg => {
+                    if (!this.isWord(seg)) {
+                        return this.escapeHtml(seg);
+                    }
+                    let classes = [];
+                    if (isWord) classes.push('word');
+                    if (isMask) classes.push('mask-box', 'hidden');
+                    
+                    if (classes.length > 0) {
+                        return `<span class="${classes.join(' ')}" data-raw="${seg.toLowerCase()}">${this.escapeHtml(seg)}</span>`;
+                    }
+                    return this.escapeHtml(seg);
+                }).join('');
+            },
+            
+            renderPreview(text, isWord, isMask) {
+                const segments = this.splitToSegments(text);
+                return segments.map(seg => {
+                    if (!this.isWord(seg)) {
+                        return `<span style="color: var(--text);">${this.escapeHtml(seg)}</span>`;
+                    }
+                    let styles = [];
+                    let title = [];
+                    if (isWord) {
+                        styles.push('border-bottom: 2px dotted var(--bottom-blue); color: var(--bottom-blue);');
+                        title.push('朗读词');
+                    }
+                    if (isMask) {
+                        styles.push('background: #333; color: #333; padding: 0 2px; border-radius: 2px;');
+                        title.push('打码');
+                    }
+                    if (styles.length === 0) {
+                        return `<span>${this.escapeHtml(seg)}</span>`;
+                    }
+                    return `<span style="${styles.join(' ')}" title="${title.join('+')}">${this.escapeHtml(seg)}</span>`;
+                }).join('');
+            },
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+            
+            extractText(html) {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = html;
+                return tmp.textContent || '';
+            }
+        };
+
+        // ===== 拖拽管理器 =====
+        const DragManager = {
+            draggedElement: null,
+            draggedType: null, // 'section' 或 'child'
+            sourceContainer: null,
+            dropTarget: null,
+            dropType: null, // 'before', 'after', 'append'
+            
+            init() {
+                this.bindDragEvents();
+            },
+            
+            bindDragEvents() {
+                const root = document.getElementById('editableRoot');
+                
+                // 拖拽开始
+                root.addEventListener('dragstart', (e) => {
+                    const handle = e.target.closest('.drag-handle');
+                    if (!handle) return;
+                    
+                    const element = handle.parentElement;
+                    if (!element) return;
+                    
+                    e.stopPropagation();
+                    
+                    this.draggedElement = element;
+                    this.draggedType = element.classList.contains('section-card') ? 'section' : 'child';
+                    this.sourceContainer = element.parentElement;
+                    
+                    element.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', '');
+                    
+                    document.getElementById('dragHint').classList.add('show');
+                    
+                    console.log('开始拖拽:', this.draggedType, element);
+                });
+                
+                // 拖拽结束
+                root.addEventListener('dragend', (e) => {
+                    if (this.draggedElement) {
+                        this.draggedElement.classList.remove('dragging');
+                    }
+                    this.clearDragOver();
+                    this.draggedElement = null;
+                    this.draggedType = null;
+                    this.sourceContainer = null;
+                    this.dropTarget = null;
+                    this.dropType = null;
+                    document.getElementById('dragHint').classList.remove('show');
+                });
+                
+                // 拖拽经过
+                root.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (!this.draggedElement) return;
+                    
+                    const result = this.findDropTarget(e);
+                    if (!result) {
+                        this.clearDragOver();
+                        return;
+                    }
+                    
+                    this.clearDragOver();
+                    this.dropTarget = result.target;
+                    this.dropType = result.type;
+                    
+                    // 应用视觉反馈
+                    if (result.type === 'append') {
+                        // 放到 Section 内（成为最后一个子元素）
+                        result.target.classList.add('drag-over-section');
+                    } else {
+                        // 插入到子元素前/后
+                        result.target.classList.add('drag-over-child');
+                    }
+                });
+                
+                // 放置
+                root.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (!this.draggedElement || !this.dropTarget) {
+                        this.clearDragOver();
+                        return;
+                    }
+                    
+                    console.log('执行放置:', this.dropType, '目标:', this.dropTarget);
+                    this.performDrop();
+                    this.clearDragOver();
+                    
+                    // 更新编辑器状态
+                    Editor.scanContent();
+                    Editor.renderStructureTree();
+                });
+            },
+            
+            findDropTarget(e) {
+                if (!this.draggedElement) return null;
+                
+                // 获取鼠标位置
+                const mouseY = e.clientY;
+                const mouseX = e.clientX;
+                
+                // 获取鼠标下的元素
+                const elementsBelow = document.elementsFromPoint(mouseX, mouseY);
+                
+                if (this.draggedType === 'section') {
+                    // Section 只能放到其他 Section 上（排序）
+                    for (const el of elementsBelow) {
+                        const section = el.closest('.section-card');
+                        if (section && section !== this.draggedElement) {
+                            const rect = section.getBoundingClientRect();
+                            const midpoint = rect.top + rect.height / 2;
+                            return {
+                                target: section,
+                                type: mouseY < midpoint ? 'before' : 'after'
+                            };
+                        }
+                    }
+                } else {
+                    // 子元素可以：
+                    // 1. 放到其他子元素上（排序）
+                    // 2. 放到 Section 上（成为最后一个子元素）
+                    
+                    for (const el of elementsBelow) {
+                        // 优先检查是否是子元素
+                        const child = el.closest('.child-tag');
+                        if (child && child !== this.draggedElement && !this.draggedElement.contains(child)) {
+                            // 检查是否在同一 Section 内或不同 Section
+                            const childSection = child.closest('.section-card');
+                            const draggedSection = this.draggedElement.closest('.section-card');
+                            
+                            // 允许跨 Section 拖拽
+                            const rect = child.getBoundingClientRect();
+                            const midpoint = rect.top + rect.height / 2;
+                            return {
+                                target: child,
+                                type: mouseY < midpoint ? 'before' : 'after'
+                            };
+                        }
+                        
+                        // 检查是否是 Section（成为最后一个子元素）
+                        const section = el.closest('.section-card');
+                        if (section && section !== this.draggedElement && !this.draggedElement.contains(section)) {
+                            // 检查鼠标是否在 Section 的下半部分（避免与子元素冲突）
+                            const rect = section.getBoundingClientRect();
+                            const children = section.querySelectorAll(':scope > .child-tag');
+                            
+                            // 如果 Section 没有子元素，或者鼠标在最后一个子元素下方
+                            if (children.length === 0) {
+                                return { target: section, type: 'append' };
+                            }
+                            
+                            const lastChild = children[children.length - 1];
+                            const lastRect = lastChild.getBoundingClientRect();
+                            
+                            if (mouseY > lastRect.bottom) {
+                                return { target: section, type: 'append' };
+                            }
+                        }
+                    }
+                }
+                
+                return null;
+            },
+            
+            performDrop() {
+                if (!this.draggedElement || !this.dropTarget) return;
+                
+                const target = this.dropTarget;
+                const type = this.dropType;
+                
+                console.log('执行:', type, '目标:', target.tagName, target.className);
+                
+                if (this.draggedType === 'section') {
+                    // Section 排序
+                    if (type === 'before') {
+                        target.parentElement.insertBefore(this.draggedElement, target);
+                    } else {
+                        target.parentElement.insertBefore(this.draggedElement, target.nextSibling);
+                    }
+                } else {
+                    // 子元素操作
+                    if (type === 'append') {
+                        // 放到 Section 内（成为最后一个子元素）
+                        target.appendChild(this.draggedElement);
+                        // 更新 sourceContainer
+                        this.sourceContainer = target;
+                    } else if (type === 'before') {
+                        // 插入到目标前
+                        target.parentElement.insertBefore(this.draggedElement, target);
+                        this.sourceContainer = target.parentElement;
+                    } else if (type === 'after') {
+                        // 插入到目标后
+                        target.parentElement.insertBefore(this.draggedElement, target.nextSibling);
+                        this.sourceContainer = target.parentElement;
+                    }
+                }
+                
+                // 滚动到放置位置
+                this.draggedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            },
+            
+            clearDragOver() {
+                document.querySelectorAll('.drag-over-section, .drag-over-child').forEach(el => {
+                    el.classList.remove('drag-over-section', 'drag-over-child');
+                });
+            }
+        };
+
+        // ===== 编辑器核心 =====
+        const Editor = {
+            selectedSection: null,
+            selectedChild: null,
+            
+            init() {
+                this.bindEvents();
+                DragManager.init();
+                this.scanContent();
+                this.renderStructureTree();
+            },
+            
+            bindEvents() {
+                const root = document.getElementById('editableRoot');
+                const canvas = document.getElementById('editorCanvas');
+                
+                root.addEventListener('click', (e) => {
+                    if (this.mode === 'preview') return;
+                    
+                    // 如果点击的是拖拽手柄，不触发选择
+                    if (e.target.closest('.drag-handle')) return;
+                    
+                    const section = e.target.closest('.section-card');
+                    const child = e.target.closest('.child-tag');
+                    
+                    if (child && section && section.contains(child)) {
+                        e.stopPropagation();
+                        this.selectChild(child, section);
+                    } else if (section) {
+                        e.stopPropagation();
+                        this.selectSection(section);
+                    }
+                });
+                
+                canvas.addEventListener('click', (e) => {
+                    if (e.target.id === 'editorCanvas' || e.target.id === 'canvasContent') {
+                        this.deselectAll();
+                    }
+                });
+            },
+            
+            selectSection(section) {
+                this.deselectAll();
+                this.selectedSection = section;
+                section.classList.add('selected');
+                this.updateSectionPanel(section);
+                this.highlightTreeItem(section.dataset.id);
+            },
+            
+            selectChild(child, section) {
+                this.deselectAll();
+                this.selectedSection = section;
+                this.selectedChild = child;
+                section.classList.add('selected');
+                child.classList.add('selected');
+                this.updateChildPanel(child);
+                this.highlightTreeItem(section.dataset.id);
+            },
+            
+            deselectAll() {
+                document.querySelectorAll('.selected').forEach(e => e.classList.remove('selected'));
+                this.selectedSection = null;
+                this.selectedChild = null;
+                document.getElementById('noSelection').style.display = 'block';
+                document.getElementById('sectionProps').style.display = 'none';
+                document.getElementById('childProps').style.display = 'none';
+                this.highlightTreeItem(null);
+            },
+            
+            updateSectionPanel(section) {
+                document.getElementById('noSelection').style.display = 'none';
+                document.getElementById('sectionProps').style.display = 'block';
+                document.getElementById('childProps').style.display = 'none';
+                
+                document.getElementById('secId').value = section.dataset.id;
+                document.getElementById('secClass').value = Array.from(section.classList)
+                    .filter(c => c !== 'card' && c !== 'section-card').join(' ');
+                
+                const children = section.querySelectorAll(':scope > .child-tag');
+                const container = document.getElementById('secChildren');
+                if (children.length === 0) {
+                    container.innerHTML = '<span style="opacity:0.5; font-size:12px;">暂无子元素</span>';
+                } else {
+                    container.innerHTML = Array.from(children).map(c => {
+                        const type = c.dataset.tagType || c.tagName.toLowerCase();
+                        const isWord = c.dataset.isWord === 'true' ? '🔊' : '';
+                        const isMask = c.dataset.isMask === 'true' ? '🙈' : '';
+                        return `<span class="tag-badge">${isWord}${isMask}${type}</span>`;
+                    }).join('');
+                }
+            },
+            
+            updateChildPanel(child) {
+                document.getElementById('noSelection').style.display = 'none';
+                document.getElementById('sectionProps').style.display = 'none';
+                document.getElementById('childProps').style.display = 'block';
+                
+                const tagType = child.dataset.tagType || child.tagName.toLowerCase();
+                document.getElementById('childTagType').value = tagType;
+                
+                document.getElementById('textContentGroup').style.display = 'block';
+                document.getElementById('previewGroup').style.display = 'block';
+                document.getElementById('imgGroup').style.display = 'none';
+                
+                if (tagType === 'img') {
+                    document.getElementById('textContentGroup').style.display = 'none';
+                    document.getElementById('previewGroup').style.display = 'none';
+                    document.getElementById('imgGroup').style.display = 'block';
+                    document.getElementById('imgSrc').value = child.src || '';
+                    document.getElementById('imgAlt').value = child.alt || '';
+                    Project.currentImageTarget = child;
+                }
+                
+                const plainText = TextProcessor.extractText(child.innerHTML);
+                
+                if (tagType === 'img') {
+                    document.getElementById('childText').value = '[图片]';
+                    document.getElementById('childText').disabled = true;
+                } else {
+                    document.getElementById('childText').value = plainText;
+                    document.getElementById('childText').disabled = false;
+                }
+                
+                const isWord = child.dataset.isWord === 'true';
+                const isMask = child.dataset.isMask === 'true';
+                
+                document.getElementById('toggleWord').classList.toggle('active', isWord);
+                document.getElementById('toggleMask').classList.toggle('active', isMask);
+                
+                this.updatePreview(plainText, isWord, isMask);
+                
+                document.getElementById('childClass').value = Array.from(child.classList)
+                    .filter(c => !['child-tag', 'word', 'mask-box', 'hidden'].includes(c)).join(' ');
+            },
+            
+            updatePreview(text, isWord, isMask) {
+                const preview = document.getElementById('textPreview');
+                if (preview) {
+                    preview.innerHTML = TextProcessor.renderPreview(text, isWord, isMask);
+                }
+            },
+            
+            scanContent() {
+                const wordSpans = document.querySelectorAll('.word');
+                const sections = document.querySelectorAll('.section-card');
+                const images = document.querySelectorAll('img');
+                
+                wordSpans.forEach(w => {
+                    const raw = w.dataset.raw || w.textContent.trim().toLowerCase();
+                    if (!Project.dict[raw]) {
+                        Project.dict[raw] = {ph: '', zh: '', eg: ''};
+                    }
+                });
+                
+                document.getElementById('wordCount').textContent = wordSpans.length;
+                document.getElementById('sectionCount').textContent = sections.length;
+                document.getElementById('imageCount').textContent = images.length;
+                document.getElementById('statusWords').textContent = wordSpans.length;
+                document.getElementById('statusImages').textContent = images.length;
+                document.getElementById('statusSections').textContent = sections.length;
+                
+                renderDictList();
+                renderImageList();
+            },
+            
+            renderStructureTree() {
+                const container = document.getElementById('structureTree');
+                const sections = document.querySelectorAll('#editableRoot > .section-card');
+                
+                if (sections.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div style="font-size: 12px;">点击"添加 Section"开始</div>
+                        </div>`;
+                    return;
+                }
+                
+                let html = '';
+                sections.forEach((sec, idx) => {
+                    const id = sec.dataset.id;
+                    const isActive = this.selectedSection === sec ? 'active' : '';
+                    const children = sec.querySelectorAll(':scope > .child-tag');
+                    
+                    html += `
+                        <div class="tree-item ${isActive}" onclick="Editor.selectSectionFromTree('${id}')" data-tree-id="${id}">
+                            <span class="tree-toggle" onclick="event.stopPropagation(); toggleTree('${id}')">▶</span>
+                            <span>📦 Section ${idx + 1}</span>
+                            <span style="margin-left:auto; font-size:10px; opacity:0.5;">${children.length} 子项</span>
+                        </div>
+                        <div id="tree-children-${id}" style="display:none; padding-left: 20px;">
+                    `;
+                    
+                    children.forEach(child => {
+                        const type = child.dataset.tagType || child.tagName.toLowerCase();
+                        const isWord = child.dataset.isWord === 'true' ? '🔊' : '';
+                        const isMask = child.dataset.isMask === 'true' ? '🙈' : '';
+                        const text = TextProcessor.extractText(child.innerHTML).substring(0, 15) + '...';
+                        html += `
+                            <div class="tree-item" onclick="Editor.selectChildFromTree('${id}', this)" data-child-type="${type}">
+                                <span class="tree-indent"></span>
+                                <span>${isWord}${isMask}${this.getTagIcon(type)} ${type}</span>
+                                <span style="margin-left:auto; font-size:10px; opacity:0.5;">${text}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                });
+                
+                container.innerHTML = html;
+            },
+            
+            getTagIcon(type) {
+                const icons = {
+                    'h1': '📰', 'h2': '📰', 'h3': '📰', 'h4': '📰', 'h5': '📰', 'h6': '📰',
+                    'p': '📝', 'img': '🖼️', 'section': '📦'
+                };
+                return icons[type] || '🏷️';
+            },
+            
+            selectSectionFromTree(id) {
+                const section = document.querySelector(`.section-card[data-id="${id}"]`);
+                if (section) {
+                    this.selectSection(section);
+                    section.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            },
+            
+            selectChildFromTree(secId, treeItem) {
+                const section = document.querySelector(`.section-card[data-id="${secId}"]`);
+                const type = treeItem.dataset.childType;
+                const children = Array.from(section.querySelectorAll(':scope > .child-tag'));
+                const idx = Array.from(treeItem.parentElement.children).indexOf(treeItem) - 1;
+                const child = children.filter(c => (c.dataset.tagType || c.tagName.toLowerCase()) === type)[idx] || children[idx];
+                
+                if (child && section) {
+                    this.selectChild(child, section);
+                    child.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            },
+            
+            highlightTreeItem(id) {
+                document.querySelectorAll('.tree-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.treeId === id);
+                });
+            },
+            
+            getSelectedSection() {
+                return this.selectedSection;
+            }
+        };
+
+        // ===== 添加元素功能 =====
+        
+        function createDragHandle() {
+            const handle = document.createElement('div');
+            handle.className = 'drag-handle';
+            handle.title = '拖拽移动';
+            handle.draggable = true;
+            return handle;
+        }
+        
+        function addSectionCard() {
+            const root = document.getElementById('editableRoot');
+            const id = `sec-${++Project.nextId}`;
+            
+            const section = document.createElement('section');
+            section.className = 'card section-card';
+            section.dataset.id = id;
+            section.appendChild(createDragHandle());
+            
+            const p = document.createElement('p');
+            p.className = 'child-tag';
+            p.dataset.tagType = 'p';
+            p.dataset.isWord = 'false';
+            p.dataset.isMask = 'false';
+            p.appendChild(createDragHandle());
+            p.appendChild(document.createTextNode('新段落内容...'));
+            section.appendChild(p);
+            
+            root.appendChild(section);
+            Editor.scanContent();
+            Editor.renderStructureTree();
+            Editor.selectSection(section);
+        }
+        
+        function addChildElement(type) {
+            const section = Editor.getSelectedSection();
+            if (!section) {
+                alert('请先选择一个 Section');
+                return;
+            }
+            
+            let el;
+            switch(type) {
+                case 'h1':
+                case 'h2':
+                case 'h3':
+                case 'h4':
+                case 'h5':
+                case 'h6':
+                    el = document.createElement(type);
+                    el.className = 'child-tag';
+                    el.dataset.tagType = type;
+                    el.dataset.isWord = 'false';
+                    el.dataset.isMask = 'false';
+                    el.appendChild(createDragHandle());
+                    el.appendChild(document.createTextNode(`标题 ${type.toUpperCase()}`));
+                    break;
+                    
+                case 'p':
+                    el = document.createElement('p');
+                    el.className = 'child-tag';
+                    el.dataset.tagType = 'p';
+                    el.dataset.isWord = 'false';
+                    el.dataset.isMask = 'false';
+                    el.appendChild(createDragHandle());
+                    el.appendChild(document.createTextNode('新段落内容，请在属性面板编辑...'));
+                    break;
+                    
+                case 'img':
+                    el = document.createElement('img');
+                    el.className = 'child-tag';
+                    el.dataset.tagType = 'img';
+                    el.dataset.isWord = 'false';
+                    el.dataset.isMask = 'false';
+                    el.src = 'placeholder.png';
+                    el.alt = '图片说明';
+                    el.style.cssText = 'max-width: 100%; border-radius: 8px; cursor: pointer;';
+                    el.onclick = function(e) {
+                        if (currentMode !== 'preview') {
+                            e.stopPropagation();
+                            selectImageFile(this);
+                        }
+                    };
+                    break;
+                    
+                case 'section':
+                    el = document.createElement('section');
+                    el.className = 'card section-card child-tag';
+                    el.dataset.tagType = 'section';
+                    el.dataset.id = `sec-${++Project.nextId}`;
+                    el.appendChild(createDragHandle());
+                    
+                    const innerP = document.createElement('p');
+                    innerP.className = 'child-tag';
+                    innerP.dataset.tagType = 'p';
+                    innerP.dataset.isWord = 'false';
+                    innerP.dataset.isMask = 'false';
+                    innerP.appendChild(createDragHandle());
+                    innerP.appendChild(document.createTextNode('嵌套 Section 内容...'));
+                    el.appendChild(innerP);
+                    break;
+                    
+                default:
+                    return;
+            }
+            
+            section.appendChild(el);
+            Editor.scanContent();
+            Editor.renderStructureTree();
+            
+            if (type === 'section') {
+                Editor.selectSection(el);
+            } else {
+                Editor.selectChild(el, section);
+            }
+        }
+async function uploadHTMLToDatabase(filename, content) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/html_exports`, {
+        method: 'POST',
+        headers: {
+            'apikey': ANON_KEY,
+            'Authorization': `Bearer ${ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates,return=representation'
+        },
+        body: JSON.stringify({
+            filename: filename,
+            content: content
+        })
+    });
+    
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`保存失败: ${res.status} ${err}`);
+    }
+    
+    const data = await res.json();
+    const id = data[0].id;
+    
+    // 返回查看链接（需要创建一个查看页面，或者直接用 API 查询）
+    return `${SUPABASE_URL}/rest/v1/html_exports?id=eq.${id}&select=content`;
+}
+
+// 获取 HTML 内容
+async function getHTMLFromDatabase(filename) {
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/html_exports?filename=eq.${encodeURIComponent(filename)}&select=content&order=created_at.desc&limit=1`,
+        {
+            headers: {
+                'apikey': ANON_KEY,
+                'Authorization': `Bearer ${ANON_KEY}`
+            }
+        }
+    );
+    
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data[0]?.content || null;
+}
+
+
+// 获取 HTML 内容
+async function getHTMLFromDatabase(filename) {
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/html_exports?filename=eq.${encodeURIComponent(filename)}&select=content&order=created_at.desc&limit=1`,
+        {
+            headers: {
+                'apikey': ANON_KEY,
+                'Authorization': `Bearer ${ANON_KEY}`
+            }
+        }
+    );
+    
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data[0]?.content || null;
+}
+
+        // ===== 属性开关功能 =====
+        
+        function toggleWordProperty() {
+            if (!Editor.selectedChild) return;
+            
+            const child = Editor.selectedChild;
+            const current = child.dataset.isWord === 'true';
+            const newValue = !current;
+            
+            child.dataset.isWord = newValue.toString();
+            document.getElementById('toggleWord').classList.toggle('active', newValue);
+            
+            const plainText = TextProcessor.extractText(child.innerHTML);
+            child.innerHTML = TextProcessor.renderHTML(plainText, newValue, child.dataset.isMask === 'true');
+            // 重新添加拖拽手柄
+            if (child.dataset.tagType !== 'img') {
+                child.insertBefore(createDragHandle(), child.firstChild);
+            }
+            
+            Editor.updatePreview(plainText, newValue, child.dataset.isMask === 'true');
+            Editor.scanContent();
+            Editor.renderStructureTree();
+            Editor.updateSectionPanel(Editor.selectedSection);
+        }
+        
+        function toggleMaskProperty() {
+            if (!Editor.selectedChild) return;
+            
+            const child = Editor.selectedChild;
+            const current = child.dataset.isMask === 'true';
+            const newValue = !current;
+            
+            child.dataset.isMask = newValue.toString();
+            document.getElementById('toggleMask').classList.toggle('active', newValue);
+            
+            const plainText = TextProcessor.extractText(child.innerHTML);
+            child.innerHTML = TextProcessor.renderHTML(plainText, child.dataset.isWord === 'true', newValue);
+            // 重新添加拖拽手柄
+            if (child.dataset.tagType !== 'img') {
+                child.insertBefore(createDragHandle(), child.firstChild);
+            }
+            
+            Editor.updatePreview(plainText, child.dataset.isWord === 'true', newValue);
+            Editor.scanContent();
+            Editor.renderStructureTree();
+            Editor.updateSectionPanel(Editor.selectedSection);
+        }
+
+        // ===== 更新属性功能 =====
+        
+                function updateChildText(val) {
+            if (Editor.selectedChild) {
+                const isWord = Editor.selectedChild.dataset.isWord === 'true';
+                const isMask = Editor.selectedChild.dataset.isMask === 'true';
+                
+                Editor.selectedChild.dataset.rawText = val;
+                Editor.selectedChild.innerHTML = TextProcessor.renderHTML(val, isWord, isMask);
+                // 重新添加拖拽手柄
+                if (Editor.selectedChild.dataset.tagType !== 'img') {
+                    Editor.selectedChild.insertBefore(createDragHandle(), Editor.selectedChild.firstChild);
+                }
+                
+                Editor.updatePreview(val, isWord, isMask);
+                Editor.renderStructureTree();
+                Editor.scanContent();
+            }
+        }
+        
+        function updateChildClass(val) {
+            if (Editor.selectedChild) {
+                const baseClasses = ['child-tag'];
+                if (Editor.selectedChild.dataset.isWord === 'true') baseClasses.push('word');
+                if (Editor.selectedChild.dataset.isMask === 'true') baseClasses.push('mask-box', 'hidden');
+                
+                Editor.selectedChild.className = [...baseClasses, ...val.split(' ').filter(Boolean)].join(' ');
+            }
+        }
+        
+        function updateSectionClass(val) {
+            if (Editor.selectedSection) {
+                Editor.selectedSection.className = ['card', 'section-card', ...val.split(' ').filter(Boolean)].join(' ');
+            }
+        }
+        
+        function updateImgAlt(val) {
+            if (Editor.selectedChild && Editor.selectedChild.tagName === 'IMG') {
+                Editor.selectedChild.alt = val;
+            }
+        }
+        
+        function deleteSelected() {
+            if (Editor.selectedChild) {
+                if (!confirm('确定删除此元素？')) return;
+                Editor.selectedChild.remove();
+                Editor.selectedChild = null;
+                Editor.scanContent();
+                Editor.renderStructureTree();
+                if (Editor.selectedSection) {
+                    Editor.updateSectionPanel(Editor.selectedSection);
+                }
+            } else if (Editor.selectedSection) {
+                if (!confirm('确定删除此 Section 及其所有内容？')) return;
+                Editor.selectedSection.remove();
+                Editor.deselectAll();
+                Editor.scanContent();
+                Editor.renderStructureTree();
+            }
+        }
+
+        // ===== 图片管理 =====
+        
+        function selectImageFile(target) {
+            Project.currentImageTarget = target;
+            document.getElementById('globalImageInput').click();
+        }
+        
+        function handleImageSelect(input, target) {
+            if (!input.files || !input.files[0]) return;
+            processImageFile(input.files[0], target);
+        }
+        
+        function handleGlobalImageSelect(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const target = Project.currentImageTarget;
+            
+            if (target === 'header') {
+                processImageFile(file, 'header');
+            } else if (target && target.tagName === 'IMG') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64 = e.target.result;
+                    target.src = base64;
+                    Project.images.set(file.name, {
+                        name: file.name,
+                        data: base64,
+                        type: file.type,
+                        size: file.size
+                    });
+                    Editor.scanContent();
+                    if (Editor.selectedChild === target) {
+                        document.getElementById('imgSrc').value = base64.substring(0, 50) + '...';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function processImageFile(file, target) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                if (target === 'header') {
+                    document.getElementById('headerImage').src = base64;
+                }
+                Project.images.set(file.name, {
+                    name: file.name,
+                    data: base64,
+                    type: file.type,
+                    size: file.size
+                });
+                Editor.scanContent();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function changeImageFile() {
+            document.getElementById('globalImageInput').click();
+        }
+        
+        function convertImageToBase64() {
+            const el = Project.currentImageTarget;
+            if (!el) return;
+            if (el.src.startsWith('data:')) {
+                alert('已经是 Base64 格式');
+                return;
+            }
+            alert('外部图片需先下载再上传');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    Project.images.set(file.name, {
+                        name: file.name,
+                        data: evt.target.result,
+                        type: file.type,
+                        size: file.size
+                    });
+                    renderImageList();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function handleBulkImages(input) {
+            if (!input.files) return;
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    Project.images.set(file.name, {
+                        name: file.name,
+                        data: e.target.result,
+                        type: file.type,
+                        size: file.size
+                    });
+                    renderImageList();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function renderImageList() {
+            const container = document.getElementById('imageList');
+            if (Project.images.size === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 20px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">🖼️</div>
+                        <div style="font-size: 12px;">拖放图片到上方或点击选择</div>
+                    </div>`;
+                return;
+            }
+            container.innerHTML = Array.from(Project.images.values()).map(img => `
+                <div class="image-item">
+                    <img src="${img.data}" class="image-thumb">
+                    <div class="image-info">
+                        <div class="image-name">${img.name}</div>
+                        <div class="image-size">${formatSize(img.size)} · ${img.type.split('/')[1].toUpperCase()}</div>
+                    </div>
+                    <button class="d-btn small" onclick="useImage('${img.name}')">使用</button>
+                    <button class="d-btn small danger" onclick="deleteImage('${img.name}')">删除</button>
+                </div>
+            `).join('');
+        }
+        
+        function useImage(name) {
+            const img = Project.images.get(name);
+            if (!img) return;
+            
+            const section = Editor.getSelectedSection();
+            if (section) {
+                const el = document.createElement('img');
+                el.className = 'child-tag';
+                el.dataset.tagType = 'img';
+                el.dataset.isWord = 'false';
+                el.dataset.isMask = 'false';
+                el.src = img.data;
+                el.alt = name;
+                el.style.cssText = 'max-width: 100%; border-radius: 8px;';
+                section.appendChild(el);
+                Editor.scanContent();
+                Editor.renderStructureTree();
+                Editor.selectChild(el, section);
+            }
+        }
+        
+        function deleteImage(name) {
+            if (confirm(`删除图片 "${name}"？`)) {
+                Project.images.delete(name);
+                renderImageList();
+            }
+        }
+        
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+            return (bytes/(1024*1024)).toFixed(1) + ' MB';
+        }
+
+        // ===== 词典管理 =====
+        
+        function renderDictList() {
+            const container = document.getElementById('dictList');
+            const entries = Object.entries(Project.dict);
+            
+            if (entries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 20px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">📚</div>
+                        <div style="font-size: 12px;">暂无词汇，点击扫描</div>
+                    </div>`;
+                return;
+            }
+            
+            container.innerHTML = entries.map(([word, data]) => `
+                <div class="image-item" onclick="editDictEntry('${word}')" style="cursor: pointer;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--blue-glow); display: flex; align-items: center; justify-content: center; font-size: 16px;">🔤</div>
+                    <div class="image-info">
+                        <div class="image-name" style="color: var(--bottom-blue);">${word}</div>
+                        <div class="image-size">${data.ph || '[无音标]'} · ${data.zh || '[无释义]'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function scanWords() {
+            const words = document.querySelectorAll('.word');
+            let count = 0;
+            words.forEach(w => {
+                const raw = w.dataset.raw || w.textContent.trim().toLowerCase();
+                if (!Project.dict[raw]) {
+                    Project.dict[raw] = {ph: '', zh: '', eg: ''};
+                    count++;
+                }
+            });
+            renderDictList();
+            alert(`扫描完成，新增 ${count} 个词汇`);
+        }
+        
+        function editDictEntry(word) {
+            const data = Project.dict[word] || {ph: '', zh: '', eg: ''};
+            document.getElementById('editDictWord').value = word;
+            document.getElementById('editDictPhonetic').value = data.ph;
+            document.getElementById('editDictZh').value = data.zh;
+            document.getElementById('editDictEg').value = data.eg;
+            document.getElementById('dictEditor').style.display = 'block';
+            switchTab('dict');
+            document.querySelectorAll('.word').forEach(w => {
+                if ((w.dataset.raw || w.textContent.trim().toLowerCase()) === word) {
+                    w.style.background = 'var(--blue-glow)';
+                    setTimeout(() => w.style.background = '', 1000);
+                }
+            });
+        }
+        
+        function saveDictEntry() {
+            const word = document.getElementById('editDictWord').value;
+            Project.dict[word] = {
+                ph: document.getElementById('editDictPhonetic').value,
+                zh: document.getElementById('editDictZh').value,
+                eg: document.getElementById('editDictEg').value
+            };
+            renderDictList();
+            cancelDictEdit();
+        }
+        
+        function cancelDictEdit() {
+            document.getElementById('dictEditor').style.display = 'none';
+        }
+        
+        function addDictEntry() {
+            const word = prompt('输入新单词:');
+            if (word) {
+                const key = word.trim().toLowerCase();
+                if (!Project.dict[key]) {
+                    Project.dict[key] = {ph: '', zh: '', eg: ''};
+                }
+                editDictEntry(key);
+            }
+        }
+
+        // ===== UI 控制 =====
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.prop-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.prop-panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`panel-${tab}`).classList.add('active');
+        }
+        
+        function toggleTree(id) {
+            const el = document.getElementById(`tree-children-${id}`);
+            const toggle = document.querySelector(`[data-tree-id="${id}"] .tree-toggle`);
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                toggle.textContent = '▼';
+            } else {
+                el.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
+        
+        let currentMode = 'edit';
+        function toggleMode() {
+            const body = document.body;
+            const btn = document.getElementById('modeBtn');
+            const badge = document.getElementById('statusBadge');
+            const canvas = document.getElementById('canvasContent');
+            
+            if (currentMode === 'edit') {
+                currentMode = 'preview';
+                body.classList.add('preview-active');
+                canvas.classList.remove('edit-mode');
+                btn.textContent = '✏️ 编辑';
+                badge.textContent = 'PREVIEW';
+                Editor.deselectAll();
+            } else {
+                currentMode = 'edit';
+                body.classList.remove('preview-active');
+                canvas.classList.add('edit-mode');
+                btn.textContent = '👁️ 预览';
+                badge.textContent = 'EDIT MODE';
+            }
+        }
+        
+        function newProject() {
+            if (!confirm('新建项目将清空当前内容？')) return;
+            document.getElementById('editableRoot').innerHTML = '';
+            document.getElementById('headerImage').src = 'title.png';
+            Project.nextId = 1;
+            Project.init();
+            Editor.scanContent();
+            Editor.renderStructureTree();
+        }
+        
+        function updateProjectSettings() {
+            Project.htmlName = document.getElementById('htmlFilename').value;
+            Project.title = document.getElementById('pageTitle').value;
+            Project.weekNum = document.getElementById('weekNumber').value;
+            Project.updateUI();
+        }
+
+        // ===== 导出功能 =====
+        
+        function showExportModal() {
+            Project.updateExportPreview();
+            document.getElementById('exportModal').classList.add('show');
+        }
+        
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('show');
+        }
+        
+        function updateExportPreview() {
+            Project.updateExportPreview();
+        }
+        // ===== Supabase Storage 配置 =====
+//const SUPABASE_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co';
+//const STORAGE_BUCKET = '1'; // 或 '2'
+//const STORAGE_UPLOAD_URL = `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/`;
+
+/**
+ * 上传文本内容到 Supabase Storage
+ * @param {string} content - 文件内容
+ * @param {string} path - 存储路径（如 'exports/Week6.html'）
+ * @returns {Promise<string>} 返回文件的公开URL
+ */
+async function uploadTextToStorage(content, path) {
+    const blob = new Blob([content], { type: 'text/html' });
+    
+    const res = await fetch(STORAGE_UPLOAD_URL + path, {
+        method: 'PUT',
+        headers: {
+            'apikey': ANON_KEY,
+            'Authorization': `Bearer ${ANON_KEY}`,
+            'Content-Type': 'text/html',
+            'x-upsert': 'true'
+        },
+        body: blob
+    });
+    
+    if (!res.ok && res.status !== 200 && res.status !== 201) {
+        throw new Error(`上传失败: ${res.status} ${res.statusText}`);
+    }
+    
+    return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
+}
+
+ // 在 <head> 中引入辅助文件
+
+
+async function confirmExport() {
+    const embedImages = document.getElementById('exportEmbedImages').checked;
+    
+    // 手动克隆和清理（像文件1一样）
+    const clone = document.getElementById('canvasContent').cloneNode(true);
+    
+    // 手动清理，保留 .word 和 .mask-box
+    clone.querySelectorAll('.section-card').forEach(el => {
+        el.classList.remove('selected', 'dragging', 'drag-over-section');
+        el.removeAttribute('data-id');
+    });
+    clone.querySelectorAll('.child-tag').forEach(el => {
+        el.classList.remove('selected', 'dragging', 'drag-over-child', 'child-tag');
+        el.removeAttribute('data-tag-type');
+        el.removeAttribute('data-is-word');
+        el.removeAttribute('data-is-mask');
+        el.removeAttribute('data-raw-text');
+        el.removeAttribute('onclick');
+        // 注意：没有移除 word, mask-box, hidden！
+    });
+    clone.querySelectorAll('.drag-handle').forEach(el => el.remove());
+    clone.querySelectorAll('[data-editable]').forEach(el => el.removeAttribute('data-editable'));
+    clone.querySelectorAll('.image-upload-overlay').forEach(el => el.remove());
+    clone.querySelectorAll('.title-img-container').forEach(el => {
+        el.classList.remove('title-img-container');
+    });
+    
+    const cleanContent = clone; // 直接使用手动清理后的结果
+    
+    // 2. 获取配置
+    const weekNum = Project.weekNum;
+    const title = Project.title;
+    const htmlName = Project.htmlName;
+    const dictName = Project.dictName;
+    
+    // 3. 生成各部分
+    const css = ExportStyle.getCSS();
+    const js = ExportApp.getJS(weekNum);
+    
+    // 4. 生成词典数据
+    const dictJson = JSON.stringify(Project.dict, null, 2);
+    const dictScript = `const DICT = ${dictJson};`;
+    
+    // 5. 生成完整 HTML（传入 dictScript）
+    const htmlContent = ExportHTML.generate({
+        title: title,
+        weekNum: weekNum,
+        content: cleanContent,
+        dictScript: dictScript,  // 新增
+        styleCSS: css,
+        
+    });
+    
+    // 6. 生成词典文件内容（外部文件用）
+    const now = new Date().toLocaleString();
+    const dictFileContent = `// ${dictName}
+// 关联文件: ${htmlName}
+// 生成时间: ${now}
+
+${dictScript}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = DICT;
+}
+`;
+    
+    // 7. 保存
+    try {
+        const dbUrl = await uploadHTMLToDatabase(htmlName, htmlContent);
+        closeExportModal();
+        alert('已保存到数据库！\n\n查看链接：\n' + dbUrl + '\n\n文件名：' + htmlName);
+        
+        navigator.clipboard.writeText(dbUrl).catch(() => {});
+        
+        if (confirm('是否同时下载词典文件到本地？')) {
+            downloadFile(htmlContent, htmlName, 'text/html');
+            downloadFile(dictFileContent, dictName, 'text/javascript');
+        }
+    } catch (err) {
+        console.error('数据库保存失败:', err);
+        alert('数据库保存失败: ' + err.message + '\n\n改为本地下载');
+        downloadFile(htmlContent, htmlName, 'text/html');
+        closeExportModal();
+    }
+}
+
+
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], {type});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], {type});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = 0.9;
+            speechSynthesis.speak(utter);
+        }
+
+        // 辅助：获取周数
+        Date.prototype.getWeek = function() {
+            const d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+        };
+        
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            Project.init();
+            Editor.init();
+            
+            document.getElementById('dropZone').addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    document.getElementById('bulkImageInput').click();
+                }
+            });
+        });
+</script>
+</body>
+</html>
