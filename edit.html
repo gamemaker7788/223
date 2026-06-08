@@ -2475,31 +2475,9 @@ async function uploadTextToStorage(content, path) {
 async function confirmExport() {
     const embedImages = document.getElementById('exportEmbedImages').checked;
     
-    // 手动克隆和清理（像文件1一样）
+    // 1. 克隆并清理内容
     const clone = document.getElementById('canvasContent').cloneNode(true);
-    
-    // 手动清理，保留 .word 和 .mask-box
-    clone.querySelectorAll('.section-card').forEach(el => {
-        el.classList.remove('selected', 'dragging', 'drag-over-section');
-        el.removeAttribute('data-id');
-    });
-    clone.querySelectorAll('.child-tag').forEach(el => {
-        el.classList.remove('selected', 'dragging', 'drag-over-child', 'child-tag');
-        el.removeAttribute('data-tag-type');
-        el.removeAttribute('data-is-word');
-        el.removeAttribute('data-is-mask');
-        el.removeAttribute('data-raw-text');
-        el.removeAttribute('onclick');
-        // 注意：没有移除 word, mask-box, hidden！
-    });
-    clone.querySelectorAll('.drag-handle').forEach(el => el.remove());
-    clone.querySelectorAll('[data-editable]').forEach(el => el.removeAttribute('data-editable'));
-    clone.querySelectorAll('.image-upload-overlay').forEach(el => el.remove());
-    clone.querySelectorAll('.title-img-container').forEach(el => {
-        el.classList.remove('title-img-container');
-    });
-    
-    const cleanContent = clone; // 直接使用手动清理后的结果
+    const cleanContent = ExportHTML.cleanContent(clone);
     
     // 2. 获取配置
     const weekNum = Project.weekNum;
