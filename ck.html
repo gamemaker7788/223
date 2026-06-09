@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>查看导出内容</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+        #loading { padding: 20px; text-align: center; }
+        #error { padding: 20px; color: red; }
+    </style>
+</head>
+<body>
+    <div id="loading">加载中...</div>
+    <div id="error" style="display:none"></div>
+    <div id="content"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://jbcrkuwnlmdmwwmiimhr.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiY3JrdXdubG1kbXd3bWlpbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODcyNjUsImV4cCI6MjA4MDA2MzI2NX0.mK7o1xaVrV39J6_wahE_1iv_cacYUVrZJurKs_s2Wf0';
+        
+        async function loadContent() {
+            const params = new URLSearchParams(location.search);
+            const filename = params.get('file');
+            
+            if (!filename) {
+                showError('请提供 filename 参数');
+                return;
+            }
+            
+            try {
+                const res = await fetch(
+                    `${SUPABASE_URL}/rest/v1/html_exports?filename=eq.${encodeURIComponent(filename)}&select=content&order=created_at.desc&limit=1`,
+                    {
+                        headers: {
+                            'apikey': ANON_KEY,
+                            'Authorization': `Bearer ${ANON_KEY}`
+                        }
+                    }
+                );
+                
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                
+                const data = await res.json();
+                const html = data[0]?.content;
+                
+                if (!html) {
+                    showError('文件未找到: ' + filename);
+                    return;
+                }
+                
+                // 直接写入 HTML
+                document.open();
+                document.write(html);
+                document.close();
+                
+            } catch (err) {
+                showError('加载失败: ' + err.message);
+            }
+        }
+        
+        function showError(msg) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = msg;
+        }
+        
+        loadContent();
+    </script>
+</body>
+</html>
